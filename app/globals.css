@@ -1,26 +1,185 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@variant light (&:where(.light, .light *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-display), system-ui, sans-serif;
+  --font-serif: var(--font-serif), Georgia, serif;
+
+  --color-bg-base: #0a0807;
+  --color-bg-elev: #110e0c;
+  --color-fg-off: #f2ece1;
+  --color-fg-mute: #a89c8d;
+  --color-amber-theme: #ff8a3d;
+  --color-amber-deep: #c2410c;
+  --color-copper: #b87333;
+  --color-ember: #e8742c;
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-marquee-slow: marquee 80s linear infinite;
+  --animate-float: float 4s ease-in-out infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
   }
 }
 
+:root {
+  --bg-base: #0a0807;
+  --bg-elev: #110e0c;
+  --fg-off: #f2ece1;       /* off-white, warm paper */
+  --fg-mute: #a89c8d;      /* warm gray */
+  --amber: #ff8a3d;        /* warm orange */
+  --amber-deep: #c2410c;   /* burnt orange */
+  --copper: #b87333;       /* copper highlight */
+  --ember: #e8742c;        /* ember */
+
+  --background: 24 18% 4%;
+  --foreground: 36 30% 92%;
+  --card: 24 12% 6%;
+  --card-foreground: 36 30% 92%;
+  --popover: 24 12% 6%;
+  --popover-foreground: 36 30% 92%;
+  --primary: 36 30% 92%;
+  --primary-foreground: 24 18% 4%;
+  --secondary: 24 10% 10%;
+  --secondary-foreground: 36 30% 92%;
+  --muted: 24 10% 10%;
+  --muted-foreground: 32 14% 60%;
+  --accent: 22 80% 55%;
+  --accent-foreground: 24 18% 4%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 28 12% 14%;
+  --input: 28 12% 14%;
+  --ring: 22 80% 55%;
+  --radius: 0.5rem;
+
+  --font-inter: var(--font-sans);
+}
+
+.light {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 4%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 4%;
+  --primary: 0 0% 4%;
+  --primary-foreground: 0 0% 100%;
+  --muted-foreground: 0 0% 40%;
+  --border: 0 0% 88%;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+  background: #0a0807;
+  color: #f2ece1;
+  transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1), color 0.8s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.light body {
+  background: #fdfbf7;
+  color: #3a322b;
+}
+
+/* Cinematic warm grain */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.11;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E");
+}
+
+/* Atmospheric vignette */
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
+  transition: background 0.5s ease;
+}
+
+.light .vignette {
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(26,22,18,0.15) 100%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(232, 116, 44, 0.22);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(232, 116, 44, 0.5);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(120, 60, 20, 0.25);
+}
+
+/* Warm cinematic glow on giant text */
+.text-glow {
+  text-shadow:
+    0 0 40px rgba(255, 138, 61, 0.18),
+    0 0 100px rgba(232, 116, 44, 0.12),
+    0 0 200px rgba(184, 115, 51, 0.08);
+}
+
+.light .text-glow {
+  text-shadow: none;
+}
+
+/* Warm ember orb */
+.glow-orb {
+  background: radial-gradient(circle at center,
+    rgba(255, 138, 61, 0.45) 0%,
+    rgba(232, 116, 44, 0.22) 35%,
+    rgba(184, 115, 51, 0.08) 60%,
+    transparent 75%);
+  filter: blur(70px);
+}
+
+.light .glow-orb {
+  background: radial-gradient(circle at center,
+    rgba(220, 100, 30, 0.15) 0%,
+    rgba(180, 80, 20, 0.08) 35%,
+    transparent 70%);
+}
+
+/* Utilities for section reveals */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
 }
