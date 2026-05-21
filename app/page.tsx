@@ -769,12 +769,12 @@ export default function Home() {
                 {[
                   {
                     label: "Github",
-                    href: "https://github.com",
+                    href: "https://github.com/septilex",
                     icon: <Github className="h-4 w-4" />,
                   },
                   {
                     label: "LinkedIn",
-                    href: "https://linkedin.com",
+                    href: "https://www.linkedin.com/in/prajit-balaji-kalidindi-2b706a36a/",
                     icon: <Linkedin className="h-4 w-4" />,
                   },
                   {
