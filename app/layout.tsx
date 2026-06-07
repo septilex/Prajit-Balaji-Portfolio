@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk, Instrument_Serif, Montserrat } from "next/font/go
 import "./globals.css";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { CursorGlow } from "@/components/CursorGlow";
+import { CustomCursor } from "@/components/CustomCursor";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -69,6 +70,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased selection:bg-[rgb(var(--amber))] selection:text-[rgb(var(--bg))] min-h-screen">
         <SmoothScroll>
+          <CustomCursor />
           <CursorGlow />
           {children}
         </SmoothScroll>

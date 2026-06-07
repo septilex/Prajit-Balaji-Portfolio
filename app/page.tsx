@@ -544,6 +544,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 onMouseEnter={() => setHoveredProject(idx)}
                 onMouseLeave={() => setHoveredProject(null)}
+                data-cursor="EXPLORE"
                 className={`group relative grid grid-cols-12 items-center gap-4 py-10 md:py-14 transition-all duration-300 ${
                   hoveredProject !== null && hoveredProject !== idx ? "opacity-35 scale-[0.99]" : "opacity-100 scale-100"
                 }`}
@@ -769,6 +770,7 @@ export default function Home() {
                 </div>
                 <a
                   href="mailto:prajitk299@gmail.com"
+                  data-cursor="EMAIL"
                   className="font-display mt-2 block text-2xl tracking-tight hover:text-[#c9bcaa] md:text-3xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors"
                 >
                   prajitk299@gmail.com
@@ -798,6 +800,7 @@ export default function Home() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-cursor={social.label === "Github" ? "CODE" : social.label === "LinkedIn" ? "CONNECT" : "EMAIL"}
                     className="group flex items-center justify-between border-b border-[#3a2a1c]/55 dark:border-[#3a2a1c]/55 light:border-black/10 py-3 text-sm transition-colors hover:text-[#f2ece1] text-[#a89c8d]"
                   >
                     <span className="flex items-center gap-3 text-[#c9bcaa] group-hover:text-[#ff8a3d] transition-colors">
