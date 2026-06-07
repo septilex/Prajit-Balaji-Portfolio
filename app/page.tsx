@@ -172,6 +172,15 @@ export default function Home() {
       year: "2026",
       link: "https://devmentorr.vercel.app/",
     },
+    {
+      num: "/04",
+      title: "KADENCE",
+      cat: "Music · 3D Universe",
+      desc: "An immersive 3D floating music discovery universe.",
+      status: "Live",
+      year: "2026",
+      link: "https://kadence-musicz.vercel.app/",
+    },
   ];
 
   const timeline = [
