@@ -147,6 +147,15 @@ export default function Home() {
   const projects = [
     {
       num: "/01",
+      title: "KADENCE",
+      cat: "Music · 3D Universe",
+      desc: "An immersive 3D floating music discovery universe.",
+      status: "Live",
+      year: "2026",
+      link: "https://kadence-musicz.vercel.app/",
+    },
+    {
+      num: "/02",
       title: "DevScore",
       cat: "AI · Developer Analysis",
       desc: "AI-powered developer scoring and analysis platform.",
@@ -155,7 +164,7 @@ export default function Home() {
       link: "https://devscore-xi.vercel.app/",
     },
     {
-      num: "/02",
+      num: "/03",
       title: "VELARI",
       cat: "Futuristic UI · Creative Engine",
       desc: "Cinematic futuristic digital experience and premium interface project.",
@@ -164,22 +173,13 @@ export default function Home() {
       link: "https://velari-dusky.vercel.app/",
     },
     {
-      num: "/03",
+      num: "/04",
       title: "DevMentor",
       cat: "AI · Developer Guidance",
       desc: "AI-native mentorship and developer guidance platform.",
       status: "Live",
       year: "2026",
       link: "https://devmentorr.vercel.app/",
-    },
-    {
-      num: "/04",
-      title: "KADENCE",
-      cat: "Music · 3D Universe",
-      desc: "An immersive 3D floating music discovery universe.",
-      status: "Live",
-      year: "2026",
-      link: "https://kadence-musicz.vercel.app/",
     },
   ];
 
@@ -314,41 +314,39 @@ export default function Home() {
           </ScrollReveal>
 
           {/* ── MASSIVE HERO TITLE — full viewport width, no container constraint ── */}
-          <div className="flex flex-1 flex-col justify-center">
+          <div className="flex flex-1 flex-col justify-center items-center text-center w-full">
             <ScrollReveal initialTransform="translateY(80px)" delay={300}>
               <h1
-                className="font-display whitespace-nowrap font-bold text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
+                className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
                 style={{
-                  fontSize: "clamp(2rem, 14vw, 20rem)",
-                  lineHeight: "0.82",
-                  letterSpacing: "-0.05em",
-                  paddingLeft: "max(1.5rem, min(3rem, 6vw))",
+                  fontSize: "clamp(2rem, 14.5vw, 21rem)",
+                  lineHeight: "0.85",
+                  letterSpacing: "-0.06em",
                 }}
               >
                 PRAJIT BALAJI
               </h1>
             </ScrollReveal>
 
-            {/* Sub-info row — constrained to 1600px again */}
-            <div className="mx-auto mt-10 w-full max-w-[1600px] px-6 md:px-12 grid grid-cols-1 gap-10 md:grid-cols-12 md:items-end">
+            {/* Sub-info row — centered directly underneath */}
+            <div className="mt-12 flex flex-col items-center justify-center gap-6 px-6 md:px-12 w-full max-w-[1600px]">
               <ScrollReveal
                 initialTransform="translateY(30px)"
                 delay={500}
-                className="md:col-span-7"
               >
-                <p className="font-display text-2xl leading-tight tracking-tight md:text-4xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+                <p className="font-display text-2xl leading-tight tracking-tight md:text-4xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-center">
                   Full-Stack AI Engineer
                   <br />
                   <span className="text-[#ff8a3d]/85">AI Builder</span>
                   <br />
-                  <span className="text-[#a89c8d]">Creating futuristic digital experiences.</span>
+                  <span className="text-[#a89c8d] text-xl md:text-2xl mt-3 inline-block">Creating futuristic digital experiences.</span>
                 </p>
               </ScrollReveal>
 
               <ScrollReveal
                 initialTransform="translateY(30px)"
                 delay={600}
-                className="md:col-span-5 md:text-right text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70"
+                className="text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70 text-center mt-4"
               >
                 <div>Based in the cloud</div>
                 <div className="mt-1">Building the next decade</div>
@@ -820,7 +818,7 @@ export default function Home() {
 
           <div className="relative mx-auto max-w-[1600px] px-6 py-16 md:px-12">
             <ScrollReveal initialTransform="translateY(100px)">
-              <h3 className="font-display text-balance text-[clamp(3.5rem,12vw,12rem)] font-bold leading-[0.85] tracking-[-0.06em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow">
+              <h3 className="font-montserrat text-balance text-[clamp(3.5rem,12vw,12rem)] font-black leading-[0.85] tracking-[-0.06em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow">
                 PRAJIT BALAJI
               </h3>
             </ScrollReveal>
