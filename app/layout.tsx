@@ -6,13 +6,13 @@ import { CursorGlow } from "@/components/CursorGlow";
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--next-font-inter",
   display: "swap",
 });
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--next-font-display",
   display: "swap",
 });
 
@@ -20,14 +20,14 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
-  variable: "--font-serif",
+  variable: "--next-font-serif",
   display: "swap",
 });
 
 const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["700", "800", "900"],
-  variable: "--font-montserrat",
+  variable: "--next-font-montserrat",
   display: "swap",
 });
 

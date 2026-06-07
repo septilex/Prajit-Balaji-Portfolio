@@ -319,7 +319,7 @@ export default function Home() {
               <h1
                 className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
                 style={{
-                  fontSize: "clamp(2rem, 14.5vw, 21rem)",
+                  fontSize: "clamp(2rem, 12.5vw, 18rem)",
                   lineHeight: "0.85",
                   letterSpacing: "-0.06em",
                 }}
@@ -388,11 +388,14 @@ export default function Home() {
           <ScrollReveal initialTransform="translateY(80px)" className="md:col-span-3 md:col-start-10 md:pt-12">
             <div className="space-y-6 text-[15px] leading-relaxed text-[#c9bcaa] dark:text-[#c9bcaa] light:text-[#3a352f]">
               <p>
-                I design and engineer interfaces, intelligent backends, and AI-native products. My work lives at
-                the intersection of cinematic design and hard engineering.
+                I'm <strong className="font-semibold text-[#ff8a3d] font-medium">Prajit Balaji K</strong>, a 2nd-year B.Tech CSE (AI & Future Tech) student at <strong className="font-semibold text-[#ff8a3d] font-medium">SRM University – AP</strong>,
+                passionate about building modern, intelligent, and high-performance digital experiences.
               </p>
-              <p className="text-[#a89c8d]/70">
-                From neural pipelines to pixel-perfect motion, every system I build should feel inevitable.
+              <p>
+                I enjoy turning ideas into real-world products using full-stack development, AI tools, and clean, interactive design.
+              </p>
+              <p>
+                Outside of code, I explore new tech, create immersive UI/UX, and constantly challenge myself to build better.
               </p>
             </div>
           </ScrollReveal>
