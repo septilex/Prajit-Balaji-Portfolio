@@ -319,7 +319,7 @@ export default function Home() {
               <h1
                 className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
                 style={{
-                  fontSize: "clamp(2rem, 12.5vw, 21rem)",
+                  fontSize: "clamp(2rem, 14.5vw, 21rem)",
                   lineHeight: "0.85",
                   letterSpacing: "-0.06em",
                 }}
