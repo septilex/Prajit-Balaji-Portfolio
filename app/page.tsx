@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import {
   Sun,
   Moon,
@@ -148,38 +149,42 @@ export default function Home() {
     {
       num: "/01",
       title: "KADENCE",
-      cat: "Music · 3D Universe",
-      desc: "An immersive 3D floating music discovery universe.",
+      cat: "MUSIC • 3D UNIVERSE",
+      desc: "Step into a living, breathing 3D universe of music where every artist and album becomes a world to explore.",
       status: "Live",
       year: "2026",
       link: "https://kadence-musicz.vercel.app/",
+      image: "/kadence-preview.png",
     },
     {
       num: "/02",
-      title: "DevScore",
-      cat: "AI · Developer Analysis",
-      desc: "AI-powered developer scoring and analysis platform.",
-      status: "Live",
-      year: "2026",
-      link: "https://devscore-xi.vercel.app/",
-    },
-    {
-      num: "/03",
       title: "VELARI",
-      cat: "Futuristic UI · Creative Engine",
-      desc: "Cinematic futuristic digital experience and premium interface project.",
+      cat: "AI • GENERATIVE ART",
+      desc: "An AI canvas that turns your imagination into mesmerizing, gallery-worthy generative art in real time.",
       status: "Live",
       year: "2026",
       link: "https://velari-dusky.vercel.app/",
+      image: "/velari-preview.png",
     },
     {
-      num: "/04",
-      title: "DevMentor",
-      cat: "AI · Developer Guidance",
-      desc: "AI-native mentorship and developer guidance platform.",
+      num: "/03",
+      title: "DevMentor AI",
+      cat: "AI • ENGINEERING ASSISTANT",
+      desc: "An AI pair programmer that thinks like a senior engineer — auditing, architecting, and documenting your code at superhuman speed.",
       status: "Live",
       year: "2026",
       link: "https://devmentorr.vercel.app/",
+      image: "/devmentor-preview.png",
+    },
+    {
+      num: "/04",
+      title: "DevScore",
+      cat: "AI • DEVELOPER ANALYSIS",
+      desc: "The ultimate verdict on your code: scans your GitHub to reveal your true skill, growth, and developer DNA.",
+      status: "Live",
+      year: "2026",
+      link: "https://devscore-xi.vercel.app/",
+      image: "/devscore-preview.png",
     },
   ];
 
@@ -386,16 +391,18 @@ export default function Home() {
           </ScrollReveal>
 
           <ScrollReveal initialTransform="translateY(80px)" className="md:col-span-3 md:col-start-10 md:pt-12">
-            <div className="space-y-6 text-[15px] leading-relaxed text-[#c9bcaa] dark:text-[#c9bcaa] light:text-[#3a352f]">
-              <p>
-                I'm <strong className="font-semibold text-[#ff8a3d] font-medium">Prajit Balaji K</strong>, a 2nd-year B.Tech CSE (AI & Future Tech) student at <strong className="font-semibold text-[#ff8a3d] font-medium">SRM University – AP</strong>,
-                passionate about building modern, intelligent, and high-performance digital experiences.
+            <div className="space-y-8 text-base md:text-[17px] leading-[1.85] tracking-[0.01em] text-[#c9bcaa] dark:text-[#c9bcaa] light:text-[#4a423a]">
+              <p className="text-lg md:text-[19px] leading-[1.6] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#2a2420]">
+                I'm <strong className="font-extrabold text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-xl md:text-2xl tracking-tight">Prajit Balaji K</strong>, a 2nd-year B.Tech CSE (AI & Future Technologies) student at <span className="font-medium text-[#ff8a3d]">SRM University – AP</span>.
               </p>
               <p>
-                I enjoy turning ideas into real-world products using full-stack development, AI tools, and clean, interactive design.
+                I love building AI products and am genuinely passionate about <span className="font-medium text-[#ff8a3d]">Generative AI</span> and <span className="font-medium text-[#ff8a3d]">LLMs</span> — exploring how they work, experimenting with them, and using them to create modern, intelligent, and high-performance digital experiences.
               </p>
               <p>
-                Outside of code, I explore new tech, create immersive UI/UX, and constantly challenge myself to build better.
+                I enjoy turning ideas into real-world products through <span className="font-medium text-[#ff8a3d]">full-stack development</span>, AI tools, and clean, interactive design.
+              </p>
+              <p>
+                Outside of code, I explore new tech, build immersive UI/UX, and constantly push myself to learn and build better.
               </p>
             </div>
           </ScrollReveal>
@@ -531,12 +538,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="divide-y divide-[#3a2a1c]/55 border-y border-[#3a2a1c]/55 dark:divide-[#3a2a1c]/55 light:divide-black/10 light:border-black/10">
+        <div className="mt-20 flex flex-col gap-y-40 md:gap-y-64">
           {projects.map((project, idx) => (
             <ScrollReveal
               key={project.title}
-              initialTransform="translateY(40px)"
-              delay={idx * 100}
+              initialTransform="translateY(80px)"
+              delay={0}
             >
               <a
                 href={project.link}
@@ -545,47 +552,88 @@ export default function Home() {
                 onMouseEnter={() => setHoveredProject(idx)}
                 onMouseLeave={() => setHoveredProject(null)}
                 data-cursor="EXPLORE"
-                className={`group relative grid grid-cols-12 items-center gap-4 py-10 md:py-14 transition-all duration-300 ${
-                  hoveredProject !== null && hoveredProject !== idx ? "opacity-35 scale-[0.99]" : "opacity-100 scale-100"
+                className={`group block w-full transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  hoveredProject !== null && hoveredProject !== idx ? "opacity-25 blur-[3px] scale-[0.97]" : "opacity-100 scale-100"
                 }`}
               >
-                <div className="col-span-2 text-[11px] uppercase tracking-[0.3em] text-[#a89c8d]/70 md:col-span-1">
-                  {project.num}
-                </div>
-                <div className="col-span-10 md:col-span-5">
-                  <h3 className="font-display text-4xl font-medium tracking-tight transition-colors group-hover:text-[#ff8a3d] md:text-7xl">
-                    {project.title}
-                  </h3>
-                  <div className="mt-3 text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70">
-                    {project.cat}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-14 items-center">
+                  
+                  {/* Left Column: Number & Title */}
+                  <div className="order-1 lg:order-none lg:col-span-4 flex flex-col justify-center relative z-20 pr-0 lg:pr-4">
+                    <div className="flex lg:flex-col items-baseline lg:items-start gap-3 lg:gap-6">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-[#a89c8d]/60">
+                        {project.num}
+                      </span>
+                      <h3 className="font-display text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-[3.5rem] leading-[0.9] font-black tracking-[-0.04em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] break-words uppercase">
+                        {project.title}
+                      </h3>
+                    </div>
                   </div>
-                </div>
-                <div className="col-span-8 hidden text-sm text-[#a89c8d] md:col-span-3 md:block">
-                  {project.desc}
-                </div>
-                <div className="col-span-3 hidden md:col-span-2 md:block">
-                  <span
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${
-                      project.status === "Live"
-                        ? "border-[#3a2a1c]/70 bg-[#1a120c]/50 text-[#ff8a3d] dark:border-[#3a2a1c]/70 dark:bg-[#1a120c]/50"
-                        : "border-[#3a2a1c]/70 bg-[#1a120c]/50 text-[#a89c8d] dark:border-[#3a2a1c]/70 dark:bg-[#1a120c]/50"
-                    }`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        project.status === "Live"
-                          ? "bg-[#ff8a3d] shadow-[0_0_10px_rgba(255,138,61,0.7)] animate-pulse"
-                          : "bg-[#a89c8d]/60"
-                      }`}
-                    ></span>
-                    {project.status}
-                  </span>
-                  <div className="mt-2 text-[11px] tracking-[0.2em] text-[#a89c8d]/70">
-                    {project.year}
+
+                  {/* Center Column: Large Image Showcase */}
+                  <div className="order-2 lg:order-none lg:col-span-5 w-full relative z-10">
+                    <div className="relative w-full rounded-2xl md:rounded-[36px] border border-white/[0.04] bg-gradient-to-br from-[#1a120c]/40 to-[#0a0807]/80 p-2 md:p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-4 group-hover:shadow-[0_40px_100px_-20px_rgba(255,138,61,0.25)] group-hover:border-[#ff8a3d]/20 dark:border-white/[0.04] dark:from-[#1a120c]/40 dark:to-[#0a0807]/80 light:from-white/80 light:to-white/90 light:border-black/[0.05] light:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] light:group-hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.15)] light:group-hover:border-[#ff8a3d]/30">
+                      {/* Browser Top Bar */}
+                      <div className="flex items-center justify-between px-3 pb-3 pt-2 md:px-5 md:pb-5 md:pt-4">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2.5 w-2.5 rounded-full bg-white/20 light:bg-black/15 transition-all duration-300 group-hover:bg-[#ff5f56] group-hover:shadow-[0_0_10px_rgba(255,95,86,0.8)]"></div>
+                          <div className="h-2.5 w-2.5 rounded-full bg-white/20 light:bg-black/15 transition-all duration-300 group-hover:bg-[#ffbd2e] group-hover:shadow-[0_0_10px_rgba(255,189,46,0.8)]"></div>
+                          <div className="h-2.5 w-2.5 rounded-full bg-white/20 light:bg-black/15 transition-all duration-300 group-hover:bg-[#27c93f] group-hover:shadow-[0_0_10px_rgba(39,201,63,0.8)]"></div>
+                        </div>
+                        <div className="text-[10px] uppercase tracking-[0.25em] text-[#a89c8d]/40 font-semibold group-hover:text-[#a89c8d]/80 transition-colors duration-500">
+                          {project.cat}
+                        </div>
+                      </div>
+                      
+                      {/* Screenshot Container */}
+                      <div className="relative overflow-hidden rounded-xl md:rounded-[24px] border border-white/5 light:border-black/5 bg-[#0a0807] light:bg-[#fdfbf7]">
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#ff8a3d]/20 to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-[800ms] z-10 pointer-events-none mix-blend-overlay"></div>
+                        <Image 
+                          src={project.image} 
+                          alt={`${project.title} Preview`}
+                          width={1600}
+                          height={1000}
+                          className="w-full h-auto object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05] aspect-[16/10]"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="col-span-1 hidden justify-end md:flex">
-                  <ArrowUpRight className="h-6 w-6 text-[#a89c8d]/55 transition-all group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-[#ff8a3d]" />
+
+                  {/* Right Column: Description, Status, Link */}
+                  <div className="order-3 lg:order-none lg:col-span-3 flex flex-col justify-center h-full lg:pt-10 xl:pt-20">
+                    <p className="text-[15px] md:text-[17px] leading-[1.8] tracking-tight text-[#a89c8d] dark:text-[#a89c8d] light:text-[#5a5046] mb-10 font-medium">
+                      {project.desc}
+                    </p>
+
+                    <div className="flex items-center justify-between border-t border-white/[0.06] pt-6 dark:border-white/[0.06] light:border-black/[0.06]">
+                      <div className="flex flex-col gap-2">
+                        <span
+                          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] w-max font-bold transition-colors duration-500 ${
+                            project.status === "Live"
+                              ? "border-[#ff8a3d]/30 bg-[#ff8a3d]/10 text-[#ff8a3d] group-hover:border-[#ff8a3d]/50 group-hover:bg-[#ff8a3d]/20"
+                              : "border-white/10 bg-white/5 text-[#a89c8d]"
+                          }`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              project.status === "Live"
+                                ? "bg-[#ff8a3d] shadow-[0_0_12px_rgba(255,138,61,0.9)] animate-pulse"
+                                : "bg-[#a89c8d]/60"
+                            }`}
+                          ></span>
+                          {project.status}
+                        </span>
+                        <span className="text-[11px] font-semibold tracking-[0.3em] text-[#a89c8d]/40 pl-1 mt-1">
+                          {project.year}
+                        </span>
+                      </div>
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all duration-[500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:border-[#ff8a3d]/50 group-hover:bg-[#ff8a3d] group-hover:text-black group-hover:scale-110 group-hover:shadow-[0_10px_30px_rgba(255,138,61,0.3)] text-[#f2ece1] dark:border-white/10 dark:bg-white/5 light:border-black/10 light:bg-black/5 light:text-black">
+                        <ArrowUpRight className="h-6 w-6" />
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </a>
             </ScrollReveal>
