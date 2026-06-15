@@ -34,7 +34,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("light");
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [hoveredPillar, setHoveredPillar] = useState<number | null>(null);
   const [formState, setFormState] = useState<"idle" | "loading" | "success">("idle");
   const [activeSection, setActiveSection] = useState<string>("hero");
 
@@ -106,32 +106,31 @@ export default function Home() {
     );
   }
 
-  const techStack = [
-    "React",
-    "Next.js",
-    "TailwindCSS",
-    "Framer Motion",
-    "TypeScript",
-    "OpenAI API",
-    "Gemini",
-    "AI Workflows",
-    "Prompt Engineering",
-    "AI Integrations",
-    "Node.js",
-    "Express",
-    "Firebase",
-    "MongoDB",
-    "APIs",
-    "Vercel",
-    "GitHub",
-    "Cloud Hosting",
-  ];
-
-  const stackCards = [
-    { title: "Frontend", num: "01", bg: "bg-[#c2410c]/15" },
-    { title: "Backend", num: "02", bg: "bg-[#c2410c]/15" },
-    { title: "AI & Tools", num: "03", bg: "bg-[#c2410c]/15" },
-    { title: "Deployment", num: "04", bg: "bg-[#c2410c]/15" },
+  const buildPillars = [
+    {
+      num: "01",
+      title: "AI Products",
+      desc: "Built DevMentor AI and KADENCE — applying LLMs, agents, and intelligent workflows to real products.",
+      image: "/kadence-preview.png",
+    },
+    {
+      num: "02",
+      title: "Creative Technology",
+      desc: "Created VELARI, combining generative AI, interaction design, and immersive digital experiences.",
+      image: "/velari-preview.png",
+    },
+    {
+      num: "03",
+      title: "Developer Platforms",
+      desc: "Built products focused on developer growth, mentorship, analysis, and productivity.",
+      image: "/devscore-preview.png",
+    },
+    {
+      num: "04",
+      title: "Full-Stack Systems",
+      desc: "Engineering complete products from frontend experiences to backend infrastructure and deployment.",
+      image: "/devmentor-preview.png",
+    }
   ];
 
   const capabilities = [
@@ -409,75 +408,116 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 2: Tech Stack */}
-      <section id="stack" className="relative py-32 md:py-48">
-        <div className="mx-auto max-w-[1600px] px-6 md:px-12">
+      {/* Section 2: Technology Arsenal */}
+      <section id="stack" className="relative mx-auto max-w-[1600px] pt-32 pb-24 md:pt-48 md:pb-32 overflow-hidden">
+        <div className="px-6 md:px-12">
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70">
             <span>02</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-            <span>Tech Stack</span>
+            <span>Technology Arsenal</span>
           </div>
           <ScrollReveal initialTransform="translateY(40px)">
-            <h2 className="font-display max-w-5xl text-[clamp(2rem,5vw,5rem)] font-semibold leading-[0.95] tracking-tight">
+            <h2 className="font-display max-w-5xl text-[clamp(2.5rem,6vw,6.5rem)] font-bold leading-[0.95] tracking-tight mb-20 md:mb-32">
               A modern arsenal for <span className="text-[#a89c8d]/70">building at the edge.</span>
             </h2>
           </ScrollReveal>
         </div>
 
         {/* Marquees */}
-        <div className="mt-20 overflow-hidden select-none">
-          {/* Marquee 1: Leftward */}
-          <div className="flex w-max animate-marquee gap-4 whitespace-nowrap">
-            {[...techStack, ...techStack].map((tech, i) => (
-              <span
-                key={`marquee-1-${i}`}
-                className="font-display inline-flex items-center gap-3 rounded-full border border-[#3a2a1c]/55 bg-[#1a120c]/40 px-7 py-3 text-2xl font-medium tracking-tight text-[#f2ece1]/80 backdrop-blur-sm hover:bg-[#2a1810]/70 hover:border-[#ff8a3d]/30 transition-colors dark:border-[#3a2a1c]/55 dark:bg-[#1a120c]/40 light:bg-white/40 light:border-black/10 light:text-[#1a1612]/80"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#ff8a3d]/80"></span>
-                {tech}
-              </span>
-            ))}
-          </div>
+        <ScrollReveal initialTransform="translateY(40px)" delay={200}>
+          <div className="flex flex-col gap-6 select-none mt-10 w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+            {/* Row 1 */}
+            <div className="flex w-max animate-marquee gap-4 md:gap-6 whitespace-nowrap hover:[animation-play-state:paused] cursor-none">
+              {[...["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"], ...["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"], ...["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"]].map((tech, i) => (
+                <span
+                  key={`m1-${i}`}
+                  data-cursor=""
+                  className="inline-flex items-center px-7 py-4 rounded-full border border-white/10 bg-white/[0.02] text-[15px] md:text-[17px] font-semibold tracking-tight text-[#f2ece1] transition-all duration-500 ease-out hover:bg-[#ff8a3d]/10 hover:border-[#ff8a3d]/50 hover:text-[#ff8a3d] hover:scale-105 hover:shadow-[0_20px_40px_-15px_rgba(255,138,61,0.2)] dark:border-white/10 dark:bg-white/[0.02] dark:text-[#f2ece1] dark:hover:bg-[#ff8a3d]/10 dark:hover:border-[#ff8a3d]/50 light:border-black/10 light:bg-black/[0.02] light:text-[#1a1612] light:hover:bg-[#ff8a3d]/10 light:hover:border-[#ff8a3d]/50 cursor-none"
+                >
+                  {["OpenAI", "LLMs", "RAG", "AI Agents", "Prompt Engineering", "AI Workflows"].includes(tech) && (
+                    <span className="w-2 h-2 rounded-full bg-[#ff8a3d] mr-3 shadow-[0_0_12px_rgba(255,138,61,0.6)]"></span>
+                  )}
+                  {tech}
+                </span>
+              ))}
+            </div>
 
-          {/* Marquee 2: Rightward (Slow) */}
-          <div className="mt-6 flex w-max animate-marquee-slow gap-4 whitespace-nowrap" style={{ animationDirection: "reverse" }}>
-            {[...techStack, ...techStack].map((tech, i) => (
-              <span
-                key={`marquee-2-${i}`}
-                className="font-display inline-flex items-center gap-3 rounded-full border border-[#3a2a1c]/55 bg-[#1a120c]/40 px-6 py-2.5 text-xl font-medium tracking-tight text-[#a89c8d] backdrop-blur-sm hover:bg-[#2a1810]/70 hover:border-[#ff8a3d]/30 transition-colors dark:border-[#3a2a1c]/55 dark:bg-[#1a120c]/40 light:bg-white/40 light:border-black/10 light:text-[#1a1612]/60"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#ff8a3d]/40"></span>
-                {tech}
-              </span>
-            ))}
+            {/* Row 2 */}
+            <div className="flex w-max animate-marquee-slow gap-4 md:gap-6 whitespace-nowrap hover:[animation-play-state:paused] cursor-none" style={{ animationDirection: "reverse" }}>
+              {[...["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"], ...["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"], ...["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"]].map((tech, i) => (
+                <span
+                  key={`m2-${i}`}
+                  data-cursor=""
+                  className="inline-flex items-center px-7 py-4 rounded-full border border-white/10 bg-white/[0.02] text-[15px] md:text-[17px] font-semibold tracking-tight text-[#a89c8d] transition-all duration-500 ease-out hover:bg-[#ff8a3d]/10 hover:border-[#ff8a3d]/50 hover:text-[#ff8a3d] hover:scale-105 hover:shadow-[0_20px_40px_-15px_rgba(255,138,61,0.2)] dark:border-white/10 dark:bg-white/[0.02] dark:text-[#a89c8d] dark:hover:bg-[#ff8a3d]/10 dark:hover:border-[#ff8a3d]/50 light:border-black/10 light:bg-black/[0.02] light:text-[#5a5046] light:hover:bg-[#ff8a3d]/10 light:hover:border-[#ff8a3d]/50 light:hover:text-[#ff8a3d] cursor-none"
+                >
+                  {["OpenAI", "LLMs", "RAG", "AI Agents", "Prompt Engineering", "AI Workflows"].includes(tech) && (
+                    <span className="w-2 h-2 rounded-full bg-[#ff8a3d] mr-3 shadow-[0_0_12px_rgba(255,138,61,0.6)] animate-pulse"></span>
+                  )}
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
+      </section>
 
-        {/* Stack Category Cards */}
-        <div className="mx-auto mt-24 grid max-w-[1600px] grid-cols-2 gap-4 px-6 md:grid-cols-4 md:px-12">
-          {stackCards.map((card, idx) => (
-            <ScrollReveal
-              key={card.title}
-              initialTransform="translateY(40px)"
-              delay={idx * 100}
-            >
+      {/* Section 3: What I Build */}
+      <section className="relative pb-32 md:pb-48 pt-10">
+        <div className="mx-auto max-w-[1600px] px-6 md:px-12">
+          <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70">
+            <span>03</span>
+            <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
+            <span>What I Build</span>
+          </div>
+          <ScrollReveal initialTransform="translateY(40px)">
+            <h2 className="font-display max-w-5xl text-[clamp(2.5rem,6vw,7rem)] font-bold leading-[0.9] tracking-tight">
+              A manifesto of <span className="text-[#a89c8d]/70">product engineering.</span>
+            </h2>
+          </ScrollReveal>
+
+          {/* Border-Grid Narrative Pillars */}
+          <div className="mt-20 md:mt-32 grid grid-cols-1 md:grid-cols-2 border-t border-l border-white/10 dark:border-white/10 light:border-black/10">
+            {buildPillars.map((pillar, idx) => (
               <div
-                onMouseEnter={() => setHoveredCard(idx)}
-                onMouseLeave={() => setHoveredCard(null)}
-                className={`group relative overflow-hidden rounded-2xl border border-[#3a2a1c]/55 bg-gradient-to-b from-white/[0.04] to-transparent p-6 backdrop-blur-sm transition-all duration-300 dark:border-[#3a2a1c]/55 light:border-black/10 light:from-black/[0.02] ${
-                  hoveredCard !== null && hoveredCard !== idx ? "opacity-55 scale-[0.98]" : "opacity-100 scale-100"
+                key={pillar.title}
+                onMouseEnter={() => setHoveredPillar(idx)}
+                onMouseLeave={() => setHoveredPillar(null)}
+                className={`group relative flex flex-col justify-between overflow-hidden border-b border-r border-white/10 dark:border-white/10 light:border-black/10 p-8 sm:p-12 md:p-16 xl:p-20 min-h-[380px] md:min-h-[460px] transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  hoveredPillar !== null && hoveredPillar !== idx ? "bg-black/20 light:bg-black/5 opacity-40 blur-[2px]" : "bg-transparent opacity-100"
                 }`}
               >
-                <div className="text-[10px] uppercase tracking-[0.25em] text-[#a89c8d]/70">
-                  {card.num}
+                {/* Number Background */}
+                <div className="absolute -bottom-10 -right-4 font-display text-[12rem] xl:text-[18rem] font-black leading-none text-white/[0.02] transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-x-6 group-hover:-translate-y-4 group-hover:text-[#ff8a3d]/[0.04] pointer-events-none select-none dark:text-white/[0.02] light:text-black/[0.03]">
+                  {pillar.num}
                 </div>
-                <div className="mt-12 font-display text-2xl font-medium tracking-tight md:text-3xl transition-colors group-hover:text-white dark:group-hover:text-white light:group-hover:text-black">
-                  {card.title}
+
+                {/* Content */}
+                <div className="relative z-10 max-w-sm xl:max-w-md">
+                  <h3 className="font-display text-4xl sm:text-5xl lg:text-5xl xl:text-[3.8rem] font-black tracking-[-0.04em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] uppercase leading-[0.9]">
+                    {pillar.title}
+                  </h3>
                 </div>
-                <div className="absolute -bottom-12 -right-12 h-32 w-32 rounded-full bg-[#c2410c]/15 blur-2xl transition-all duration-500 group-hover:bg-[#ff8a3d]/35"></div>
+                
+                <div className="relative z-10 mt-16 md:mt-32 max-w-[280px] xl:max-w-sm">
+                  <p className="text-[15px] xl:text-[17px] leading-[1.7] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#5a5046] font-medium transition-colors duration-500 group-hover:text-[#c9bcaa]">
+                    {pillar.desc}
+                  </p>
+                </div>
+
+                {/* Subtly Revealed Project Image (Visible on Desktop) */}
+                <div className="absolute top-12 right-12 w-48 xl:w-72 aspect-[16/10] rounded-[16px] overflow-hidden border border-white/[0.06] opacity-0 translate-y-6 scale-95 transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] pointer-events-none z-20 hidden lg:block dark:border-white/[0.06] light:border-black/10">
+                  <div className="absolute inset-0 bg-[#ff8a3d]/10 mix-blend-overlay z-10 pointer-events-none"></div>
+                  <Image
+                    src={pillar.image}
+                    alt={pillar.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 300px"
+                  />
+                </div>
               </div>
-            </ScrollReveal>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
