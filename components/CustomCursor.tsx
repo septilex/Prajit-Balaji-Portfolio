@@ -73,8 +73,8 @@ export function CustomCursor() {
     <motion.div
       className="pointer-events-none fixed top-0 left-0 z-[9999] flex items-center justify-center rounded-full will-change-transform"
       style={{
-        x: cursorX,
-        y: cursorY,
+        x: mouseX,
+        y: mouseY,
         translateX: "-50%",
         translateY: "-50%",
       }}
