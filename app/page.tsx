@@ -16,6 +16,7 @@ import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { BackgroundTypography } from "@/components/BackgroundTypography";
 import { StatsMarquee } from "@/components/StatsMarquee";
+import { Credentials } from "@/components/Credentials";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -472,7 +473,7 @@ export default function Home() {
                   {tech}
                 </span>
               ))}
-            </div>
+          </div>
           </div>
         </ScrollReveal>
       </section>
@@ -537,10 +538,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 3: Capabilities */}
+      {/* Section 4: Capabilities */}
       <section className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70">
-          <span>03</span>
+          <span>04</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
           <span>Capabilities</span>
         </div>
@@ -575,10 +576,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 4: Selected Work */}
+      {/* Section 5: Selected Work */}
       <section id="projects" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70">
-          <span>04</span>
+          <span>05</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
           <span>Selected Work</span>
         </div>
@@ -697,10 +698,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 5: Journey */}
+      {/* Section 6: Credentials */}
+      <Credentials />
+
+      {/* Section 7: Journey */}
       <section id="journey" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70">
-          <span>05</span>
+          <span>07</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
           <span>Journey</span>
         </div>
@@ -772,11 +776,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 6: Contact */}
+      {/* Section 8: Contact */}
       <section id="contact" className="relative overflow-hidden">
         <div className="mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70">
-            <span>06</span>
+            <span>08</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
             <span>Contact</span>
           </div>
