@@ -17,6 +17,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { BackgroundTypography } from "@/components/BackgroundTypography";
 import { StatsMarquee } from "@/components/StatsMarquee";
 import { Credentials } from "@/components/Credentials";
+import { TypewriterTitle } from "@/components/TypewriterTitle";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -359,7 +360,7 @@ export default function Home() {
                 <p className="font-display text-2xl leading-tight tracking-tight md:text-4xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-center">
                   Full-Stack AI Engineer
                   <br />
-                  <span className="text-[#ff8a3d]/85">AI Builder</span>
+                  <TypewriterTitle />
                   <br />
                   <span className="text-[#a89c8d] text-xl md:text-2xl mt-3 inline-block">Creating futuristic digital experiences.</span>
                 </p>
