@@ -73,7 +73,7 @@ function ParallaxText({
   return (
     <div className="flex flex-nowrap overflow-hidden whitespace-nowrap leading-[0.8] m-0 py-2">
       <motion.div
-        className="flex whitespace-nowrap text-nowrap flex-nowrap uppercase font-display font-black tracking-[-0.04em]"
+        className="flex whitespace-nowrap text-nowrap flex-nowrap uppercase font-display font-black tracking-[-0.04em] will-change-transform"
         style={{ x }}
       >
         {[...Array(4)].map((_, i) => (

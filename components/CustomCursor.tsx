@@ -83,16 +83,15 @@ export function CustomCursor() {
         height: isHovering ? 72 : isPointer ? 8 : 10,
         backgroundColor: isHovering ? "rgba(255, 138, 61, 0.03)" : "rgba(255, 138, 61, 1)",
         border: isHovering ? "1px solid rgba(255, 138, 61, 0.4)" : "0px solid rgba(255, 138, 61, 0)",
-        backdropFilter: isHovering ? "blur(4px)" : "blur(0px)",
       }}
       transition={{ type: "spring", stiffness: 400, damping: 28 }}
     >
       {/* Subtle glow layer (only visible when not hovering a label to prevent blobbiness) */}
       <motion.div 
-        className="absolute inset-0 rounded-full bg-[#ff8a3d] mix-blend-screen pointer-events-none"
+        className="absolute inset-0 rounded-full bg-transparent mix-blend-screen pointer-events-none"
         animate={{
-          opacity: isHovering ? 0 : 0.6,
-          filter: isHovering ? "blur(0px)" : "blur(4px)",
+          opacity: isHovering ? 0 : 1,
+          boxShadow: isHovering ? "none" : "0 0 12px 4px rgba(255, 138, 61, 0.4)",
           scale: isHovering ? 1 : 1.5,
         }}
         transition={{ duration: 0.2 }}
