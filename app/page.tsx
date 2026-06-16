@@ -196,12 +196,16 @@ export default function Home() {
       role: "Amazon Internship Goal",
       desc: "Aiming to enter large-scale engineering environments as a Java-focused developer while strengthening backend systems, scalability, and software engineering foundations through real-world experience.",
       side: "left",
+      logoSrc: "/logos/amazon.png",
+      logoClass: "scale-[1.6]",
     },
     {
       year: "2032",
       role: "Aspiring Data Scientist at Google",
       desc: "Working toward contributing to intelligent systems, machine learning infrastructure, and large-scale data-driven technologies while expanding expertise in AI research, analytics, and generative systems.",
       side: "right",
+      logoSrc: "/logos/google.png",
+      logoClass: "scale-[1.6]",
     },
     {
       year: "2037",
@@ -734,10 +738,17 @@ export default function Home() {
                   node.side === "left" ? "md:text-right" : "md:hidden"
                 }`}
               >
-                <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
-                  {node.year}
+                <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 ${node.side === "left" ? "md:justify-end" : ""}`}>
+                  {node.side === "left" && node.logoSrc && (
+                    <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
+                      <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
+                    </div>
+                  )}
+                  <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
+                    {node.year}
+                  </div>
                 </div>
-                <div className="mt-3 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
+                <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
                   {node.role}
                 </div>
                 <p className="mt-2 text-sm text-[#a89c8d]/70">
@@ -759,10 +770,17 @@ export default function Home() {
               >
                 {node.side === "right" && (
                   <>
-                    <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
-                      {node.year}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
+                      <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
+                        {node.year}
+                      </div>
+                      {node.logoSrc && (
+                        <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
+                          <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
+                        </div>
+                      )}
                     </div>
-                    <div className="mt-3 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
+                    <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
                       {node.role}
                     </div>
                     <p className="mt-2 text-sm text-[#a89c8d]/70">
