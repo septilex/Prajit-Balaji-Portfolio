@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { BackgroundTypography } from "@/components/BackgroundTypography";
+import { StatsMarquee } from "@/components/StatsMarquee";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -289,6 +291,17 @@ export default function Home() {
 
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen w-full overflow-hidden">
+        {/* Background Typography */}
+        <BackgroundTypography 
+           rows={[
+            "PRAJIT BALAJI • CREATIVE ENGINEER •",
+            "ARTIFICIAL INTELLIGENCE • NEXT.JS • REACT •",
+            "SYSTEM ARCHITECTURE • UI/UX PRO MAX •",
+            "BUILDING THE FUTURE • SCALING SYSTEMS •"
+           ]} 
+           opacity={0.06}
+        />
+
         {/* Background */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_50%,rgba(40,18,8,0.9),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_70%_50%,rgba(40,18,8,0.9),transparent_60%)] light:bg-[radial-gradient(ellipse_at_70%_50%,rgba(255,240,225,0.4),transparent_60%)]"></div>
@@ -407,6 +420,9 @@ export default function Home() {
           </ScrollReveal>
         </div>
       </section>
+
+      {/* Stats Marquee Strip */}
+      <StatsMarquee />
 
       {/* Section 2: Technology Arsenal */}
       <section id="stack" className="relative mx-auto max-w-[1600px] pt-32 pb-24 md:pt-48 md:pb-32 overflow-hidden">
