@@ -36,7 +36,6 @@ const Linkedin = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
   const [hoveredPillar, setHoveredPillar] = useState<number | null>(null);
   const [formState, setFormState] = useState<"idle" | "loading" | "success">("idle");
@@ -49,9 +48,6 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    // Get initial theme
-    const isLight = document.documentElement.classList.contains("light");
-    setTheme(isLight ? "light" : "dark");
 
     // Scroll spy logic to highlight active link
     const sections = ["hero", "projects", "about", "stack", "journey", "contact"];
@@ -74,19 +70,7 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScrollSpy);
   }, []);
 
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    if (nextTheme === "light") {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.classList.remove("light");
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  };
+
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -280,17 +264,7 @@ export default function Home() {
           </ul>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              aria-label="toggle theme"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#3a2a1c]/70 bg-[#1a120c]/60 transition-colors hover:bg-[#2a1a10]/80 hover:border-[#ff8a3d]/40 dark:border-[#3a2a1c]/70 dark:bg-[#1a120c]/60 light:bg-[#f5efe6] light:border-black/10"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-3.5 w-3.5 text-[#ff8a3d]" aria-hidden="true" />
-              ) : (
-                <Moon className="h-3.5 w-3.5 text-[#ff8a3d]" aria-hidden="true" />
-              )}
-            </button>
+            {/* Theme toggle removed */}
           </div>
         </div>
       </nav>
@@ -393,22 +367,83 @@ export default function Home() {
       </section>
 
       {/* Section 1: About */}
-      <section id="about" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
-        <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70">
+      <section id="about" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48 overflow-hidden">
+        <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 relative z-20">
           <span>01</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
           <span>About</span>
         </div>
 
-        <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
-          <ScrollReveal initialTransform="translateY(60px)" className="md:col-span-9">
-            <h2 className="font-display text-[clamp(2.2rem,6.5vw,6.5rem)] font-semibold leading-[0.95] tracking-tight">
-              Building digital <span className="text-[#a89c8d]/70">systems</span> that feel{" "}
-              <em className="not-italic text-[#ff8a3d]/85">futuristic</em>, scalable, and alive.
-            </h2>
+        <div className="grid grid-cols-1 gap-16 md:grid-cols-12 relative z-10 items-center">
+          
+          {/* Left Column: Portrait Showcase */}
+          <ScrollReveal initialTransform="translateY(60px)" className="md:col-span-9 relative flex items-center justify-center min-h-[600px] md:min-h-[800px]">
+            
+            {/* Background Oversized Typography */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center select-none pointer-events-none z-0 opacity-[0.015] dark:opacity-[0.015] light:opacity-[0.02] overflow-hidden">
+              <h2 className="font-display text-[min(18vw,200px)] font-black leading-[0.8] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+                PRAJIT
+              </h2>
+              <h2 className="font-display text-[min(18vw,200px)] font-black leading-[0.8] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+                BALAJI
+              </h2>
+            </div>
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full">
+              
+              {/* Vertical Feature List */}
+              <div className="flex flex-row md:flex-col gap-6 md:gap-10 order-2 md:order-1 flex-wrap justify-center md:justify-start w-full md:w-auto md:min-w-[140px] z-20">
+                {[
+                  { icon: "⌨", label: "Full Stack Developer" },
+                  { icon: "🤖", label: "AI Builder" },
+                  { icon: "⚛", label: "React Developer" },
+                  { icon: "🎨", label: "UI/UX Enthusiast" }
+                ].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-4 group">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.02] border border-white/[0.05] dark:bg-white/[0.02] dark:border-white/[0.05] light:bg-black/[0.02] light:border-black/[0.05] text-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-white/[0.06] dark:group-hover:bg-white/[0.06] light:group-hover:bg-black/[0.06] group-hover:border-[#ff8a3d]/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)] group-hover:shadow-[0_10px_30px_rgba(255,138,61,0.15)]">
+                      <span className="opacity-80 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">{feature.icon}</span>
+                    </div>
+                    <div className="hidden md:block">
+                      <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[#a89c8d] group-hover:text-[#f2ece1] dark:group-hover:text-[#f2ece1] light:group-hover:text-[#1a1612] transition-colors duration-500 whitespace-nowrap">
+                        {feature.label.split(' ').map((word, idx) => (
+                          <React.Fragment key={idx}>
+                            {word}<br/>
+                          </React.Fragment>
+                        ))}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Portrait Image (Massive Showcase) */}
+              <div className="relative order-1 md:order-2 flex-grow w-full group perspective-1000 z-10 flex justify-center lg:justify-start">
+                <div className="relative aspect-square w-full max-w-[850px] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2">
+                  
+                  {/* Soft ambient lighting behind image */}
+                  <div className="absolute inset-0 z-0 bg-[#ff8a3d]/[0.03] light:bg-[#ff8a3d]/[0.05] rounded-full blur-[100px] transition-all duration-700 group-hover:bg-[#ff8a3d]/[0.06] light:group-hover:bg-[#ff8a3d]/[0.08] scale-90"></div>
+                  
+                  {/* The Image perfectly blended */}
+                  <Image
+                    src="/portrait/portrait-fdfbf7.png"
+                    alt="Prajit Balaji"
+                    fill
+                    className="object-cover object-center transition-transform duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02] drop-shadow-[0_30px_60px_rgba(0,0,0,0.15)]"
+                    style={{
+                      maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)",
+                      WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)"
+                    }}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
+                    priority
+                  />
+                </div>
+              </div>
+              
+            </div>
           </ScrollReveal>
 
-          <ScrollReveal initialTransform="translateY(80px)" className="md:col-span-3 md:col-start-10 md:pt-12">
+          {/* Right Column: Biography */}
+          <ScrollReveal initialTransform="translateY(80px)" className="md:col-span-3 md:pt-12 relative z-20">
             <div className="space-y-8 text-base md:text-[17px] leading-[1.85] tracking-[0.01em] text-[#c9bcaa] dark:text-[#c9bcaa] light:text-[#4a423a]">
               <p className="text-lg md:text-[19px] leading-[1.6] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#2a2420]">
                 I'm <strong className="font-extrabold text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-xl md:text-2xl tracking-tight">Prajit Balaji K</strong>, a 2nd-year B.Tech CSE (AI & Future Technologies) student at <span className="font-medium text-[#ff8a3d]">SRM University – AP</span>.
