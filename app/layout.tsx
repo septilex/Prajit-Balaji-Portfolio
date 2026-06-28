@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, Instrument_Serif, Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { CursorGlow } from "@/components/CursorGlow";
 import { CustomCursor } from "@/components/CustomCursor";
@@ -31,6 +32,12 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+const researcher = localFont({
+  src: "../public/font/researcherfontregular.ttf",
+  variable: "--font-researcher",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "PRAJIT BALAJI — Full-Stack AI Engineer",
   description: "A cinematic futuristic tech identity experience. Full-Stack AI Engineer. Creating futuristic digital experiences.",
@@ -44,7 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} light`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} light`}
       suppressHydrationWarning
     >
       <head>

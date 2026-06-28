@@ -101,7 +101,7 @@ export function Credentials() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ff8a3d]/[0.02] rounded-full blur-[80px] pointer-events-none"></div>
 
       <div className="mx-auto max-w-[1600px] px-6 md:px-12 relative z-10 w-full">
-        <div className="mb-6 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#8c7d6e]">
+        <div className="mb-6 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#8c7d6e] font-researcher">
           <span>06</span>
           <span className="h-px w-12 bg-[#ff8a3d]/40"></span>
           <span>Credentials</span>
@@ -191,7 +191,7 @@ export function Credentials() {
             {/* Right: Details (50%) */}
             <div className="flex flex-col space-y-6">
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-[#ff8a3d]">
+                <div className="flex items-center gap-2 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-[#ff8a3d] font-researcher">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>VERIFIED • {activeCredential.date.split(" ").pop()}</span>
                 </div>
@@ -213,7 +213,7 @@ export function Credentials() {
                 </p>
                 
                 <div className="space-y-3 pt-2">
-                  <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#8c7d6e]">Skills Validated</h4>
+                  <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#8c7d6e] font-researcher">Skills Validated</h4>
                   <div className="flex flex-wrap gap-2">
                     {activeCredential.skills.map(skill => (
                       <span key={skill} className="px-3 py-1.5 rounded-lg border border-[#e6e0d8] bg-white text-xs md:text-sm font-medium text-[#110e0c] shadow-sm transition-all duration-300 hover:border-[#ff8a3d]/40 hover:text-[#ff8a3d] hover:shadow-[0_4px_12px_rgba(255,138,61,0.08)]">

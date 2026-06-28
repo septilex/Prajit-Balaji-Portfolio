@@ -81,7 +81,7 @@ function SkillRow({ name, index }: { name: string; index: number }) {
         </span>
 
         {/* Index number */}
-        <span className="font-sans text-xs tracking-wider text-[#f2ece1]/20 light:text-[#3a2a1c]/30 group-hover/skill:text-[#ff8a3d] group-hover/skill:scale-110 transition-all duration-500">
+        <span className="font-researcher text-xs tracking-wider text-[#f2ece1]/20 light:text-[#3a2a1c]/30 group-hover/skill:text-[#ff8a3d] group-hover/skill:scale-110 transition-all duration-500">
           {padded}
         </span>
       </div>
@@ -127,7 +127,7 @@ function StickyDigitCounter({ activeIndex }: { activeIndex: number }) {
 
   return (
     <div className="hidden md:block md:w-[35%] md:flex-shrink-0">
-      <div className="sticky top-24 pt-8">
+      <div className="sticky top-[200px]">
         <div
           className="flex font-display font-bold text-[#f2ece1]/10 light:text-black leading-none"
           style={{ fontSize: "18vw" }}
@@ -257,8 +257,8 @@ export function Expertise() {
               "opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), filter 0.95s cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         >
-          <span className="font-sans text-[#ff8a3d] text-xs tracking-[0.3em] uppercase block mb-4">
-            03 / Expertise
+          <span className="font-researcher text-[#ff8a3d] text-xs tracking-[0.3em] uppercase block mb-4">
+            04 / Expertise
           </span>
           <h2 className="font-display font-bold text-5xl md:text-7xl text-[#f2ece1] light:text-[#1a1612] leading-[0.9] tracking-wide">
             My <span className="text-[#ff8a3d]">Expertise</span>

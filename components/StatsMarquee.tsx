@@ -89,7 +89,7 @@ export function StatsMarquee() {
                     <span className="font-display font-bold text-3xl sm:text-4xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] tracking-tight group-hover:text-[#ff8a3d] transition-colors duration-500 drop-shadow-[0_0_15px_rgba(255,138,61,0)] group-hover:drop-shadow-[0_0_15px_rgba(255,138,61,0.4)]">
                       {stat.value}
                     </span>
-                    <span className="text-[10px] sm:text-xs font-semibold tracking-[0.25em] uppercase text-[#a89c8d]/70 group-hover:text-[#a89c8d] transition-colors duration-500">
+                    <span className="text-[10px] sm:text-xs font-semibold tracking-[0.25em] uppercase text-[#a89c8d]/70 group-hover:text-[#a89c8d] transition-colors duration-500 font-researcher">
                       {stat.label}
                     </span>
                   </div>
