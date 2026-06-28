@@ -17,7 +17,7 @@ export function ScrollReveal({
   className = "",
   initialTransform = "translateY(40px)",
   delay = 0,
-  duration = 800,
+  duration = 400,
   threshold = 0.05,
   triggerOnce = true,
 }: ScrollRevealProps) {

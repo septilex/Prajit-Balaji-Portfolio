@@ -51,25 +51,25 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
 
-    // Scroll spy logic to highlight active link
+    // Scroll spy logic to highlight active link using IntersectionObserver
     const sections = ["hero", "projects", "about", "stack", "journey", "contact"];
-    const handleScrollSpy = () => {
-      const scrollPos = window.scrollY + 200;
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            setActiveSection(section);
-            break;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
           }
-        }
-      }
-    };
+        });
+      },
+      { rootMargin: "-40% 0px -60% 0px", threshold: 0 }
+    );
 
-    window.addEventListener("scroll", handleScrollSpy);
-    return () => window.removeEventListener("scroll", handleScrollSpy);
+    sections.forEach((section) => {
+      const el = document.getElementById(section);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
 
@@ -299,7 +299,6 @@ export default function Home() {
           {/* Top metadata row — constrained to 1600px */}
           <ScrollReveal
             initialTransform="translateY(20px)"
-            delay={100}
             className="mx-auto mt-12 w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[9.5px] uppercase tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
           >
             <div className="flex items-center gap-3">
@@ -314,7 +313,7 @@ export default function Home() {
 
           {/* ── MASSIVE HERO TITLE — full viewport width, no container constraint ── */}
           <div className="flex flex-1 flex-col justify-center items-center text-center w-full">
-            <ScrollReveal initialTransform="translateY(80px)" delay={300}>
+            <ScrollReveal initialTransform="translateY(80px)">
               <h1
                 className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
                 style={{
@@ -331,7 +330,6 @@ export default function Home() {
             <div className="mt-12 flex flex-col items-center justify-center gap-6 px-6 md:px-12 w-full max-w-[1600px]">
               <ScrollReveal
                 initialTransform="translateY(30px)"
-                delay={500}
               >
                 <p className="font-display text-2xl leading-tight tracking-tight md:text-4xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-center">
                   Full-Stack AI Engineer
@@ -344,7 +342,6 @@ export default function Home() {
 
               <ScrollReveal
                 initialTransform="translateY(30px)"
-                delay={600}
                 className="text-[9.5px] uppercase tracking-[0.25em] text-[#1A1612] font-researcher font-bold text-center mt-4"
               >
                 <div>Based in the <span className="text-[#ff8a3d] font-bold">cloud</span></div>
@@ -356,7 +353,6 @@ export default function Home() {
           {/* Bottom row — constrained to 1600px */}
           <ScrollReveal
             initialTransform="translateY(20px)"
-            delay={800}
             className="mx-auto w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[9px] uppercase tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
           >
             <span className="flex items-center gap-2">Scroll to explore</span>
@@ -373,7 +369,7 @@ export default function Home() {
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 relative z-20 font-researcher">
           <span>01</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-          <span>About</span>
+          <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">About</span>
         </div>
 
         <div className="grid grid-cols-1 gap-16 md:grid-cols-12 relative z-10 items-center">
@@ -476,11 +472,11 @@ export default function Home() {
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
             <span>03</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-            <span>Technology Arsenal</span>
+            <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Technology Arsenal</span>
           </div>
           <ScrollReveal initialTransform="translateY(40px)">
-            <h2 className="font-display max-w-5xl text-[clamp(2.5rem,6vw,6.5rem)] font-bold leading-[0.95] tracking-tight mb-20 md:mb-32">
-              A modern arsenal for <span className="text-[#a89c8d]/70">building at the edge.</span>
+            <h2 className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] mb-20 md:mb-32 text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+              A modern arsenal for <span className="text-[#ff8a3d]">building at the edge.</span>
             </h2>
           </ScrollReveal>
         </div>
@@ -533,13 +529,13 @@ export default function Home() {
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
           <span>05</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-          <span>Projects</span>
+          <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Projects</span>
         </div>
 
         <div className="mb-20 flex flex-wrap items-end justify-between gap-6">
           <ScrollReveal initialTransform="translateY(40px)">
-            <h2 className="font-display max-w-5xl text-[clamp(2rem,6vw,7rem)] font-semibold leading-[0.95] tracking-tight">
-              Projects that <span className="text-[#a89c8d]/70">define me.</span>
+            <h2 className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+              Projects that <span className="text-[#ff8a3d]">define me.</span>
             </h2>
           </ScrollReveal>
           <div className="text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70 font-researcher">
@@ -552,7 +548,6 @@ export default function Home() {
             <ScrollReveal
               key={project.title}
               initialTransform="translateY(80px)"
-              delay={0}
             >
               <a
                 href={project.link}
@@ -561,8 +556,8 @@ export default function Home() {
                 onMouseEnter={() => setHoveredProject(idx)}
                 onMouseLeave={() => setHoveredProject(null)}
                 data-cursor="EXPLORE"
-                className={`group block w-full transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                  hoveredProject !== null && hoveredProject !== idx ? "opacity-25 blur-[3px] scale-[0.97]" : "opacity-100 scale-100"
+                className={`group block w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  hoveredProject !== null && hoveredProject !== idx ? "opacity-40 scale-[0.97]" : "opacity-100 scale-100"
                 }`}
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-14 items-center">
@@ -581,7 +576,7 @@ export default function Home() {
 
                   {/* Center Column: Large Image Showcase */}
                   <div className="order-2 lg:order-none lg:col-span-5 w-full relative z-10">
-                    <div className="relative w-full rounded-2xl md:rounded-[36px] border border-white/[0.04] bg-gradient-to-br from-[#1a120c]/40 to-[#0a0807]/80 p-2 md:p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-4 group-hover:shadow-[0_40px_100px_-20px_rgba(255,138,61,0.25)] group-hover:border-[#ff8a3d]/20 dark:border-white/[0.04] dark:from-[#1a120c]/40 dark:to-[#0a0807]/80 light:from-white/80 light:to-white/90 light:border-black/[0.05] light:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] light:group-hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.15)] light:group-hover:border-[#ff8a3d]/30">
+                    <div className="relative w-full rounded-2xl md:rounded-[36px] border border-white/[0.04] bg-gradient-to-br from-[#1a120c]/40 to-[#0a0807]/80 p-2 md:p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-4 group-hover:shadow-[0_40px_100px_-20px_rgba(255,138,61,0.25)] group-hover:border-[#ff8a3d]/20 dark:border-white/[0.04] dark:from-[#1a120c]/40 dark:to-[#0a0807]/80 light:from-white/80 light:to-white/90 light:border-black/[0.05] light:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] light:group-hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.15)] light:group-hover:border-[#ff8a3d]/30">
                       {/* Browser Top Bar */}
                       <div className="flex items-center justify-between px-3 pb-3 pt-2 md:px-5 md:pb-5 md:pt-4">
                         <div className="flex items-center gap-2">
@@ -602,7 +597,7 @@ export default function Home() {
                           alt={`${project.title} Preview`}
                           width={1600}
                           height={1000}
-                          className="w-full h-auto object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05] aspect-[16/10]"
+                          className="w-full h-auto object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05] aspect-[16/10]"
                           loading="lazy"
                         />
                       </div>
@@ -660,12 +655,12 @@ export default function Home() {
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
           <span>07</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-          <span>Journey</span>
+          <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Journey</span>
         </div>
 
         <ScrollReveal initialTransform="translateY(40px)">
-          <h2 className="font-display mb-24 max-w-5xl text-[clamp(2rem,5.5vw,6rem)] font-semibold leading-[0.95] tracking-tight">
-            My vision towards <span className="text-[#a89c8d]/70">what I am striving to.</span>
+          <h2 className="font-display mb-24 max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+            My vision towards <span className="text-[#ff8a3d]">what I am striving to.</span>
           </h2>
         </ScrollReveal>
 
@@ -677,7 +672,6 @@ export default function Home() {
             <ScrollReveal
               key={node.year}
               initialTransform="translateY(40px)"
-              delay={idx * 150}
               className={`relative mb-20 grid grid-cols-12 items-start gap-6 ${
                 node.side === "right" ? "md:flex-row-reverse" : ""
               }`}
@@ -750,12 +744,12 @@ export default function Home() {
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
             <span>08</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-            <span>Contact</span>
+            <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Let&apos;s Talk</span>
           </div>
 
           <ScrollReveal initialTransform="translateY(40px)">
             <h2 className="font-display max-w-6xl text-[clamp(2.5rem,8vw,10rem)] font-semibold leading-[0.9] tracking-tight">
-              Let's build the <span className="text-[#a89c8d]/70">future.</span>
+              Let's build the <span className="text-[#ff8a3d]">future.</span>
             </h2>
           </ScrollReveal>
 
@@ -836,8 +830,7 @@ export default function Home() {
 
             {/* Direct details */}
             <ScrollReveal
-              initialTransform="translateY(40px)"
-              delay={200}
+              initialTransform="translateX(-40px)"
               className="md:col-span-4 md:col-start-9 space-y-8"
             >
               <div>

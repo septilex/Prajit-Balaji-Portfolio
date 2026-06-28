@@ -1,16 +1,8 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React from "react";
 import {
   motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  useVelocity,
-  useAnimationFrame,
-  useReducedMotion,
-  useMotionValue,
-  wrap,
 } from "framer-motion";
 
 const STATS = [
@@ -23,62 +15,16 @@ const STATS = [
 ];
 
 export function StatsMarquee() {
-  const baseX = useMotionValue(0);
-  const { scrollY } = useScroll();
-  const scrollVelocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 100,
-    stiffness: 200,
-  });
-  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 2], {
-    clamp: false,
-  });
-
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverVelocity = useSpring(1, { stiffness: 200, damping: 50 });
-
-  useEffect(() => {
-    hoverVelocity.set(isHovered ? 0 : 1);
-  }, [isHovered, hoverVelocity]);
-
-  const prefersReducedMotion = useReducedMotion();
-  const directionFactor = useRef<number>(1);
-  const baseVelocity = -0.5; // ultra slow, 60fps smooth glide
-
-  // Wrap between 0 and -25% since we have 4 identical groups
-  const x = useTransform(baseX, (v) => `${wrap(0, -25, v)}%`);
-
-  useAnimationFrame((t, delta) => {
-    if (prefersReducedMotion) return;
-
-    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
-
-    if (velocityFactor.get() < 0) {
-      directionFactor.current = 1;
-    } else if (velocityFactor.get() > 0) {
-      directionFactor.current = -1;
-    }
-
-    // Apply scroll-based velocity boost
-    moveBy += directionFactor.current * moveBy * velocityFactor.get();
-    
-    // Apply smooth hover slowdown
-    moveBy *= hoverVelocity.get();
-
-    baseX.set(baseX.get() + moveBy);
-  });
 
   return (
     <section className="relative w-full py-4 sm:py-5 border-y border-[#3a2a1c]/40 bg-[#0a0807]/40 backdrop-blur-xl overflow-hidden light:bg-[#fdfbf7]/80 light:border-black/10 z-20">
       {/* Container without fade mask */}
       <div 
-        className="relative z-0 flex overflow-hidden whitespace-nowrap"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className="relative z-0 flex overflow-hidden whitespace-nowrap group/marquee"
       >
-        <motion.div 
-          className="flex flex-nowrap items-center gap-12 sm:gap-16 md:gap-24 w-max" 
-          style={{ x, willChange: "transform" }}
+        <div 
+          className="flex flex-nowrap items-center gap-12 sm:gap-16 md:gap-24 w-max animate-marquee hover:[animation-play-state:paused] light:hover:[animation-play-state:paused] group-hover/marquee:[animation-play-state:paused]" 
+          style={{ willChange: "transform" }}
         >
           {[...Array(4)].map((_, i) => (
             <React.Fragment key={i}>
@@ -111,7 +57,7 @@ export function StatsMarquee() {
               ))}
             </React.Fragment>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

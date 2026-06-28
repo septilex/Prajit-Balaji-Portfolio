@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, Instrument_Serif, Montserrat } from "next/font/google";
+import { GeistSans } from 'geist/font/sans';
 import localFont from "next/font/local";
 import "./globals.css";
 import { CursorGlow } from "@/components/CursorGlow";
@@ -51,7 +52,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} light`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} ${GeistSans.variable} light`}
       suppressHydrationWarning
     >
       <head>

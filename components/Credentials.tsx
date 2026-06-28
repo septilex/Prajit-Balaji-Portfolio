@@ -96,7 +96,7 @@ export function Credentials() {
   const x = useTransform(baseX, (v) => `${v}%`);
 
   return (
-    <section id="credentials" className="relative mx-auto w-full pt-16 pb-20 md:pt-20 md:pb-24 z-10 bg-[#faf8f5] flex flex-col justify-center min-h-[90vh]">
+    <section id="credentials" className="relative mx-auto w-full pt-16 pb-20 md:pt-20 md:pb-24 z-10 bg-[#faf8f5] block min-h-[90vh]">
       {/* Background soft glow effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ff8a3d]/[0.02] rounded-full blur-[80px] pointer-events-none"></div>
 
@@ -104,16 +104,18 @@ export function Credentials() {
         <div className="mb-6 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#8c7d6e] font-researcher">
           <span>06</span>
           <span className="h-px w-12 bg-[#ff8a3d]/40"></span>
-          <span>Credentials</span>
+          <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Credentials</span>
         </div>
         
-        <h2 className="font-display max-w-5xl text-[clamp(2rem,5vw,4.5rem)] font-bold leading-[0.95] tracking-tight mb-8 md:mb-12 text-[#110e0c]">
-          Verified <span className="text-[#8c7d6e]/60">Expertise.</span>
+        <h2 className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] mb-8 md:mb-12 text-[#110e0c]">
+          Verified <span className="text-[#ff8a3d]">Expertise.</span>
         </h2>
       </div>
 
-      {/* Sticky Ticker Tape Menu */}
-      <div className="sticky top-0 md:top-24 z-50 w-full bg-[#faf8f5]/90 backdrop-blur-xl pb-4">
+      {/* Ticker Tape Menu */}
+      <div 
+        className="relative z-[100] w-full bg-[#faf8f5] pb-4 pt-2"
+      >
         <div 
           className="relative w-full border-y border-[#110e0c]/5 bg-white/80 shadow-[0_4px_30px_rgba(0,0,0,0.02)] overflow-hidden"
           onMouseEnter={() => setIsHovered(true)}
@@ -157,7 +159,7 @@ export function Credentials() {
       </div>
 
       {/* Content Area */}
-      <div className="mx-auto max-w-[1600px] w-full px-6 md:px-12 relative z-10 pt-8 md:pt-12">
+      <div className="mx-auto max-w-[1600px] w-full px-6 md:px-12 relative z-10 pt-12 md:pt-16 min-h-[1000px] lg:min-h-[750px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeId}

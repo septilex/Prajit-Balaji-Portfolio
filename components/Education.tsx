@@ -17,7 +17,7 @@ export const Education = () => {
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
           <span>02</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-          <span>Education</span>
+          <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Education</span>
         </div>
 
 
@@ -31,7 +31,7 @@ export const Education = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             aria-hidden="true"
             className="absolute inset-0 overflow-hidden"
             style={{ zIndex: 0, pointerEvents: "none", userSelect: "none" }}
@@ -49,7 +49,7 @@ export const Education = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="relative flex w-full justify-end"
             style={{ zIndex: 10 }}
           >
@@ -62,32 +62,32 @@ export const Education = () => {
               </div>
 
               {/* Institution */}
-              <h3 className="font-display text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-bold leading-[1.05] tracking-tight text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
                 SRM University AP
               </h3>
 
               {/* Degree */}
-              <h4 className="font-display mt-1 text-[1.4rem] md:text-[2.2rem] lg:text-[2.6rem] font-bold leading-[1.1] tracking-tight text-[#ff8a3d]">
+              <h4 className="font-geist mt-2 text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
                 B.Tech Computer Science
               </h4>
 
               {/* Subtitle */}
-              <p className="mt-3 text-sm md:text-base font-medium tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <p className="mt-4 text-base md:text-lg lg:text-xl font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                 AI &amp; Future Technologies
               </p>
 
               {/* CGPA */}
-              <div className="mt-4 flex flex-col items-end">
-                <span className="font-researcher text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <div className="mt-6 flex flex-col items-end">
+                <span className="font-researcher text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                   CGPA
                 </span>
-                <span className="mt-1 font-display text-xl md:text-2xl font-bold text-[#ff8a3d]">
+                <span className="mt-1 font-display text-3xl md:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-[#ff8a3d]">
                   8.92
                 </span>
               </div>
 
               {/* Location & years */}
-              <div className="mt-4 flex flex-col items-end gap-1 font-researcher text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <div className="mt-4 flex flex-col items-end gap-1 font-researcher text-[9px] md:text-[10px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                 <span>Amaravati, Andhra Pradesh</span>
                 <span>2024 &ndash; Present</span>
               </div>
@@ -109,7 +109,7 @@ export const Education = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             aria-hidden="true"
             className="absolute inset-0 overflow-hidden"
             style={{ zIndex: 0, pointerEvents: "none", userSelect: "none" }}
@@ -127,7 +127,7 @@ export const Education = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="relative flex w-full justify-start"
             style={{ zIndex: 10 }}
           >
@@ -140,32 +140,32 @@ export const Education = () => {
               </div>
 
               {/* Institution */}
-              <h3 className="font-display text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-bold leading-[1.05] tracking-tight text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
                 Geethanjali Olympiad School
               </h3>
 
               {/* Board */}
-              <h4 className="font-display mt-1 text-[1.4rem] md:text-[2.2rem] lg:text-[2.6rem] font-bold leading-[1.1] tracking-tight text-[#ff8a3d]">
+              <h4 className="font-geist mt-2 text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
                 CBSE
               </h4>
 
               {/* Subjects */}
-              <p className="mt-3 text-sm md:text-base font-medium tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <p className="mt-4 text-base md:text-lg lg:text-xl font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                 Physics &bull; Chemistry &bull; Biology
               </p>
 
               {/* Percentage */}
-              <div className="mt-4 flex flex-col items-start">
-                <span className="font-researcher text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <div className="mt-6 flex flex-col items-start">
+                <span className="font-researcher text-[10px] md:text-[11px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                   Percentage
                 </span>
-                <span className="mt-1 font-display text-xl md:text-2xl font-bold text-[#ff8a3d]">
+                <span className="mt-1 font-display text-3xl md:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-[#ff8a3d]">
                   93%
                 </span>
               </div>
 
               {/* Location & years */}
-              <div className="mt-4 flex flex-col items-start gap-1 font-researcher text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <div className="mt-4 flex flex-col items-start gap-1 font-researcher text-[9px] md:text-[10px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                 <span>Greater Bengaluru, Karnataka</span>
                 <span>2022 &ndash; 2024</span>
               </div>

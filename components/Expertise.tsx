@@ -101,7 +101,7 @@ function DigitColumn({ digit }: { digit: number }) {
         className="absolute left-0 w-full"
         style={{
           transform: `translateY(-${digit}em)`,
-          transition: "transform 1000ms cubic-bezier(0.16, 1, 0.3, 1)",
+          transition: "transform 400ms cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
@@ -205,36 +205,31 @@ export function Expertise() {
     return () => observer.unobserve(el);
   }, []);
 
-  // Scroll spy — update active index based on which category is most visible
-  const handleScrollSpy = useCallback(() => {
+  // Scroll spy — update active index using IntersectionObserver (highly performant)
+  useEffect(() => {
     const refs = categoryRefs.current;
     if (!refs.length) return;
 
-    let bestIndex = 0;
-    let bestVisibility = -1;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = refs.indexOf(entry.target as HTMLDivElement);
+            if (index !== -1) {
+              setActiveIndex(index);
+            }
+          }
+        });
+      },
+      { rootMargin: "-30% 0px -30% 0px", threshold: 0 }
+    );
 
-    refs.forEach((ref, i) => {
-      if (!ref) return;
-      const rect = ref.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const visibleTop = Math.max(0, rect.top);
-      const visibleBottom = Math.min(windowHeight, rect.bottom);
-      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-
-      if (visibleHeight > bestVisibility) {
-        bestVisibility = visibleHeight;
-        bestIndex = i;
-      }
+    refs.forEach((ref) => {
+      if (ref) observer.observe(ref);
     });
 
-    setActiveIndex(bestIndex);
+    return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScrollSpy, { passive: true });
-    handleScrollSpy();
-    return () => window.removeEventListener("scroll", handleScrollSpy);
-  }, [handleScrollSpy]);
 
   const setCategoryRef = useCallback(
     (index: number) => (el: HTMLDivElement | null) => {
@@ -252,15 +247,14 @@ export function Expertise() {
           style={{
             opacity: revealed ? 1 : 0,
             transform: revealed ? "translateY(0)" : "translateY(46px)",
-            filter: revealed ? "blur(0px)" : "blur(8px)",
             transition:
-              "opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), filter 0.95s cubic-bezier(0.22, 1, 0.36, 1)",
+              "opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         >
-          <span className="font-researcher text-[#ff8a3d] text-xs tracking-[0.3em] uppercase block mb-4">
+          <span className="font-researcher text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em] uppercase block mb-4">
             04 / Expertise
           </span>
-          <h2 className="font-display font-bold text-5xl md:text-7xl text-[#f2ece1] light:text-[#1a1612] leading-[0.9] tracking-wide">
+          <h2 className="font-display font-black text-[clamp(3rem,7vw,8rem)] text-[#f2ece1] light:text-[#1a1612] leading-[0.9] tracking-[-0.03em]">
             My <span className="text-[#ff8a3d]">Expertise</span>
           </h2>
         </div>
