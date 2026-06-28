@@ -1,0 +1,288 @@
+"use client";
+
+import React, { useEffect, useRef, useState, useCallback } from "react";
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+type ExpertiseCategoryData = {
+  title: string;
+  description: string;
+  skills: string[];
+};
+
+const EXPERTISE_DATA: ExpertiseCategoryData[] = [
+  {
+    title: "AI & Intelligent Systems",
+    description:
+      "Building intelligent systems that learn, adapt, and solve real problems.",
+    skills: [
+      "OpenAI",
+      "LLMs",
+      "RAG",
+      "AI Agents",
+      "Prompt Engineering",
+      "AI Workflows",
+    ],
+  },
+  {
+    title: "Full-Stack Development",
+    description:
+      "Crafting end-to-end products with modern frameworks and clean architecture.",
+    skills: [
+      "React",
+      "Next.js",
+      "TypeScript",
+      "Node.js",
+      "Express.js",
+      "Tailwind CSS",
+    ],
+  },
+  {
+    title: "Backend & Infrastructure",
+    description:
+      "Designing resilient, scalable systems from APIs to deployment pipelines.",
+    skills: ["MongoDB", "PostgreSQL", "REST APIs", "Docker", "AWS", "Vercel"],
+  },
+  {
+    title: "UI/UX & Creative Engineering",
+    description:
+      "Blending art with technology to build experiences people remember.",
+    skills: [
+      "UI/UX Design",
+      "Motion Design",
+      "Interaction Design",
+      "Three.js / React Three Fiber",
+      "Performance Optimization",
+      "Responsive Design",
+    ],
+  },
+];
+
+// ─── SkillRow ────────────────────────────────────────────────────────────────
+
+function SkillRow({ name, index }: { name: string; index: number }) {
+  const padded = String(index + 1).padStart(2, "0");
+
+  return (
+    <div
+      className="group/skill relative cursor-default border-b border-[#3a2a1c]/35 light:border-black/10 hover:border-[#ff8a3d]/30 light:hover:border-[#ff8a3d]/30 transition-all duration-500"
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      <div
+        className="flex items-center justify-between py-4 px-4 -mx-4 transition-all duration-500 origin-top group-hover/skill:bg-[#f2ece1]/[0.03] light:group-hover/skill:bg-black/[0.02] group-hover/skill:[transform:rotateX(-2deg)_translateZ(10px)]"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {/* Left accent bar — reveals on hover */}
+        <div className="absolute left-0 top-0 w-[3px] h-full bg-[#ff8a3d] scale-y-0 group-hover/skill:scale-y-100 transition-transform duration-500 origin-top" />
+
+        {/* Skill name */}
+        <span className="font-sans text-sm text-[#f2ece1]/60 light:text-[#3a2a1c]/70 group-hover/skill:text-[#f2ece1] light:group-hover/skill:text-[#1a1612] group-hover/skill:translate-x-2 transition-all duration-500">
+          {name}
+        </span>
+
+        {/* Index number */}
+        <span className="font-sans text-xs tracking-wider text-[#f2ece1]/20 light:text-[#3a2a1c]/30 group-hover/skill:text-[#ff8a3d] group-hover/skill:scale-110 transition-all duration-500">
+          {padded}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Digit Column (Slot-machine counter) ────────────────────────────────────
+
+function DigitColumn({ digit }: { digit: number }) {
+  return (
+    <div
+      className="relative overflow-hidden"
+      style={{ width: "0.6em", height: "1em" }}
+    >
+      <div
+        className="absolute left-0 w-full"
+        style={{
+          transform: `translateY(-${digit}em)`,
+          transition: "transform 1000ms cubic-bezier(0.16, 1, 0.3, 1)",
+        }}
+      >
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+          <div
+            key={n}
+            className="flex items-center justify-center"
+            style={{ height: "1em" }}
+          >
+            {n}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Sticky Digit Counter (Desktop left column) ────────────────────────────
+
+function StickyDigitCounter({ activeIndex }: { activeIndex: number }) {
+  const displayNum = activeIndex + 1;
+  const tens = Math.floor(displayNum / 10);
+  const ones = displayNum % 10;
+
+  return (
+    <div className="hidden md:block md:w-[35%] md:flex-shrink-0">
+      <div className="sticky top-24 pt-8">
+        <div
+          className="flex font-display font-bold text-[#f2ece1]/10 light:text-black leading-none"
+          style={{ fontSize: "18vw" }}
+        >
+          <DigitColumn digit={tens} />
+          <DigitColumn digit={ones} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── ExpertiseCategoryBlock ─────────────────────────────────────────────────
+
+const ExpertiseCategoryBlock = React.forwardRef<
+  HTMLDivElement,
+  { category: ExpertiseCategoryData; index: number }
+>(function ExpertiseCategoryBlock({ category, index }, ref) {
+  const padded = String(index + 1).padStart(2, "0");
+
+  return (
+    <div
+      ref={ref}
+      className="min-h-[80vh] flex flex-col justify-center border-t border-[#3a2a1c]/35 light:border-black/10 last:border-b"
+    >
+      {/* Mobile-only ghost number */}
+      <span className="md:hidden font-display font-bold text-6xl text-[#f2ece1]/10 light:text-black mb-4">
+        {padded}
+      </span>
+
+      {/* Category title */}
+      <h3 className="font-display font-bold text-3xl md:text-5xl text-[#f2ece1] light:text-[#1a1612] tracking-wide leading-[1.05] uppercase">
+        {category.title}
+      </h3>
+
+      {/* Category description */}
+      <p className="text-[#a89c8d] light:text-[#3a2a1c]/70 font-sans text-sm md:text-base mt-4 leading-relaxed max-w-xl">
+        {category.description}
+      </p>
+
+      {/* Skills list */}
+      <div className="mt-10 space-y-0" style={{ perspective: "800px" }}>
+        {category.skills.map((skill, i) => (
+          <SkillRow key={skill} name={skill} index={i} />
+        ))}
+      </div>
+    </div>
+  );
+});
+
+// ─── ExpertiseSection (Main Export) ─────────────────────────────────────────
+
+export function Expertise() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const categoryRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  // Scroll reveal for the header
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRevealed(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(el);
+    return () => observer.unobserve(el);
+  }, []);
+
+  // Scroll spy — update active index based on which category is most visible
+  const handleScrollSpy = useCallback(() => {
+    const refs = categoryRefs.current;
+    if (!refs.length) return;
+
+    let bestIndex = 0;
+    let bestVisibility = -1;
+
+    refs.forEach((ref, i) => {
+      if (!ref) return;
+      const rect = ref.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const visibleTop = Math.max(0, rect.top);
+      const visibleBottom = Math.min(windowHeight, rect.bottom);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+      if (visibleHeight > bestVisibility) {
+        bestVisibility = visibleHeight;
+        bestIndex = i;
+      }
+    });
+
+    setActiveIndex(bestIndex);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScrollSpy, { passive: true });
+    handleScrollSpy();
+    return () => window.removeEventListener("scroll", handleScrollSpy);
+  }, [handleScrollSpy]);
+
+  const setCategoryRef = useCallback(
+    (index: number) => (el: HTMLDivElement | null) => {
+      categoryRefs.current[index] = el;
+    },
+    []
+  );
+
+  return (
+    <section ref={sectionRef} className="px-6 md:px-12 relative">
+      <div className="max-w-7xl mx-auto">
+        {/* Section header */}
+        <div
+          className="mb-16 pt-32"
+          style={{
+            opacity: revealed ? 1 : 0,
+            transform: revealed ? "translateY(0)" : "translateY(46px)",
+            filter: revealed ? "blur(0px)" : "blur(8px)",
+            transition:
+              "opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), filter 0.95s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          <span className="font-sans text-[#ff8a3d] text-xs tracking-[0.3em] uppercase block mb-4">
+            03 / Expertise
+          </span>
+          <h2 className="font-display font-bold text-5xl md:text-7xl text-[#f2ece1] light:text-[#1a1612] leading-[0.9] tracking-wide">
+            My <span className="text-[#ff8a3d]">Expertise</span>
+          </h2>
+        </div>
+
+        {/* Two-column layout */}
+        <div className="md:flex md:gap-12">
+          {/* Left: Sticky giant counter (desktop only) */}
+          <StickyDigitCounter activeIndex={activeIndex} />
+
+          {/* Right: Category list */}
+          <div className="md:flex-1 space-y-0">
+            {EXPERTISE_DATA.map((category, i) => (
+              <ExpertiseCategoryBlock
+                key={category.title}
+                ref={setCategoryRef(i)}
+                category={category}
+                index={i}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

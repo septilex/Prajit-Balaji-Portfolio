@@ -298,14 +298,14 @@ export default function Home() {
           <ScrollReveal
             initialTransform="translateY(20px)"
             delay={100}
-            className="mx-auto mt-12 w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-[#a89c8d]"
+            className="mx-auto mt-12 w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[9.5px] uppercase tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
           >
             <div className="flex items-center gap-3">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff8a3d] opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff8a3d]"></span>
               </span>
-              <span>Available for select projects · 2026</span>
+              <span>Available for projects · 2026</span>
             </div>
             <div className="hidden md:block">Portfolio · v0.26</div>
           </ScrollReveal>
@@ -343,10 +343,10 @@ export default function Home() {
               <ScrollReveal
                 initialTransform="translateY(30px)"
                 delay={600}
-                className="text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70 text-center mt-4"
+                className="text-[9.5px] uppercase tracking-[0.25em] text-[#1A1612] font-researcher font-bold text-center mt-4"
               >
-                <div>Based in the cloud</div>
-                <div className="mt-1">Building the next decade</div>
+                <div>Based in the <span className="text-[#ff8a3d] font-bold">cloud</span></div>
+                <div className="mt-1">Building the <span className="text-[#ff8a3d] font-bold">next decade</span></div>
               </ScrollReveal>
             </div>
           </div>
@@ -355,7 +355,7 @@ export default function Home() {
           <ScrollReveal
             initialTransform="translateY(20px)"
             delay={800}
-            className="mx-auto w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70"
+            className="mx-auto w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[9px] uppercase tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
           >
             <span className="flex items-center gap-2">Scroll to explore</span>
             <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#3a2a1c]/80 dark:border-[#3a2a1c]/80 light:border-black/10">
