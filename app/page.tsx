@@ -568,7 +568,7 @@ export default function Home() {
                       <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-[#a89c8d]/60 font-researcher">
                         {project.num}
                       </span>
-                      <h3 className="font-display text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-[3.5rem] leading-[0.9] font-black tracking-[-0.04em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] break-words uppercase">
+                      <h3 className="font-display text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-[3.5rem] leading-[0.9] font-black tracking-wider text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] break-words uppercase scale-x-110 origin-left">
                         {project.title}
                       </h3>
                     </div>
