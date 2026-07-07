@@ -251,7 +251,7 @@ export default function Home() {
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#ff8a3d] to-[#c2410c] text-white text-[10px] font-bold shadow-[0_0_20px_rgba(255,138,61,0.4)]">
               P
             </span>
-            <span className="hidden sm:inline text-[#3a322b] font-syne font-extrabold tracking-[0.02em] text-[13.5px] uppercase">
+            <span className="hidden sm:inline text-[#3a322b] font-researcher font-bold tracking-[0.2em] text-[11px]">
               PRAJIT BALAJI
             </span>
           </a>
@@ -435,7 +435,12 @@ export default function Home() {
             <div className="space-y-5 text-[15px] md:text-[16px] leading-[1.85] tracking-[0.005em] text-[#3a322b]/65">
               <p className="text-[16px] md:text-[17px] text-[#3a322b]/80 leading-[1.75]">
                 I'm{" "}
-                <span className="font-syne font-extrabold text-[18px] text-[#3a322b] tracking-[-0.02em]">Prajit Balaji K</span>
+                <span 
+                  className="font-extrabold text-[#3a322b] text-[1.05em] tracking-tight"
+                  style={{ fontFamily: "var(--next-font-syne), sans-serif" }}
+                >
+                  Prajit Balaji K
+                </span>
                 {" "}— a 3rd-year B.Tech CSE
                 {" "}<span className="text-[#ff8a3d] font-medium">(AI & Future Technologies)</span>{" "}
                 student at{" "}
