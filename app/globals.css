@@ -14,6 +14,7 @@
   --font-researcher: var(--font-researcher), system-ui, sans-serif;
   --font-geist: var(--font-geist-sans), system-ui, sans-serif;
   --font-anton: 'Anton', sans-serif;
+  --font-syne: var(--next-font-syne), system-ui, sans-serif;
 
   --color-bg-base: #f2ece1;
   --color-bg-elev: #e8e1d4;

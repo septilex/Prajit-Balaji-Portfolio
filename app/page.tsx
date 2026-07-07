@@ -23,6 +23,7 @@ import { TypewriterTitle } from "@/components/TypewriterTitle";
 import { IntroPreloader } from "@/components/IntroPreloader";
 import { MagneticNavGroup } from "@/components/ui/MagneticNavItem";
 import { ProximityPillRow } from "@/components/ui/TechPill";
+import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -250,7 +251,7 @@ export default function Home() {
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#ff8a3d] to-[#c2410c] text-white text-[10px] font-bold shadow-[0_0_20px_rgba(255,138,61,0.4)]">
               P
             </span>
-            <span className="hidden sm:inline text-[#3a322b] font-researcher font-bold tracking-[0.2em] text-[11px]">
+            <span className="hidden sm:inline text-[#3a322b] font-syne font-extrabold tracking-[0.02em] text-[13.5px] uppercase">
               PRAJIT BALAJI
             </span>
           </a>
@@ -357,97 +358,125 @@ export default function Home() {
       </section>
 
       {/* Section 1: About */}
-      <section id="about" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48 overflow-hidden">
-        <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 relative z-20 font-researcher">
-          <span>01</span>
-          <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-          <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">About</span>
-        </div>
+      <section id="about" className="relative mx-auto max-w-[1600px] px-0 py-0 overflow-hidden">
 
-        <div className="grid grid-cols-1 gap-16 md:grid-cols-12 relative z-10 items-center">
-          
-          {/* Left Column: Portrait Showcase */}
-          <ScrollReveal initialTransform="translateY(60px)" className="md:col-span-9 relative flex items-center justify-center min-h-[600px] md:min-h-[800px]">
-            
-            {/* Background Oversized Typography */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center select-none pointer-events-none z-0 opacity-[0.015] dark:opacity-[0.015] light:opacity-[0.02] overflow-hidden">
-              <h2 className="font-display text-[min(18vw,200px)] font-black leading-[0.8] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+        {/* ── Main 2-col editorial grid ───────────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[100vh] relative z-10">
+
+          {/* ── LEFT: Dominant Portrait ──────────────────────────────────── */}
+          <ScrollReveal
+            initialTransform="translateX(-30px)"
+            className="md:col-span-6 relative overflow-hidden flex items-end"
+          >
+            {/* Atmospheric name watermark */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center select-none pointer-events-none z-0 overflow-hidden">
+              <span className="font-display font-black leading-[0.85] tracking-[-0.04em] text-[#3a322b]/[0.035] text-[clamp(5rem,14vw,16rem)]">
                 PRAJIT
-              </h2>
-              <h2 className="font-display text-[min(18vw,200px)] font-black leading-[0.8] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
+              </span>
+              <span className="font-display font-black leading-[0.85] tracking-[-0.04em] text-[#3a322b]/[0.035] text-[clamp(5rem,14vw,16rem)]">
                 BALAJI
-              </h2>
+              </span>
             </div>
 
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 w-full">
-              
-              {/* Vertical Feature List */}
-              <div className="flex flex-row md:flex-col gap-6 md:gap-10 order-2 md:order-1 flex-wrap justify-center md:justify-start w-full md:w-auto md:min-w-[140px] z-20">
-                {[
-                  { icon: "⌨", label: "Full Stack Developer" },
-                  { icon: "🤖", label: "AI Builder" },
-                  { icon: "⚛", label: "React Developer" },
-                  { icon: "🎨", label: "UI/UX Enthusiast" }
-                ].map((feature, i) => (
-                  <div key={i} className="flex items-center gap-4 group">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.02] border border-white/[0.05] dark:bg-white/[0.02] dark:border-white/[0.05] light:bg-black/[0.02] light:border-black/[0.05] text-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-white/[0.06] dark:group-hover:bg-white/[0.06] light:group-hover:bg-black/[0.06] group-hover:border-[#ff8a3d]/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)] group-hover:shadow-[0_10px_30px_rgba(255,138,61,0.15)]">
-                      <span className="opacity-80 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">{feature.icon}</span>
-                    </div>
-                    <div className="hidden md:block">
-                      <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[#a89c8d] group-hover:text-[#f2ece1] dark:group-hover:text-[#f2ece1] light:group-hover:text-[#1a1612] transition-colors duration-500 whitespace-nowrap">
-                        {feature.label.split(' ').map((word, idx) => (
-                          <React.Fragment key={idx}>
-                            {word}<br/>
-                          </React.Fragment>
-                        ))}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {/* Portrait — bleeds to full height, soft bottom fade */}
+            <div className="relative z-10 w-full h-[70vh] md:h-[100vh] group">
+              <Image
+                src="/portrait/My Portrait White Shirt.png"
+                alt="Prajit Balaji"
+                fill
+                className="object-cover object-top transition-transform duration-[1800ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.025]"
+                style={{
+                  maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%), linear-gradient(to right, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
+                  WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%), linear-gradient(to right, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
+                  maskComposite: "intersect",
+                  WebkitMaskComposite: "source-in",
+                  mixBlendMode: "multiply",
+                }}
+                sizes="(max-width: 768px) 100vw, 58vw"
+                priority
+              />
+              {/* Warm ambient glow */}
+              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#f2ece1] via-[#f2ece1]/30 to-transparent pointer-events-none" />
+            </div>
 
-              {/* Portrait Image (Massive Showcase) */}
-              <div className="relative order-1 md:order-2 flex-grow w-full group perspective-1000 z-10 flex justify-center lg:justify-start">
-                <div className="relative aspect-square w-full max-w-[850px] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2">
-                  
-                  {/* Soft ambient lighting behind image */}
-                  <div className="absolute inset-0 z-0 bg-[#ff8a3d]/[0.03] light:bg-[#ff8a3d]/[0.05] rounded-full blur-[100px] transition-all duration-700 group-hover:bg-[#ff8a3d]/[0.06] light:group-hover:bg-[#ff8a3d]/[0.08] scale-90"></div>
-                  
-                  {/* The Image perfectly blended */}
-                  <Image
-                    src="/portrait/My Portrait White Shirt.png"
-                    alt="Prajit Balaji"
-                    fill
-                    className="object-cover object-center transition-transform duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02] drop-shadow-[0_30px_60px_rgba(0,0,0,0.15)]"
-                    style={{
-                      maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)",
-                      WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)",
-                      mixBlendMode: "multiply"
-                    }}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
-                    priority
-                  />
-                </div>
-              </div>
-              
+            {/* Section tag — bottom-left corner */}
+            <div className="absolute bottom-8 left-8 md:left-12 z-20 flex items-center gap-3 font-researcher text-[10px] uppercase tracking-[0.35em] text-[#3a322b]/40">
+              <span>01</span>
+              <span className="h-px w-8 bg-[#3a322b]/20" />
+              <span className="text-[#ff8a3d]/70 font-black tracking-[0.4em]">About</span>
             </div>
           </ScrollReveal>
 
-          {/* Right Column: Biography */}
-          <ScrollReveal initialTransform="translateY(80px)" className="md:col-span-3 md:pt-12 relative z-20">
-            <div className="space-y-8 text-base md:text-[17px] leading-[1.85] tracking-[0.01em] text-[#c9bcaa] dark:text-[#c9bcaa] light:text-[#4a423a]">
-              <p className="text-lg md:text-[19px] leading-[1.6] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#2a2420]">
-                I'm <strong className="font-extrabold text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-xl md:text-2xl tracking-tight">Prajit Balaji K</strong>, a 2nd-year B.Tech CSE (AI & Future Technologies) student at <span className="font-medium text-[#ff8a3d]">SRM University – AP</span>.
+          {/* ── RIGHT: Editorial intro panel ─────────────────────────────── */}
+          <ScrollReveal
+            initialTransform="translateY(50px)"
+            className="md:col-span-6 flex flex-col justify-center px-8 md:px-12 lg:px-14 py-20 md:py-24"
+          >
+            {/* Small eyebrow */}
+            <p className="font-researcher text-[10px] uppercase tracking-[0.5em] text-[#ff8a3d]/70 mb-6">
+              Introduction
+            </p>
+
+            {/* Syed-style 3-line animated hero heading */}
+            <AnimatedHeroHeading
+              lines={[
+                "I BUILD PRODUCTS,",
+                "CRAFT EXPERIENCES,",
+                "ENGINEER THE FUTURE.",
+              ]}
+              accentWords={["products", "experiences", "future"]}
+              className="mb-10"
+            />
+
+            {/* Thin separator */}
+            <div className="w-12 h-[2px] bg-[#ff8a3d]/40 rounded-full mb-8" />
+
+            {/* Biography block */}
+            <div className="space-y-5 text-[15px] md:text-[16px] leading-[1.85] tracking-[0.005em] text-[#3a322b]/65">
+              <p className="text-[16px] md:text-[17px] text-[#3a322b]/80 leading-[1.75]">
+                I'm{" "}
+                <span className="font-syne font-extrabold text-[18px] text-[#3a322b] tracking-[-0.02em]">Prajit Balaji K</span>
+                {" "}— a 3rd-year B.Tech CSE
+                {" "}<span className="text-[#ff8a3d] font-medium">(AI & Future Technologies)</span>{" "}
+                student at{" "}
+                <span className="text-[#ff8a3d] font-medium">SRM University – AP</span>.
               </p>
+
               <p>
-                I love building AI products and am genuinely passionate about <span className="font-medium text-[#ff8a3d]">Generative AI</span> and <span className="font-medium text-[#ff8a3d]">LLMs</span> — exploring how they work, experimenting with them, and using them to create modern, intelligent, and high-performance digital experiences.
+                I build AI-powered products and am deeply passionate about{" "}
+                <span className="text-[#ff8a3d]/90 font-medium">Generative AI</span> and{" "}
+                <span className="text-[#ff8a3d]/90 font-medium">LLMs</span> — understanding how
+                they work, experimenting with them, and shipping intelligent digital experiences.
               </p>
+
               <p>
-                I enjoy turning ideas into real-world products through <span className="font-medium text-[#ff8a3d]">full-stack development</span>, AI tools, and clean, interactive design.
+                I turn ideas into real-world products through{" "}
+                <span className="text-[#ff8a3d]/90 font-medium">full-stack engineering</span>,
+                AI tooling, and design systems that feel as good as they perform.
               </p>
+
               <p>
-                Outside of code, I explore new tech, build immersive UI/UX, and constantly push myself to learn and build better.
+                Outside of code, I obsess over new tech, build immersive UI/UX, and
+                constantly push myself to learn faster and ship smarter.
               </p>
+            </div>
+
+            {/* CTA links */}
+            <div className="mt-10 flex items-center gap-6">
+              <a
+                href="#projects"
+                className="group inline-flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.3em] text-[#3a322b] hover:text-[#ff8a3d] transition-colors duration-300"
+              >
+                <span>View Work</span>
+                <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+              <span className="h-px w-8 bg-[#3a322b]/15" />
+              <a
+                href="#contact"
+                className="text-[13px] font-medium uppercase tracking-[0.3em] text-[#3a322b]/45 hover:text-[#3a322b] transition-colors duration-300"
+              >
+                Let's Talk
+              </a>
             </div>
           </ScrollReveal>
         </div>

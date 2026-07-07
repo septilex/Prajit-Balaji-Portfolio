@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, Instrument_Serif, Montserrat } from "next/font/google";
+import { Inter, Space_Grotesk, Instrument_Serif, Montserrat, Syne } from "next/font/google";
 import { GeistSans } from 'geist/font/sans';
 import localFont from "next/font/local";
 import "./globals.css";
@@ -33,6 +33,13 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  variable: "--next-font-syne",
+  display: "swap",
+});
+
 const researcher = localFont({
   src: "../public/font/researcherfontregular.ttf",
   variable: "--font-researcher",
@@ -52,7 +59,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} ${GeistSans.variable} light`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} ${GeistSans.variable} ${syne.variable} light`}
       suppressHydrationWarning
     >
       <head>
