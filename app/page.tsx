@@ -210,16 +210,7 @@ export default function Home() {
   ];
 
   return (
-    <main 
-      className="relative min-h-screen w-full overflow-x-clip bg-[#f2ece1] transition-colors duration-700 ease-in-out"
-      style={{
-        backgroundImage: `
-          linear-gradient(to right, rgba(58, 50, 43, 0.07) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(58, 50, 43, 0.07) 1px, transparent 1px)
-        `,
-        backgroundSize: "24px 24px"
-      }}
-    >
+    <main className="relative min-h-screen w-full overflow-x-clip bg-[#f2ece1] transition-colors duration-700 ease-in-out">
       <IntroPreloader />
       <ScrollProgressBar />
 
@@ -232,6 +223,7 @@ export default function Home() {
         <div className="glow-orb h-full w-full rounded-full"></div>
       </div>
 
+      <div className="grid-overlay"></div>
       <div className="grain"></div>
       <div className="vignette"></div>
 
