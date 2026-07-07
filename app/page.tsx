@@ -21,6 +21,8 @@ import { Education } from "@/components/Education";
 import { Expertise } from "@/components/Expertise";
 import { TypewriterTitle } from "@/components/TypewriterTitle";
 import { IntroPreloader } from "@/components/IntroPreloader";
+import { MagneticNavGroup } from "@/components/ui/MagneticNavItem";
+import { ProximityPillRow } from "@/components/ui/TechPill";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -209,6 +211,14 @@ export default function Home() {
     },
   ];
 
+  const navItems = [
+    { id: "projects", label: "Work" },
+    { id: "about", label: "About" },
+    { id: "stack", label: "Stack" },
+    { id: "journey", label: "Journey" },
+    { id: "contact", label: "Contact" },
+  ];
+
   return (
     <main className="relative min-h-screen w-full overflow-x-clip bg-[#f2ece1] transition-colors duration-700 ease-in-out">
       <IntroPreloader />
@@ -245,28 +255,7 @@ export default function Home() {
             </span>
           </a>
 
-          <ul className="hidden md:flex items-center gap-1">
-            {[
-              { id: "projects", label: "Work" },
-              { id: "about", label: "About" },
-              { id: "stack", label: "Stack" },
-              { id: "journey", label: "Journey" },
-              { id: "contact", label: "Contact" },
-            ].map((link) => (
-              <li key={link.id}>
-                <a
-                  href={`#${link.id}`}
-                  className={`relative inline-block rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors ${
-                    activeSection === link.id
-                      ? "text-[#ff8a3d]"
-                      : "text-[#3a322b]/60 hover:text-[#ff8a3d]"
-                  }`}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <MagneticNavGroup items={navItems} activeSection={activeSection} />
 
           <div className="flex items-center gap-2">
             {/* Theme toggle removed */}
@@ -487,38 +476,22 @@ export default function Home() {
 
         {/* Marquees */}
         <ScrollReveal initialTransform="translateY(40px)" delay={200}>
-          <div className="flex flex-col gap-6 select-none mt-10 w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+          <div className="flex flex-col gap-6 select-none mt-10 w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] overflow-hidden">
             {/* Row 1 */}
-            <div className="flex w-max animate-marquee gap-4 md:gap-6 whitespace-nowrap hover:[animation-play-state:paused] cursor-none">
-              {[...["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"], ...["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"], ...["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"]].map((tech, i) => (
-                <span
-                  key={`m1-${i}`}
-                  data-cursor=""
-                  className="inline-flex items-center px-7 py-4 rounded-full border border-white/10 bg-white/[0.02] text-[15px] md:text-[17px] font-semibold tracking-tight text-[#f2ece1] transition-all duration-500 ease-out hover:bg-[#ff8a3d]/10 hover:border-[#ff8a3d]/50 hover:text-[#ff8a3d] hover:scale-105 hover:shadow-[0_20px_40px_-15px_rgba(255,138,61,0.2)] dark:border-white/10 dark:bg-white/[0.02] dark:text-[#f2ece1] dark:hover:bg-[#ff8a3d]/10 dark:hover:border-[#ff8a3d]/50 light:border-black/10 light:bg-black/[0.02] light:text-[#1a1612] light:hover:bg-[#ff8a3d]/10 light:hover:border-[#ff8a3d]/50 cursor-none"
-                >
-                  {["OpenAI", "LLMs", "RAG", "AI Agents", "Prompt Engineering", "AI Workflows"].includes(tech) && (
-                    <span className="w-2 h-2 rounded-full bg-[#ff8a3d] mr-3 shadow-[0_0_12px_rgba(255,138,61,0.6)]"></span>
-                  )}
-                  {tech}
-                </span>
-              ))}
-            </div>
+            <ProximityPillRow
+              techs={["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"]}
+              rowKey="row1"
+              animClass="animate-marquee"
+            />
 
             {/* Row 2 */}
-            <div className="flex w-max animate-marquee-slow gap-4 md:gap-6 whitespace-nowrap hover:[animation-play-state:paused] cursor-none" style={{ animationDirection: "reverse" }}>
-              {[...["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"], ...["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"], ...["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"]].map((tech, i) => (
-                <span
-                  key={`m2-${i}`}
-                  data-cursor=""
-                  className="inline-flex items-center px-7 py-4 rounded-full border border-white/10 bg-white/[0.02] text-[15px] md:text-[17px] font-semibold tracking-tight text-[#a89c8d] transition-all duration-500 ease-out hover:bg-[#ff8a3d]/10 hover:border-[#ff8a3d]/50 hover:text-[#ff8a3d] hover:scale-105 hover:shadow-[0_20px_40px_-15px_rgba(255,138,61,0.2)] dark:border-white/10 dark:bg-white/[0.02] dark:text-[#a89c8d] dark:hover:bg-[#ff8a3d]/10 dark:hover:border-[#ff8a3d]/50 light:border-black/10 light:bg-black/[0.02] light:text-[#5a5046] light:hover:bg-[#ff8a3d]/10 light:hover:border-[#ff8a3d]/50 light:hover:text-[#ff8a3d] cursor-none"
-                >
-                  {["OpenAI", "LLMs", "RAG", "AI Agents", "Prompt Engineering", "AI Workflows"].includes(tech) && (
-                    <span className="w-2 h-2 rounded-full bg-[#ff8a3d] mr-3 shadow-[0_0_12px_rgba(255,138,61,0.6)] animate-pulse"></span>
-                  )}
-                  {tech}
-                </span>
-              ))}
-          </div>
+            <ProximityPillRow
+              techs={["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"]}
+              rowKey="row2"
+              reverse
+              dimmed
+              animClass="animate-marquee-slow"
+            />
           </div>
         </ScrollReveal>
       </section>

@@ -38,7 +38,7 @@ export const Education = () => {
           >
             <span
               className="font-researcher absolute right-[0%] top-[50%] -translate-y-[50%] text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
-              style={{ color: "rgb(185,185,185)", opacity: 0.12 }}
+              style={{ color: "rgb(58, 50, 43)", opacity: 0.10 }}
             >
               2028
             </span>
@@ -116,7 +116,7 @@ export const Education = () => {
           >
             <span
               className="font-researcher absolute left-[0%] top-[50%] -translate-y-[50%] text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
-              style={{ color: "rgb(185,185,185)", opacity: 0.12 }}
+              style={{ color: "rgb(58, 50, 43)", opacity: 0.10 }}
             >
               2024
             </span>

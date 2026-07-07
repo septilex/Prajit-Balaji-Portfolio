@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { ProximitySkillList } from "@/components/ui/ExpertiseHoverItem";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -62,29 +64,65 @@ const EXPERTISE_DATA: ExpertiseCategoryData[] = [
 
 function SkillRow({ name, index }: { name: string; index: number }) {
   const padded = String(index + 1).padStart(2, "0");
+  
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 220, mass: 0.5 };
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [10, -10]), springConfig);
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-12, 12]), springConfig);
+  const shiftX = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left - width / 2;
+    const mouseY = e.clientY - rect.top - height / 2;
+    x.set(mouseX / width);
+    y.set(mouseY / height);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <div
-      className="group/skill relative cursor-default border-b border-[#3a2a1c]/35 light:border-black/10 hover:border-[#ff8a3d]/30 light:hover:border-[#ff8a3d]/30 transition-all duration-500"
-      style={{ transformStyle: "preserve-3d" }}
+      className="group/skill relative cursor-default border-b border-[#3a2a1c]/15 hover:border-[#ff8a3d]/30 transition-all duration-500"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ perspective: "800px" }}
     >
-      <div
-        className="flex items-center justify-between py-4 px-4 -mx-4 transition-all duration-500 origin-top group-hover/skill:bg-[#f2ece1]/[0.03] light:group-hover/skill:bg-black/[0.02] group-hover/skill:[transform:rotateX(-2deg)_translateZ(10px)]"
-        style={{ transformStyle: "preserve-3d" }}
+      <motion.div
+        className="flex items-center justify-between py-4 px-4 -mx-4 transition-all duration-300 origin-center group-hover/skill:bg-[#3a322b]/[0.02]"
+        style={{
+          rotateX,
+          rotateY,
+          x: shiftX,
+          transformStyle: "preserve-3d",
+        }}
       >
         {/* Left accent bar — reveals on hover */}
-        <div className="absolute left-0 top-0 w-[3px] h-full bg-[#ff8a3d] scale-y-0 group-hover/skill:scale-y-100 transition-transform duration-500 origin-top" />
+        <div className="absolute left-0 top-0 w-[3px] h-full bg-[#ff8a3d] scale-y-0 group-hover/skill:scale-y-100 transition-transform duration-300 origin-top" />
 
         {/* Skill name */}
-        <span className="font-sans text-sm text-[#f2ece1]/60 light:text-[#3a2a1c]/70 group-hover/skill:text-[#f2ece1] light:group-hover/skill:text-[#1a1612] group-hover/skill:translate-x-2 transition-all duration-500">
+        <span 
+          className="font-sans text-sm text-[#3a322b]/70 group-hover/skill:text-[#3a322b] transition-all duration-300"
+          style={{ transform: "translateZ(15px)" }}
+        >
           {name}
         </span>
 
         {/* Index number */}
-        <span className="font-researcher text-xs tracking-wider text-[#f2ece1]/20 light:text-[#3a2a1c]/30 group-hover/skill:text-[#ff8a3d] group-hover/skill:scale-110 transition-all duration-500">
+        <span 
+          className="font-researcher text-xs tracking-wider text-[#3a322b]/30 group-hover/skill:text-[#ff8a3d] transition-all duration-300"
+          style={{ transform: "translateZ(10px)" }}
+        >
           {padded}
         </span>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -172,10 +210,8 @@ const ExpertiseCategoryBlock = React.forwardRef<
       </p>
 
       {/* Skills list */}
-      <div className="mt-10 space-y-0" style={{ perspective: "800px" }}>
-        {category.skills.map((skill, i) => (
-          <SkillRow key={skill} name={skill} index={i} />
-        ))}
+      <div className="mt-10 space-y-0">
+        <ProximitySkillList skills={category.skills} />
       </div>
     </div>
   );
