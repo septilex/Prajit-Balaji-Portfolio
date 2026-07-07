@@ -58,7 +58,8 @@ export function ScrollReveal({
     transitionDuration: `${duration}ms`,
     transitionDelay: `${delay}ms`,
     transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-    willChange: "opacity, transform",
+    // Only promote to own layer during the transition, not permanently
+    willChange: isVisible ? "auto" : "opacity, transform",
   };
 
   return (

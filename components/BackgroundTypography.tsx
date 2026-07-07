@@ -1,17 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  useVelocity,
-  useAnimationFrame,
-  useReducedMotion,
-  useMotionValue,
-  wrap,
-} from "framer-motion";
+import React from "react";
 
 export interface BackgroundTypographyProps {
   rows?: string[];
@@ -29,52 +18,23 @@ const DEFAULT_ROWS = [
 
 function ParallaxText({
   children,
-  baseVelocity = 100,
+  direction,
+  duration,
   strokeWidth = 1,
 }: {
   children: string;
-  baseVelocity: number;
+  direction: "normal" | "reverse";
+  duration: number;
   strokeWidth: number;
 }) {
-  const baseX = useMotionValue(0);
-  const { scrollY } = useScroll();
-  const scrollVelocity = useVelocity(scrollY);
-  const smoothVelocity = useSpring(scrollVelocity, {
-    damping: 50,
-    stiffness: 400,
-  });
-  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 5], {
-    clamp: false,
-  });
-  const prefersReducedMotion = useReducedMotion();
-
-  // Create duplicate content to ensure smooth wrap
-  // Assuming 4 children, we wrap seamlessly by shifting between 0 and 25% (or 0 and 33.33% if 3 children)
-  // But wait, the standard framer-motion scroll velocity tutorial wraps from -20 to -45.
-  const x = useTransform(baseX, (v) => `${wrap(-25, -50, v)}%`);
-
-  const directionFactor = useRef<number>(1);
-  useAnimationFrame((t, delta) => {
-    if (prefersReducedMotion) return;
-
-    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
-
-    // Change direction based on scroll velocity if scrolling happens
-    if (velocityFactor.get() < 0) {
-      directionFactor.current = -1;
-    } else if (velocityFactor.get() > 0) {
-      directionFactor.current = 1;
-    }
-
-    moveBy += directionFactor.current * moveBy * velocityFactor.get();
-    baseX.set(baseX.get() + moveBy);
-  });
-
   return (
     <div className="flex flex-nowrap overflow-hidden whitespace-nowrap leading-[0.8] m-0 py-2">
-      <motion.div
-        className="flex whitespace-nowrap text-nowrap flex-nowrap uppercase font-display font-black tracking-[-0.04em] will-change-transform"
-        style={{ x }}
+      <div
+        className="flex whitespace-nowrap text-nowrap flex-nowrap uppercase font-display font-black tracking-[-0.04em] will-change-transform animate-marquee"
+        style={{
+          animationDuration: `${duration}s`,
+          animationDirection: direction,
+        }}
       >
         {[...Array(4)].map((_, i) => (
           <span
@@ -89,14 +49,13 @@ function ParallaxText({
             {children}
           </span>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
 
 export function BackgroundTypography({
   rows = DEFAULT_ROWS,
-  speed = 1,
   opacity = 0.04,
   strokeWidth = 1,
 }: BackgroundTypographyProps) {
@@ -106,17 +65,16 @@ export function BackgroundTypography({
       style={{ opacity }}
       aria-hidden="true"
     >
-      {rows.map((row, i) => {
-        // Alternate directions and vary speeds slightly to make it organic
-        const direction = i % 2 === 0 ? 1 : -1;
-        const rowSpeed = speed * direction * (1 + i * 0.1);
-
-        return (
-          <ParallaxText key={i} baseVelocity={rowSpeed} strokeWidth={strokeWidth}>
-            {row}
-          </ParallaxText>
-        );
-      })}
+      {rows.map((row, i) => (
+        <ParallaxText
+          key={i}
+          direction={i % 2 === 0 ? "normal" : "reverse"}
+          duration={60 + i * 8}
+          strokeWidth={strokeWidth}
+        >
+          {row}
+        </ParallaxText>
+      ))}
     </div>
   );
 }

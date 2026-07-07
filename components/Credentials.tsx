@@ -96,7 +96,7 @@ export function Credentials() {
   const x = useTransform(baseX, (v) => `${v}%`);
 
   return (
-    <section id="credentials" className="relative mx-auto w-full pt-16 pb-20 md:pt-20 md:pb-24 z-10 bg-[#faf8f5] block min-h-[90vh]">
+    <section id="credentials" className="relative mx-auto w-full pt-16 pb-20 md:pt-20 md:pb-24 z-10 bg-[#f2ece1] block min-h-[90vh]">
       {/* Background soft glow effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ff8a3d]/[0.02] rounded-full blur-[80px] pointer-events-none"></div>
 
@@ -114,16 +114,16 @@ export function Credentials() {
 
       {/* Ticker Tape Menu */}
       <div 
-        className="relative z-[100] w-full bg-[#faf8f5] pb-4 pt-2"
+        className="relative z-[100] w-full bg-[#f2ece1] pb-4 pt-2"
       >
         <div 
-          className="relative w-full border-y border-[#110e0c]/5 bg-white/80 shadow-[0_4px_30px_rgba(0,0,0,0.02)] overflow-hidden"
+          className="relative w-full border-y border-[#110e0c]/5 bg-[#f2ece1]/80 shadow-[0_4px_30px_rgba(0,0,0,0.02)] overflow-hidden"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           {/* Edge Fade Masks */}
-          <div className="absolute inset-y-0 left-0 w-24 md:w-32 bg-gradient-to-r from-[#faf8f5] to-transparent z-20 pointer-events-none"></div>
-          <div className="absolute inset-y-0 right-0 w-24 md:w-32 bg-gradient-to-l from-[#faf8f5] to-transparent z-20 pointer-events-none"></div>
+          <div className="absolute inset-y-0 left-0 w-24 md:w-32 bg-gradient-to-r from-[#f2ece1] to-transparent z-20 pointer-events-none"></div>
+          <div className="absolute inset-y-0 right-0 w-24 md:w-32 bg-gradient-to-l from-[#f2ece1] to-transparent z-20 pointer-events-none"></div>
           
           <motion.div
             style={{ x }}

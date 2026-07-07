@@ -1,4 +1,6 @@
 @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400,900&f[]=switzer@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montenegrin+Gothic+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 @import "tailwindcss";
 
 @variant light (&:where(.light, .light *));
@@ -11,11 +13,12 @@
   --font-serif: var(--next-font-serif), Georgia, serif;
   --font-researcher: var(--font-researcher), system-ui, sans-serif;
   --font-geist: var(--font-geist-sans), system-ui, sans-serif;
+  --font-anton: 'Anton', sans-serif;
 
-  --color-bg-base: #0a0807;
-  --color-bg-elev: #110e0c;
-  --color-fg-off: #f2ece1;
-  --color-fg-mute: #a89c8d;
+  --color-bg-base: #f2ece1;
+  --color-bg-elev: #e8e1d4;
+  --color-fg-off: #3a322b;
+  --color-fg-mute: #7a6f62;
   --color-amber-theme: #ff8a3d;
   --color-amber-deep: #c2410c;
   --color-copper: #b87333;
@@ -36,48 +39,38 @@
 }
 
 :root {
-  --bg-base: #0a0807;
-  --bg-elev: #110e0c;
-  --fg-off: #f2ece1;       /* off-white, warm paper */
-  --fg-mute: #a89c8d;      /* warm gray */
+  --bg-base: #f2ece1;
+  --bg-elev: #e8e1d4;
+  --fg-off: #3a322b;       /* dark brown/charcoal text */
+  --fg-mute: #7a6f62;      /* warm muted text */
   --amber: #ff8a3d;        /* warm orange */
   --amber-deep: #c2410c;   /* burnt orange */
   --copper: #b87333;       /* copper highlight */
   --ember: #e8742c;        /* ember */
+  --grid-color: rgba(58, 50, 43, 0.07);
 
-  --background: 24 18% 4%;
-  --foreground: 36 30% 92%;
-  --card: 24 12% 6%;
-  --card-foreground: 36 30% 92%;
-  --popover: 24 12% 6%;
-  --popover-foreground: 36 30% 92%;
-  --primary: 36 30% 92%;
-  --primary-foreground: 24 18% 4%;
-  --secondary: 24 10% 10%;
-  --secondary-foreground: 36 30% 92%;
-  --muted: 24 10% 10%;
-  --muted-foreground: 32 14% 60%;
+  --background: 36 30% 92%;
+  --foreground: 24 18% 20%;
+  --card: 36 20% 88%;
+  --card-foreground: 24 18% 20%;
+  --popover: 36 20% 88%;
+  --popover-foreground: 24 18% 20%;
+  --primary: 24 18% 20%;
+  --primary-foreground: 36 30% 92%;
+  --secondary: 36 20% 85%;
+  --secondary-foreground: 24 18% 20%;
+  --muted: 36 20% 85%;
+  --muted-foreground: 36 10% 50%;
   --accent: 22 80% 55%;
-  --accent-foreground: 24 18% 4%;
+  --accent-foreground: 36 30% 92%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 28 12% 14%;
-  --input: 28 12% 14%;
+  --border: 36 15% 80%;
+  --input: 36 15% 80%;
   --ring: 22 80% 55%;
   --radius: 0.5rem;
 
   --font-inter: var(--font-sans);
-}
-
-.light {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 4%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 4%;
-  --primary: 0 0% 4%;
-  --primary-foreground: 0 0% 100%;
-  --muted-foreground: 0 0% 40%;
-  --border: 0 0% 88%;
 }
 
 html {
@@ -89,8 +82,12 @@ html {
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
   overflow-x: clip;
-  background: #0a0807;
-  color: #f2ece1;
+  background-color: #f2ece1;
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #3a322b;
   transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1), color 0.8s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -98,11 +95,6 @@ body {
   body, a, button, input, textarea, select {
     cursor: none !important;
   }
-}
-
-.light body {
-  background: #fdfbf7;
-  color: #3a322b;
 }
 
 /* Cinematic warm grain */
@@ -122,12 +114,8 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 99;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
-  transition: background 0.5s ease;
-}
-
-.light .vignette {
   background: radial-gradient(ellipse at center, transparent 50%, rgba(26,22,18,0.15) 100%);
+  transition: background 0.5s ease;
 }
 
 /* Custom scrollbar */
@@ -141,45 +129,26 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(232, 116, 44, 0.22);
+  background: rgba(120, 60, 20, 0.25);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(232, 116, 44, 0.5);
-}
-
-.light ::-webkit-scrollbar-thumb {
-  background: rgba(120, 60, 20, 0.25);
+  background: rgba(120, 60, 20, 0.45);
 }
 
 /* Warm cinematic glow on giant text */
 .text-glow {
-  text-shadow:
-    0 0 40px rgba(255, 138, 61, 0.18),
-    0 0 100px rgba(232, 116, 44, 0.12),
-    0 0 200px rgba(184, 115, 51, 0.08);
-}
-
-.light .text-glow {
   text-shadow: none;
 }
 
 /* Warm ember orb */
 .glow-orb {
   background: radial-gradient(circle at center,
-    rgba(255, 138, 61, 0.45) 0%,
-    rgba(232, 116, 44, 0.22) 35%,
-    rgba(184, 115, 51, 0.08) 60%,
-    transparent 75%);
-  filter: blur(70px);
-}
-
-.light .glow-orb {
-  background: radial-gradient(circle at center,
     rgba(220, 100, 30, 0.15) 0%,
     rgba(180, 80, 20, 0.08) 35%,
     transparent 70%);
+  filter: blur(40px);
 }
 
 /* Utilities for section reveals */
@@ -192,4 +161,51 @@ body {
 .reveal-active {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Glass Button Styles */
+.glass-button-wrap {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-button-wrap:hover {
+  transform: translateY(-2px);
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  color: #3a322b;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-button-wrap:hover .glass-button {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 138, 61, 0.3);
+  box-shadow: 
+    0 8px 30px rgba(255, 138, 61, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(255, 138, 61, 0.1);
+}
+
+.glass-button-shadow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at center, rgba(255, 138, 61, 0.12) 0%, transparent 70%);
+  filter: blur(12px);
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-button-wrap:hover .glass-button-shadow {
+  opacity: 1;
 }

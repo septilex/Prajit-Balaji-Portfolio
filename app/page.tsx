@@ -20,6 +20,7 @@ import { Credentials } from "@/components/Credentials";
 import { Education } from "@/components/Education";
 import { Expertise } from "@/components/Expertise";
 import { TypewriterTitle } from "@/components/TypewriterTitle";
+import { IntroPreloader } from "@/components/IntroPreloader";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -209,7 +210,8 @@ export default function Home() {
   ];
 
   return (
-    <main className="relative min-h-screen w-full overflow-x-clip bg-[#0a0807] light:bg-[#fdfbf7] transition-colors duration-700 ease-in-out">
+    <main className="relative min-h-screen w-full overflow-x-clip bg-[#f2ece1] transition-colors duration-700 ease-in-out">
+      <IntroPreloader />
       <ScrollProgressBar />
 
       {/* Static Glow Orb */}
@@ -232,12 +234,12 @@ export default function Home() {
           transform: mounted ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-40px)",
         }}
       >
-        <div className="flex items-center justify-between gap-6 rounded-full border border-[#3a2a1c]/60 bg-[#0f0a07]/55 px-5 py-2.5 backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,180,120,0.06)] dark:border-[#3a2a1c]/60 light:bg-white/60 light:border-black/10">
+        <div className="flex items-center justify-between gap-6 rounded-full border border-[#3a2a1c]/10 bg-[#f2ece1]/45 backdrop-blur-xl px-5 py-2.5 shadow-[0_12px_40px_rgba(58,50,43,0.1),0_2px_8px_rgba(58,50,43,0.05),inset_0_1px_0_rgba(255,255,255,0.5)]">
           <a href="#hero" className="flex items-center gap-2 text-sm font-medium tracking-tight">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#ff8a3d] to-[#c2410c] text-[#0a0807] text-[10px] font-bold shadow-[0_0_20px_rgba(255,138,61,0.4)]">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#ff8a3d] to-[#c2410c] text-white text-[10px] font-bold shadow-[0_0_20px_rgba(255,138,61,0.4)]">
               P
             </span>
-            <span className="hidden sm:inline text-[#f2ece1]/90 dark:text-[#f2ece1]/90 light:text-[#1a1612]/90">
+            <span className="hidden sm:inline text-[#3a322b] font-researcher font-bold tracking-[0.2em] text-[11px]">
               PRAJIT BALAJI
             </span>
           </a>
@@ -256,7 +258,7 @@ export default function Home() {
                   className={`relative inline-block rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors ${
                     activeSection === link.id
                       ? "text-[#ff8a3d]"
-                      : "text-[#f2ece1]/55 dark:text-[#f2ece1]/55 light:text-[#1a1612]/55 hover:text-[#ff8a3d]"
+                      : "text-[#3a322b]/60 hover:text-[#ff8a3d]"
                   }`}
                 >
                   {link.label}
@@ -287,9 +289,9 @@ export default function Home() {
         {/* Background */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_50%,rgba(40,18,8,0.9),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_70%_50%,rgba(40,18,8,0.9),transparent_60%)] light:bg-[radial-gradient(ellipse_at_70%_50%,rgba(255,240,225,0.4),transparent_60%)]"></div>
-          <div className="absolute left-[8%] top-[18%] h-[520px] w-[520px] rounded-full bg-[#c2410c]/25 blur-[140px] light:bg-[#c2410c]/8 light:blur-[140px]"></div>
-          <div className="absolute right-[5%] top-[35%] h-[640px] w-[640px] rounded-full bg-[#ff8a3d]/18 blur-[160px] light:bg-[#ff8a3d]/6 light:blur-[160px]"></div>
-          <div className="absolute bottom-[-10%] left-1/2 h-[420px] w-[80%] -translate-x-1/2 rounded-full bg-[#b87333]/22 blur-[120px] light:bg-[#b87333]/8 light:blur-[120px]"></div>
+          <div className="absolute left-[8%] top-[18%] h-[400px] w-[400px] rounded-full bg-[#c2410c]/20 blur-[80px] light:bg-[#c2410c]/8 light:blur-[80px]"></div>
+          <div className="absolute right-[5%] top-[35%] h-[500px] w-[500px] rounded-full bg-[#ff8a3d]/15 blur-[100px] light:bg-[#ff8a3d]/6 light:blur-[100px]"></div>
+          <div className="absolute bottom-[-10%] left-1/2 h-[350px] w-[70%] -translate-x-1/2 rounded-full bg-[#b87333]/18 blur-[80px] light:bg-[#b87333]/8 light:blur-[80px]"></div>
           <div className="absolute inset-x-0 bottom-0 h-[40vh] bg-gradient-to-t from-[#1a0d05]/80 via-[#0d0807]/40 to-transparent dark:from-[#1a0d05]/80 dark:via-[#0d0807]/40 light:from-[#f5efe6] light:to-transparent"></div>
         </div>
 
@@ -423,13 +425,14 @@ export default function Home() {
                   
                   {/* The Image perfectly blended */}
                   <Image
-                    src="/portrait/portrait-fdfbf7.png"
+                    src="/portrait/My Portrait White Shirt.png"
                     alt="Prajit Balaji"
                     fill
                     className="object-cover object-center transition-transform duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02] drop-shadow-[0_30px_60px_rgba(0,0,0,0.15)]"
                     style={{
                       maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)",
-                      WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)"
+                      WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%)",
+                      mixBlendMode: "multiply"
                     }}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
                     priority
@@ -576,7 +579,7 @@ export default function Home() {
 
                   {/* Center Column: Large Image Showcase */}
                   <div className="order-2 lg:order-none lg:col-span-5 w-full relative z-10">
-                    <div className="relative w-full rounded-2xl md:rounded-[36px] border border-white/[0.04] bg-gradient-to-br from-[#1a120c]/40 to-[#0a0807]/80 p-2 md:p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-4 group-hover:shadow-[0_40px_100px_-20px_rgba(255,138,61,0.25)] group-hover:border-[#ff8a3d]/20 dark:border-white/[0.04] dark:from-[#1a120c]/40 dark:to-[#0a0807]/80 light:from-white/80 light:to-white/90 light:border-black/[0.05] light:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] light:group-hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.15)] light:group-hover:border-[#ff8a3d]/30">
+                    <div className="relative w-full rounded-2xl md:rounded-[36px] border border-white/[0.04] bg-gradient-to-br from-[#1a120c]/40 to-[#0a0807]/80 p-2 md:p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-lg transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-4 group-hover:shadow-[0_40px_100px_-20px_rgba(255,138,61,0.25)] group-hover:border-[#ff8a3d]/20 dark:border-white/[0.04] dark:from-[#1a120c]/40 dark:to-[#0a0807]/80 light:from-white/80 light:to-white/90 light:border-black/[0.05] light:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] light:group-hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.15)] light:group-hover:border-[#ff8a3d]/30">
                       {/* Browser Top Bar */}
                       <div className="flex items-center justify-between px-3 pb-3 pt-2 md:px-5 md:pb-5 md:pt-4">
                         <div className="flex items-center gap-2">

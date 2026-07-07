@@ -159,7 +159,10 @@ const ExpertiseCategoryBlock = React.forwardRef<
       </span>
 
       {/* Category title */}
-      <h3 className="font-display font-bold text-3xl md:text-5xl text-[#f2ece1] light:text-[#1a1612] tracking-wide leading-[1.05] uppercase">
+      <h3 
+        className="font-normal text-3xl md:text-5xl text-[#3a322b] tracking-wide leading-[1.05] uppercase"
+        style={{ fontFamily: "'Anton', sans-serif" }}
+      >
         {category.title}
       </h3>
 
