@@ -13,6 +13,7 @@
   --font-serif: var(--next-font-serif), Georgia, serif;
   --font-researcher: var(--font-researcher), system-ui, sans-serif;
   --font-geist: var(--font-geist-sans), system-ui, sans-serif;
+  --font-geist-mono: var(--font-geist-mono), monospace;
   --font-anton: 'Anton', sans-serif;
   --font-syne: var(--next-font-syne), system-ui, sans-serif;
 
@@ -104,12 +105,6 @@ body {
   background-size: 24px 24px;
 }
 
-@media (pointer: fine) {
-  body, a, button, input, textarea, select {
-    cursor: none !important;
-  }
-}
-
 /* Cinematic warm grain */
 .grain {
   position: fixed;
@@ -174,6 +169,64 @@ body {
 .reveal-active {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Animated RGB rainbow border — loops around project cards on hover.
+   GPU-composited: the gradient is rasterized once, then rotated via transform.
+   No per-frame repaint or reblur, so it stays smooth. */
+.rainbow-ring {
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  overflow: hidden; /* clips the spinning gradient to a rounded rect → the card on top leaves a thin border */
+}
+
+/* Soft radiating bloom — gradient is clipped to the card shape (overflow:hidden),
+   so the blur only spills OUTWARD from the edge instead of washing the background. */
+.rainbow-halo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  filter: blur(16px);
+  transition: opacity 0.4s ease;
+}
+
+/* The big rotating gradient square (sized to always cover the card at any angle) */
+.rainbow-conic {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(0deg);
+  background: conic-gradient(
+    from 0deg,
+    #ff2d2d, #ff8a00, #ffd500, #34ff5b, #00e5ff, #2d6bff, #b53dff, #ff2da8, #ff2d2d
+  );
+}
+
+.rainbow-glow:hover .rainbow-ring {
+  opacity: 1;
+}
+
+.rainbow-glow:hover .rainbow-halo {
+  opacity: 0.7;
+}
+
+.rainbow-glow:hover .rainbow-conic {
+  animation: rainbow-spin 4s linear infinite;
+}
+
+@keyframes rainbow-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* Glass Button Styles */

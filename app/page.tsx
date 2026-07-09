@@ -11,6 +11,7 @@ import {
   Mail,
   Loader2,
   CheckCircle2,
+  Link2,
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -24,6 +25,7 @@ import { IntroPreloader } from "@/components/IntroPreloader";
 import { MagneticNavGroup } from "@/components/ui/MagneticNavItem";
 import { ProximityPillRow } from "@/components/ui/TechPill";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
+import { GlowButton } from "@/components/ui/glow";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -42,7 +44,6 @@ const Linkedin = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  const [hoveredProject, setHoveredProject] = useState<number | null>(null);
   const [hoveredPillar, setHoveredPillar] = useState<number | null>(null);
   const [formState, setFormState] = useState<"idle" | "loading" | "success">("idle");
   const [activeSection, setActiveSection] = useState<string>("hero");
@@ -144,9 +145,11 @@ export default function Home() {
       title: "KADENCE",
       cat: "MUSIC • 3D UNIVERSE",
       desc: "Step into a living, breathing 3D universe of music where every artist and album becomes a world to explore.",
+      tags: ["REACT", "THREE.JS", "NEXT.JS"],
       status: "Live",
       year: "2026",
       link: "https://kadence-musicz.vercel.app/",
+      github: "https://github.com/septilex",
       image: "/kadence-preview.png",
     },
     {
@@ -154,9 +157,11 @@ export default function Home() {
       title: "VELARI",
       cat: "AI • GENERATIVE ART",
       desc: "An AI canvas that turns your imagination into mesmerizing, gallery-worthy generative art in real time.",
+      tags: ["REACT", "OPENAI", "TAILWIND CSS"],
       status: "Live",
       year: "2026",
       link: "https://velari-dusky.vercel.app/",
+      github: "https://github.com/septilex",
       image: "/velari-preview.png",
     },
     {
@@ -164,9 +169,11 @@ export default function Home() {
       title: "DevMentor AI",
       cat: "AI • ENGINEERING ASSISTANT",
       desc: "An AI pair programmer that thinks like a senior engineer — auditing, architecting, and documenting your code at superhuman speed.",
+      tags: ["NEXT.JS", "TYPESCRIPT", "OPENAI"],
       status: "Live",
       year: "2026",
       link: "https://devmentorr.vercel.app/",
+      github: "https://github.com/septilex",
       image: "/devmentor-preview.png",
     },
     {
@@ -174,9 +181,11 @@ export default function Home() {
       title: "DevScore",
       cat: "AI • DEVELOPER ANALYSIS",
       desc: "The ultimate verdict on your code: scans your GitHub to reveal your true skill, growth, and developer DNA.",
+      tags: ["NEXT.JS", "GITHUB API", "AI"],
       status: "Live",
       year: "2026",
       link: "https://devscore-xi.vercel.app/",
+      github: "https://github.com/septilex",
       image: "/devscore-preview.png",
     },
   ];
@@ -329,7 +338,7 @@ export default function Home() {
                   <br />
                   <TypewriterTitle />
                   <br />
-                  <span className="text-[#a89c8d] text-xl md:text-2xl mt-3 inline-block">Creating futuristic digital experiences.</span>
+                  <span className="font-syne text-[#a89c8d] text-xl md:text-2xl mt-3 inline-block">Creating futuristic digital experiences.</span>
                 </p>
               </ScrollReveal>
 
@@ -432,8 +441,8 @@ export default function Home() {
             <div className="w-12 h-[2px] bg-[#ff8a3d]/40 rounded-full mb-8" />
 
             {/* Biography block */}
-            <div className="space-y-5 text-[15px] md:text-[16px] leading-[1.85] tracking-[0.005em] text-[#3a322b]/65">
-              <p className="text-[16px] md:text-[17px] text-[#3a322b]/80 leading-[1.75]">
+            <div className="font-syne space-y-5 text-[16px] font-semibold leading-[24px] text-[#95979D]">
+              <p>
                 I'm{" "}
                 <span 
                   className="font-extrabold text-[#3a322b] text-[1.05em] tracking-tight"
@@ -554,103 +563,122 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-20 flex flex-col gap-y-40 md:gap-y-64">
-          {projects.map((project, idx) => (
+        <div className="mt-20 flex flex-col gap-y-12 md:gap-y-20">
+          {projects.map((project) => (
             <ScrollReveal
               key={project.title}
               initialTransform="translateY(80px)"
             >
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                onMouseEnter={() => setHoveredProject(idx)}
-                onMouseLeave={() => setHoveredProject(null)}
-                data-cursor="EXPLORE"
-                className={`group block w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                  hoveredProject !== null && hoveredProject !== idx ? "opacity-40 scale-[0.97]" : "opacity-100 scale-100"
-                }`}
+              <div className="rainbow-glow relative rounded-[28px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 md:rounded-[40px]">
+              <span aria-hidden="true" className="rainbow-halo"><span className="rainbow-conic" /></span>
+              <span aria-hidden="true" className="rainbow-ring"><span className="rainbow-conic" /></span>
+              <div
+                className="group relative overflow-hidden rounded-[28px] md:rounded-[40px] border border-[#3a322b]/10 bg-gradient-to-br from-white via-[#faf5ec] to-[#f3ecdf] shadow-[0_30px_80px_-30px_rgba(58,50,43,0.28)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[#ff8a3d]/30 hover:shadow-[0_45px_100px_-30px_rgba(255,138,61,0.35)]"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-14 items-center">
-                  
-                  {/* Left Column: Number & Title */}
-                  <div className="order-1 lg:order-none lg:col-span-4 flex flex-col justify-center relative z-20 pr-0 lg:pr-4">
-                    <div className="flex lg:flex-col items-baseline lg:items-start gap-3 lg:gap-6">
-                      <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-[#a89c8d]/60 font-researcher">
-                        {project.num}
-                      </span>
-                      <h3 className="font-researcher text-4xl sm:text-5xl md:text-5xl lg:text-4xl xl:text-[3.2rem] leading-[1.1] font-bold tracking-[0.05em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] break-words uppercase">
-                        {project.title}
-                      </h3>
-                    </div>
-                  </div>
+                {/* Ambient orange glow on hover */}
+                <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[#ff8a3d]/10 opacity-0 blur-[80px] transition-opacity duration-700 group-hover:opacity-100"></div>
 
-                  {/* Center Column: Large Image Showcase */}
-                  <div className="order-2 lg:order-none lg:col-span-5 w-full relative z-10">
-                    <div className="relative w-full rounded-2xl md:rounded-[36px] border border-white/[0.04] bg-gradient-to-br from-[#1a120c]/40 to-[#0a0807]/80 p-2 md:p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] backdrop-blur-lg transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-4 group-hover:shadow-[0_40px_100px_-20px_rgba(255,138,61,0.25)] group-hover:border-[#ff8a3d]/20 dark:border-white/[0.04] dark:from-[#1a120c]/40 dark:to-[#0a0807]/80 light:from-white/80 light:to-white/90 light:border-black/[0.05] light:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] light:group-hover:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.15)] light:group-hover:border-[#ff8a3d]/30">
-                      {/* Browser Top Bar */}
-                      <div className="flex items-center justify-between px-3 pb-3 pt-2 md:px-5 md:pb-5 md:pt-4">
-                        <div className="flex items-center gap-2">
-                          <div className="h-2.5 w-2.5 rounded-full bg-white/20 light:bg-black/15 transition-all duration-300 group-hover:bg-[#ff5f56] group-hover:shadow-[0_0_10px_rgba(255,95,86,0.8)]"></div>
-                          <div className="h-2.5 w-2.5 rounded-full bg-white/20 light:bg-black/15 transition-all duration-300 group-hover:bg-[#ffbd2e] group-hover:shadow-[0_0_10px_rgba(255,189,46,0.8)]"></div>
-                          <div className="h-2.5 w-2.5 rounded-full bg-white/20 light:bg-black/15 transition-all duration-300 group-hover:bg-[#27c93f] group-hover:shadow-[0_0_10px_rgba(39,201,63,0.8)]"></div>
-                        </div>
-                        <div className="text-[10px] uppercase tracking-[0.25em] text-[#a89c8d]/40 font-semibold group-hover:text-[#a89c8d]/80 transition-colors duration-500 font-researcher">
-                          {project.cat}
-                        </div>
-                      </div>
-                      
-                      {/* Screenshot Container */}
-                      <div className="relative overflow-hidden rounded-xl md:rounded-[24px] border border-white/5 light:border-black/5 bg-[#0a0807] light:bg-[#fdfbf7]">
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#ff8a3d]/20 to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-[800ms] z-10 pointer-events-none mix-blend-overlay"></div>
-                        <Image 
-                          src={project.image} 
-                          alt={`${project.title} Preview`}
-                          width={1600}
-                          height={1000}
-                          className="w-full h-auto object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05] aspect-[16/10]"
-                          loading="lazy"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                <div className="relative grid grid-cols-1 items-center gap-10 p-8 md:p-12 lg:grid-cols-2 lg:gap-12 lg:p-16">
 
-                  {/* Right Column: Description, Status, Link */}
-                  <div className="order-3 lg:order-none lg:col-span-3 flex flex-col justify-center h-full lg:pt-10 xl:pt-20">
-                    <p className="text-[15px] md:text-[17px] leading-[1.8] tracking-tight text-[#a89c8d] dark:text-[#a89c8d] light:text-[#5a5046] mb-10 font-medium">
+                  {/* ── Left: Icons, Title, Description, Tech Tags ── */}
+                  <div className="flex flex-col">
+                    {/* Icon buttons */}
+                    <div className="mb-8 flex items-center gap-4 md:mb-10">
+                      <GlowButton
+                        asChild
+                        mode="rotate"
+                        blur="soft"
+                        glowScale={1.1}
+                        colors={["#ff8a3d", "#3a322b", "#ffaf7a"]}
+                        variant="unstyled"
+                        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1a1612] text-[#f2ece1] transition-all duration-300 hover:scale-110 hover:bg-[#ff8a3d] hover:text-[#1a1612] border-0 outline-none"
+                      >
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${project.title} source on GitHub`}
+                        >
+                          <Github className="h-5 w-5" />
+                        </a>
+                      </GlowButton>
+                      <GlowButton
+                        asChild
+                        mode="rotate"
+                        blur="soft"
+                        glowScale={1.1}
+                        colors={["#ff8a3d", "#3a322b", "#ffaf7a"]}
+                        variant="unstyled"
+                        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1a1612] text-[#f2ece1] transition-all duration-300 hover:scale-110 hover:bg-[#ff8a3d] hover:text-[#1a1612] border-0 outline-none"
+                      >
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Visit ${project.title} live site`}
+                        >
+                          <Link2 className="h-5 w-5" />
+                        </a>
+                      </GlowButton>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="font-montserrat text-4xl font-black leading-[0.95] tracking-tight text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] md:text-5xl xl:text-6xl">
+                      {project.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="font-syne mt-4 w-[90%] max-w-[457px] text-[16px] font-semibold leading-[24px] text-[#95979D]">
                       {project.desc}
                     </p>
 
-                    <div className="flex items-center justify-between border-t border-white/[0.06] pt-6 dark:border-white/[0.06] light:border-black/[0.06]">
-                      <div className="flex flex-col gap-2">
+                    {/* Tech tags */}
+                    <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+                      {project.tags.map((tag) => (
                         <span
-                          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] w-max font-bold transition-colors duration-500 font-researcher ${
-                            project.status === "Live"
-                              ? "border-[#ff8a3d]/30 bg-[#ff8a3d]/10 text-[#ff8a3d] group-hover:border-[#ff8a3d]/50 group-hover:bg-[#ff8a3d]/20"
-                              : "border-white/10 bg-white/5 text-[#a89c8d]"
-                          }`}
+                          key={tag}
+                          className="font-syne text-[13px] font-bold uppercase tracking-[0.12em] text-[#3a322b] transition-colors duration-300 group-hover:text-[#1a1612] md:text-[15px]"
                         >
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              project.status === "Live"
-                                ? "bg-[#ff8a3d] shadow-[0_0_12px_rgba(255,138,61,0.9)] animate-pulse"
-                                : "bg-[#a89c8d]/60"
-                            }`}
-                          ></span>
-                          {project.status}
+                          {tag}
                         </span>
-                        <span className="text-[11px] font-semibold tracking-[0.3em] text-[#a89c8d]/40 pl-1 mt-1 font-researcher">
-                          {project.year}
-                        </span>
-                      </div>
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all duration-[500ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:border-[#ff8a3d]/50 group-hover:bg-[#ff8a3d] group-hover:text-black group-hover:scale-110 group-hover:shadow-[0_10px_30px_rgba(255,138,61,0.3)] text-[#f2ece1] dark:border-white/10 dark:bg-white/5 light:border-black/10 light:bg-black/5 light:text-black">
-                        <ArrowUpRight className="h-6 w-6" />
-                      </div>
+                      ))}
                     </div>
                   </div>
 
+                  {/* ── Right: MacBook mockup ── */}
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open ${project.title}`}
+                    className="relative block w-full"
+                  >
+                    <div className="relative mx-auto w-full max-w-[580px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1">
+                      {/* Screen + bezel */}
+                      <div className="relative rounded-t-[16px] border-[10px] border-b-0 border-[#2b2b2f] bg-[#2b2b2f] shadow-[0_25px_60px_-20px_rgba(0,0,0,0.5)] md:rounded-t-[20px] md:border-[14px] md:border-b-0">
+                        <div className="relative overflow-hidden rounded-[4px] bg-black">
+                          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#ff8a3d]/25 to-transparent opacity-0 mix-blend-overlay transition-opacity duration-700 group-hover:opacity-100"></div>
+                          <Image
+                            src={project.image}
+                            alt={`${project.title} Preview`}
+                            width={1600}
+                            height={1000}
+                            className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+                            loading="lazy"
+                          />
+                        </div>
+                      </div>
+                      {/* Base / hinge */}
+                      <div className="relative left-1/2 h-3.5 w-[112%] -translate-x-1/2 rounded-b-[10px] bg-gradient-to-b from-[#d8d8db] via-[#bcbcc0] to-[#96969b] shadow-[0_12px_24px_-8px_rgba(0,0,0,0.4)] md:h-4">
+                        {/* Notch */}
+                        <div className="absolute left-1/2 top-0 h-1.5 w-[14%] -translate-x-1/2 rounded-b-[6px] bg-[#7c7c82]"></div>
+                      </div>
+                    </div>
+                  </a>
+
                 </div>
-              </a>
+              </div>
+              </div>
             </ScrollReveal>
           ))}
         </div>
@@ -706,7 +734,7 @@ export default function Home() {
                 <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
                   {node.role}
                 </div>
-                <p className="mt-2 text-sm text-[#a89c8d]/70 font-researcher">
+                <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
                   {node.desc}
                 </p>
               </div>
@@ -738,7 +766,7 @@ export default function Home() {
                     <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
                       {node.role}
                     </div>
-                    <p className="mt-2 text-sm text-[#a89c8d]/70 font-researcher">
+                    <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
                       {node.desc}
                     </p>
                   </>
@@ -813,10 +841,15 @@ export default function Home() {
                   />
                 </div>
 
-                <button
+                <GlowButton
                   type="submit"
                   disabled={formState === "loading" || formState === "success"}
-                  className="group relative mt-4 inline-flex items-center gap-3 overflow-hidden rounded-full border border-[#ff8a3d]/50 bg-gradient-to-br from-[#ff8a3d] via-[#e8742c] to-[#c2410c] px-7 py-4 text-sm font-medium text-[#1a0d05] transition-all hover:shadow-[0_0_60px_rgba(255,138,61,0.45),inset_0_1px_0_rgba(255,220,180,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
+                  mode="rotate"
+                  blur="medium"
+                  colors={["#ff8a3d", "#e8742c", "#c2410c", "#ffaf7a"]}
+                  variant="unstyled"
+                  wrapperClassName="mt-4"
+                  className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full border border-[#ff8a3d]/50 bg-gradient-to-br from-[#ff8a3d] via-[#e8742c] to-[#c2410c] px-7 py-4 text-sm font-medium text-[#1a0d05] transition-all hover:shadow-[0_0_60px_rgba(255,138,61,0.45),inset_0_1px_0_rgba(255,220,180,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {formState === "loading" ? (
                     <>
@@ -835,7 +868,7 @@ export default function Home() {
                       <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                     </>
                   )}
-                </button>
+                </GlowButton>
               </form>
             </ScrollReveal>
 
@@ -850,7 +883,6 @@ export default function Home() {
                 </div>
                 <a
                   href="mailto:prajitk299@gmail.com"
-                  data-cursor="EMAIL"
                   className="font-display mt-2 block text-2xl tracking-tight hover:text-[#c9bcaa] md:text-3xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors"
                 >
                   prajitk299@gmail.com
@@ -880,7 +912,6 @@ export default function Home() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    data-cursor={social.label === "Github" ? "CODE" : social.label === "LinkedIn" ? "CONNECT" : "EMAIL"}
                     className="group flex items-center justify-between border-b border-[#3a2a1c]/55 dark:border-[#3a2a1c]/55 light:border-black/10 py-3 text-sm transition-colors hover:text-[#f2ece1] text-[#a89c8d]"
                   >
                     <span className="flex items-center gap-3 text-[#c9bcaa] group-hover:text-[#ff8a3d] transition-colors">

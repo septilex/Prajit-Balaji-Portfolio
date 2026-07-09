@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, Instrument_Serif, Montserrat, Syne } from "next/font/google";
 import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import localFont from "next/font/local";
 import "./globals.css";
 import { CursorGlow } from "@/components/CursorGlow";
-import { CustomCursor } from "@/components/CustomCursor";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,7 +35,7 @@ const montserrat = Montserrat({
 
 const syne = Syne({
   subsets: ["latin"],
-  weight: ["700", "800"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--next-font-syne",
   display: "swap",
 });
@@ -59,13 +59,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} ${GeistSans.variable} ${syne.variable} light`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} ${GeistSans.variable} ${GeistMono.variable} ${syne.variable} light`}
       suppressHydrationWarning
     >
       <head>
       </head>
       <body className="antialiased selection:bg-[rgb(var(--amber))] selection:text-[rgb(var(--bg))] min-h-screen">
-          <CustomCursor />
           <CursorGlow />
           {children}
       </body>

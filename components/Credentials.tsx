@@ -202,7 +202,7 @@ export function Credentials() {
                   {activeCredential.title}
                 </h3>
                 
-                <p className="text-lg md:text-xl font-medium text-[#8c7d6e]">
+                <p className="font-syne text-lg md:text-xl font-medium text-[#8c7d6e]">
                   Issued by <span className="text-[#110e0c]">{activeCredential.issuer}</span>
                 </p>
               </div>
@@ -210,7 +210,7 @@ export function Credentials() {
               <div className="w-16 h-[2px] bg-gradient-to-r from-[#ff8a3d] to-transparent opacity-40"></div>
 
               <div className="space-y-6">
-                <p className="text-base md:text-lg leading-[1.6] text-[#6b6054] font-light">
+                <p className="font-syne text-base md:text-lg leading-[1.6] text-[#6b6054] font-normal">
                   {activeCredential.description}
                 </p>
                 

@@ -205,7 +205,7 @@ const ExpertiseCategoryBlock = React.forwardRef<
       </h3>
 
       {/* Category description */}
-      <p className="text-[#a89c8d] light:text-[#3a2a1c]/70 font-sans text-sm md:text-base mt-4 leading-relaxed max-w-xl">
+      <p className="text-[#a89c8d] light:text-[#3a2a1c]/70 font-syne text-sm md:text-base mt-4 leading-relaxed max-w-xl">
         {category.description}
       </p>
 

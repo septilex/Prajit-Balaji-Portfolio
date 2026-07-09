@@ -72,7 +72,7 @@ export const Education = () => {
               </h4>
 
               {/* Subtitle */}
-              <p className="mt-4 text-base md:text-lg lg:text-xl font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <p className="font-syne mt-4 text-base md:text-lg lg:text-xl font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                 AI &amp; Future Technologies
               </p>
 
@@ -150,7 +150,7 @@ export const Education = () => {
               </h4>
 
               {/* Subjects */}
-              <p className="mt-4 text-base md:text-lg lg:text-xl font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <p className="font-syne mt-4 text-base md:text-lg lg:text-xl font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                 Physics &bull; Chemistry &bull; Biology
               </p>
 

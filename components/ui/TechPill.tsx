@@ -55,7 +55,6 @@ export function TechPill({ tech, pillKey, mouseX, dimmed = false }: TechPillProp
     <motion.span
       ref={ref}
       key={pillKey}
-      data-cursor=""
       style={{
         scale,
         y,
@@ -63,7 +62,7 @@ export function TechPill({ tech, pillKey, mouseX, dimmed = false }: TechPillProp
           ? `0 ${Math.round(shadowStrength.get() * 20)}px ${Math.round(shadowStrength.get() * 36)}px -10px rgba(255,138,61,${(shadowStrength.get() * 0.22).toFixed(3)}), 0 ${Math.round(shadowStrength.get() * 6)}px ${Math.round(shadowStrength.get() * 14)}px rgba(58,50,43,${(shadowStrength.get() * 0.08).toFixed(3)})`
           : undefined,
       }}
-      className={`relative inline-flex items-center px-7 py-4 rounded-full border cursor-none select-none transition-colors duration-200
+      className={`relative inline-flex items-center px-7 py-4 rounded-full border select-none transition-colors duration-200
         ${dimmed
           ? "border-[#3a322b]/10 bg-[#3a322b]/[0.02] text-[#5a5046]"
           : "border-[#3a322b]/10 bg-[#3a322b]/[0.02] text-[#3a322b]"
@@ -114,7 +113,7 @@ export function ProximityPillRow({
 
   return (
     <div
-      className={`flex w-max ${animClass} gap-4 md:gap-6 whitespace-nowrap cursor-none`}
+      className={`flex w-max ${animClass} gap-4 md:gap-6 whitespace-nowrap`}
       style={reverse ? { animationDirection: "reverse" } : undefined}
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
