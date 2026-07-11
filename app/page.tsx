@@ -12,6 +12,7 @@ import {
   Loader2,
   CheckCircle2,
   Link2,
+  Download,
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -348,6 +349,30 @@ export default function Home() {
               >
                 <div>Based in the <span className="text-[#ff8a3d] font-bold">cloud</span></div>
                 <div className="mt-1">Building the <span className="text-[#ff8a3d] font-bold">next decade</span></div>
+              </ScrollReveal>
+
+              {/* Liquid-glass glowing resume download button */}
+              <ScrollReveal initialTransform="translateY(30px)" className="mt-8 flex justify-center">
+                <a
+                  href="/Prajit_Balaji_Resume.pdf"
+                  download="Prajit_Balaji_Resume.pdf"
+                  aria-label="Download my resume"
+                  className="glass-button-wrap group relative rounded-full"
+                >
+                  {/* Animated orange glow */}
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg transition-opacity duration-500 group-hover:opacity-80 animate-pulse"
+                  />
+                  {/* Liquid glass pill */}
+                  <span className="glass-button relative z-10 flex items-center gap-3 rounded-full px-7 py-4">
+                    <Download className="h-4 w-4 text-[#ff8a3d] transition-transform duration-500 group-hover:translate-y-0.5" />
+                    <span className="font-researcher font-bold text-[11px] uppercase tracking-[0.3em] text-[#1A1612]">
+                      My Resume
+                    </span>
+                  </span>
+                  <span aria-hidden="true" className="glass-button-shadow rounded-full" />
+                </a>
               </ScrollReveal>
             </div>
           </div>
