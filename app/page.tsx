@@ -516,7 +516,7 @@ export default function Home() {
       <IntroPreloader />
       <ScrollProgressBar />
 
-      {/* Floating quick-access dock — GitHub / LinkedIn / Gmail, always on screen */}
+      {/* Floating quick-access dock — GitHub / LinkedIn / Gmail / Instagram, always on screen */}
       <div className="fixed right-5 top-1/2 z-[90] hidden -translate-y-1/2 flex-col gap-3 md:flex">
         {[
           {
@@ -534,6 +534,17 @@ export default function Home() {
             href: "mailto:prajitk299@gmail.com",
             icon: <Mail className="h-[18px] w-[18px]" />,
           },
+          {
+            label: "Instagram",
+            href: "https://www.instagram.com/_prajitbalaji_/",
+            icon: (
+              <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+              </svg>
+            ),
+          },
         ].map((item) => (
           <Magnetic key={item.label} strength={0.35}>
             <a
@@ -550,15 +561,15 @@ export default function Home() {
               />
               {/* Liquid glass circle */}
               <span className="relative z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/40 text-[#3a322b] backdrop-blur-xl shadow-[0_10px_30px_rgba(58,50,43,0.14),inset_0_1px_0_rgba(255,255,255,0.75),inset_0_-2px_6px_rgba(58,50,43,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d]/50 group-hover:bg-white/60 group-hover:text-[#ff8a3d] group-hover:shadow-[0_14px_40px_rgba(255,138,61,0.28),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-2px_6px_rgba(255,138,61,0.1)]">
-                {/* Specular sheen — the "liquid" top-light */}
+                {/* Specular sheen */}
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.85)_0%,rgba(255,255,255,0.25)_28%,rgba(255,255,255,0)_50%)]"
                 />
                 <span className="relative z-10">{item.icon}</span>
               </span>
-              {/* Hover label — same type treatment as the My Resume button */}
-              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#3a322b]/10 bg-[#f2ece1]/90 px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] text-[#1A1612] opacity-0 shadow-[0_8px_24px_rgba(58,50,43,0.12)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+              {/* Hover label — glowing orange text */}
+              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a3d]/30 bg-[#f2ece1]/90 px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.2),0_0_12px_rgba(255,138,61,0.15)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" style={{ color: "#ff8a3d", textShadow: "0 0 8px rgba(255,138,61,0.7), 0 0 20px rgba(255,138,61,0.4)" }}>
                 {item.label}
               </span>
             </a>
