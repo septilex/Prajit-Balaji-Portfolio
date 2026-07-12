@@ -554,10 +554,10 @@ export default function Home() {
               aria-label={item.label}
               className="group relative block rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5"
             >
-              {/* Warm bloom behind the glass — brightens on hover */}
+              {/* Always-on pulsing orange glow — same as the resume button */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-br from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-60"
+                className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
               />
               {/* Liquid glass circle */}
               <span className="relative z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/40 text-[#3a322b] backdrop-blur-xl shadow-[0_10px_30px_rgba(58,50,43,0.14),inset_0_1px_0_rgba(255,255,255,0.75),inset_0_-2px_6px_rgba(58,50,43,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d]/50 group-hover:bg-white/60 group-hover:text-[#ff8a3d] group-hover:shadow-[0_14px_40px_rgba(255,138,61,0.28),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-2px_6px_rgba(255,138,61,0.1)]">
