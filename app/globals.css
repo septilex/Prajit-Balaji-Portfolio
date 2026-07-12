@@ -172,7 +172,14 @@ body {
   height: 24px;
 }
 
-/* Cinematic warm grain */
+/* Cinematic warm grain — desktop only: full-screen mix-blend overlays are
+   expensive on mobile GPUs and grain is barely visible at phone size */
+@media (max-width: 767px) {
+  .grain {
+    display: none;
+  }
+}
+
 .grain {
   position: fixed;
   inset: 0;

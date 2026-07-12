@@ -7,11 +7,11 @@ export const Education = () => {
   return (
     <section
       id="education"
-      className="relative mx-auto max-w-[1600px] px-6 md:px-12"
-      style={{ height: "100vh", minHeight: "750px" }}
+      className="relative mx-auto max-w-[1600px] px-6 md:h-screen md:min-h-[750px] md:px-12"
     >
-      {/* ── Section layout: flex column, space entries top/bottom ── */}
-      <div className="flex h-full flex-col justify-between py-28 md:py-36">
+      {/* ── Section layout: flex column, space entries top/bottom.
+           Mobile: natural height with gaps; desktop: full-viewport spread ── */}
+      <div className="flex flex-col gap-16 py-24 md:h-full md:justify-between md:gap-0 md:py-36">
 
         {/* ── SECTION HEADER ── */}
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">

@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   Link2,
   Download,
+  Menu,
+  X,
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -323,6 +325,9 @@ export default function Home() {
   const [hoveredPillar, setHoveredPillar] = useState<number | null>(null);
   const [formState, setFormState] = useState<"idle" | "loading" | "success">("idle");
   const [activeSection, setActiveSection] = useState<string>("hero");
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Mouse-driven effects (WebGL hero mesh) only make sense with a fine pointer
+  const [isFinePointer, setIsFinePointer] = useState(false);
 
   // Form Fields
   const [name, setName] = useState("");
@@ -337,6 +342,7 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    setIsFinePointer(window.matchMedia("(pointer: fine)").matches);
 
     // Scroll spy logic to highlight active link using IntersectionObserver
     const sections = ["hero", "projects", "about", "stack", "journey", "contact"];
@@ -517,7 +523,7 @@ export default function Home() {
       <ScrollProgressBar />
 
       {/* Floating quick-access dock — GitHub / LinkedIn / Gmail / Instagram, always on screen */}
-      <div className="fixed right-5 top-1/2 z-[90] hidden -translate-y-1/2 flex-col gap-3 md:flex">
+      <div className="fixed z-[90] flex gap-3 max-md:bottom-5 max-md:left-1/2 max-md:-translate-x-1/2 max-md:flex-row md:right-5 md:top-1/2 md:-translate-y-1/2 md:flex-col">
         {[
           {
             label: "Github",
@@ -569,7 +575,7 @@ export default function Home() {
                 <span className="relative z-10">{item.icon}</span>
               </span>
               {/* Hover label — glowing orange text */}
-              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a3d]/30 bg-[#f2ece1]/90 px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.2),0_0_12px_rgba(255,138,61,0.15)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" style={{ color: "#ff8a3d", textShadow: "0 0 8px rgba(255,138,61,0.7), 0 0 20px rgba(255,138,61,0.4)" }}>
+              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a3d]/30 bg-[#f2ece1]/90 px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.2),0_0_12px_rgba(255,138,61,0.15)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block" style={{ color: "#ff8a3d", textShadow: "0 0 8px rgba(255,138,61,0.7), 0 0 20px rgba(255,138,61,0.4)" }}>
                 {item.label}
               </span>
             </a>
@@ -616,7 +622,50 @@ export default function Home() {
           <MagneticNavGroup items={navItems} activeSection={activeSection} />
 
           <div className="flex items-center gap-2">
-            {/* Theme toggle removed */}
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[#3a322b] transition-colors hover:text-[#ff8a3d] md:hidden"
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile dropdown — glass panel */}
+        <div
+          className={`mt-2 overflow-hidden rounded-3xl border bg-[#f2ece1]/90 backdrop-blur-xl shadow-[0_20px_60px_rgba(58,50,43,0.15)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden ${
+            menuOpen
+              ? "max-h-96 border-[#3a2a1c]/10 opacity-100"
+              : "max-h-0 border-transparent opacity-0"
+          }`}
+        >
+          <div className="flex flex-col p-3">
+            {navItems.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={() => setMenuOpen(false)}
+                className={`font-syne rounded-2xl px-4 py-3 text-[15px] font-semibold transition-colors ${
+                  activeSection === item.id
+                    ? "bg-[#ff8a3d]/10 text-[#ff8a3d]"
+                    : "text-[#3a322b]/70 active:bg-[#3a322b]/5"
+                }`}
+              >
+                {item.label}
+              </a>
+            ))}
+            <a
+              href="/Prajit_Balaji_Resume.pdf"
+              download="Prajit_Balaji_Resume.pdf"
+              onClick={() => setMenuOpen(false)}
+              className="font-syne mt-1 flex items-center gap-2 rounded-2xl border-t border-[#3a2a1c]/10 px-4 py-3 text-[15px] font-semibold text-[#3a322b]"
+            >
+              <Download className="h-4 w-4 text-[#ff8a3d]" />
+              My Resume
+            </a>
           </div>
         </div>
       </nav>
@@ -675,14 +724,26 @@ export default function Home() {
                       position: "relative",
                     }}
                   >
-                    {/* Invisible text drives layout; MeshText canvas renders on top */}
-                    <span style={{ opacity: 0, display: "block" }}>PRAJIT BALAJI</span>
-                    <MeshText
-                      text="PRAJIT BALAJI"
-                      color="#1a1612"
-                      colorSplit={true}
-                      customColors={["#ff8a3d", "#c2410c"]}
-                    />
+                    {/* Desktop: invisible text drives layout, MeshText canvas renders on top.
+                        Touch devices: plain text — the WebGL mesh is cursor-driven, so it
+                        would only burn battery there. */}
+                    <span
+                      style={{
+                        opacity: isFinePointer ? 0 : 1,
+                        display: "block",
+                        color: "#1a1612",
+                      }}
+                    >
+                      PRAJIT BALAJI
+                    </span>
+                    {isFinePointer && (
+                      <MeshText
+                        text="PRAJIT BALAJI"
+                        color="#1a1612"
+                        colorSplit={true}
+                        customColors={["#ff8a3d", "#c2410c"]}
+                      />
+                    )}
                   </h1>
                 </Magnetic>
               </motion.div>
