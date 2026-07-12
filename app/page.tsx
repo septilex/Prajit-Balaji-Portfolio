@@ -31,6 +31,7 @@ import { WordReveal } from "@/components/ui/WordReveal";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { GlowButton } from "@/components/ui/glow";
+import MeshText from "@/components/ui/MeshText";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -660,9 +661,17 @@ export default function Home() {
                       fontSize: "clamp(2rem, 12.5vw, 18rem)",
                       lineHeight: "0.85",
                       letterSpacing: "-0.06em",
+                      position: "relative",
                     }}
                   >
-                    PRAJIT BALAJI
+                    {/* Invisible text drives layout; MeshText canvas renders on top */}
+                    <span style={{ opacity: 0, display: "block" }}>PRAJIT BALAJI</span>
+                    <MeshText
+                      text="PRAJIT BALAJI"
+                      color="#1a1612"
+                      colorSplit={true}
+                      customColors={["#ff8a3d", "#c2410c"]}
+                    />
                   </h1>
                 </Magnetic>
               </motion.div>
