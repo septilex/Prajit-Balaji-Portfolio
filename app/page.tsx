@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Sun,
   Moon,
@@ -26,6 +27,9 @@ import { IntroPreloader } from "@/components/IntroPreloader";
 import { MagneticNavGroup } from "@/components/ui/MagneticNavItem";
 import { ProximityPillRow } from "@/components/ui/TechPill";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
+import { WordReveal } from "@/components/ui/WordReveal";
+import { TiltCard } from "@/components/ui/TiltCard";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { GlowButton } from "@/components/ui/glow";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
@@ -43,6 +47,276 @@ const Linkedin = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Project = {
+  num: string;
+  title: string;
+  cat: string;
+  desc: string;
+  tags: string[];
+  status: string;
+  year: string;
+  link: string;
+  github: string;
+  image: string;
+};
+
+type TimelineNode = {
+  year: string;
+  role: string;
+  desc: string;
+  side: string;
+  logoSrc?: string;
+  logoClass?: string;
+};
+
+// ─── ProjectCard ──────────────────────────────────────────────────────────────
+// One project card: rainbow hover border, glow icon buttons, tilt mockup,
+// and a bottom-up clip-path wipe on the screenshot when it enters the viewport.
+
+function ProjectCard({ project }: { project: Project }) {
+  return (
+    <div className="rainbow-glow group relative rounded-[28px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 md:rounded-[40px]">
+      <span aria-hidden="true" className="rainbow-halo"><span className="rainbow-conic" /></span>
+      <span aria-hidden="true" className="rainbow-ring"><span className="rainbow-conic" /></span>
+      {/* Hover shadow — pre-rendered on its own layer, faded via opacity (composited).
+          Animating box-shadow directly repaints the whole card every frame. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[28px] md:rounded-[40px] shadow-[0_45px_100px_-30px_rgba(255,138,61,0.35)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      ></div>
+      <div className="relative overflow-hidden rounded-[28px] md:rounded-[40px] border border-[#3a322b]/10 bg-gradient-to-br from-white via-[#faf5ec] to-[#f3ecdf] shadow-[0_30px_80px_-30px_rgba(58,50,43,0.28)] transition-colors duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[#ff8a3d]/30">
+        {/* Ambient orange glow on hover */}
+        <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[#ff8a3d]/10 opacity-0 blur-[80px] transition-opacity duration-700 group-hover:opacity-100"></div>
+
+        <div className="relative grid grid-cols-1 items-center gap-10 p-8 md:p-12 lg:grid-cols-2 lg:gap-12 lg:p-16">
+
+          {/* ── Left: Icons, Title, Description, Tech Tags ── */}
+          <div className="flex flex-col">
+            {/* Icon buttons */}
+            <div className="mb-8 flex items-center gap-4 md:mb-10">
+              <GlowButton
+                asChild
+                mode="rotate"
+                blur="soft"
+                glowScale={1.1}
+                colors={["#ff8a3d", "#3a322b", "#ffaf7a"]}
+                variant="unstyled"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1a1612] text-[#f2ece1] transition-all duration-300 hover:scale-110 hover:bg-[#ff8a3d] hover:text-[#1a1612] border-0 outline-none"
+              >
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${project.title} source on GitHub`}
+                >
+                  <Github className="h-5 w-5" />
+                </a>
+              </GlowButton>
+              <GlowButton
+                asChild
+                mode="rotate"
+                blur="soft"
+                glowScale={1.1}
+                colors={["#ff8a3d", "#3a322b", "#ffaf7a"]}
+                variant="unstyled"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1a1612] text-[#f2ece1] transition-all duration-300 hover:scale-110 hover:bg-[#ff8a3d] hover:text-[#1a1612] border-0 outline-none"
+              >
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Visit ${project.title} live site`}
+                >
+                  <Link2 className="h-5 w-5" />
+                </a>
+              </GlowButton>
+            </div>
+
+            {/* Title */}
+            <h3 className="font-montserrat text-4xl font-black leading-[0.95] tracking-tight text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] md:text-5xl xl:text-6xl">
+              {project.title}
+            </h3>
+
+            {/* Description */}
+            <p className="font-syne mt-4 w-[90%] max-w-[457px] text-[16px] font-semibold leading-[24px] text-[#95979D]">
+              {project.desc}
+            </p>
+
+            {/* Tech tags */}
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+              {project.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-syne text-[13px] font-bold uppercase tracking-[0.12em] text-[#3a322b] transition-colors duration-300 group-hover:text-[#1a1612] md:text-[15px]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Right: MacBook mockup ── */}
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${project.title}`}
+            className="relative block w-full"
+          >
+            <TiltCard>
+              <div className="relative mx-auto w-full max-w-[580px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1">
+                {/* Screen + bezel */}
+                <div className="relative rounded-t-[16px] border-[10px] border-b-0 border-[#2b2b2f] bg-[#2b2b2f] shadow-[0_25px_60px_-20px_rgba(0,0,0,0.5)] md:rounded-t-[20px] md:border-[14px] md:border-b-0">
+                  <div className="relative overflow-hidden rounded-[4px] bg-black">
+                    <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#ff8a3d]/25 to-transparent opacity-0 mix-blend-overlay transition-opacity duration-700 group-hover:opacity-100"></div>
+                    {/* Bottom-up wipe reveal */}
+                    <motion.div
+                      initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
+                      whileInView={{ clipPath: "inset(0% 0% 0% 0%)" }}
+                      viewport={{ once: true, margin: "-10%" }}
+                      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <Image
+                        src={project.image}
+                        alt={`${project.title} Preview`}
+                        width={1600}
+                        height={1000}
+                        className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+                        loading="eager"
+                      />
+                    </motion.div>
+                  </div>
+                </div>
+                {/* Base / hinge */}
+                <div className="relative left-1/2 h-3.5 w-[112%] -translate-x-1/2 rounded-b-[10px] bg-gradient-to-b from-[#d8d8db] via-[#bcbcc0] to-[#96969b] shadow-[0_12px_24px_-8px_rgba(0,0,0,0.4)] md:h-4">
+                  {/* Notch */}
+                  <div className="absolute left-1/2 top-0 h-1.5 w-[14%] -translate-x-1/2 rounded-b-[6px] bg-[#7c7c82]"></div>
+                </div>
+              </div>
+            </TiltCard>
+          </a>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── ProjectsShowcase ─────────────────────────────────────────────────────────
+// Simple vertical stack of full project cards with scroll reveals,
+// on every screen size.
+
+function ProjectsShowcase({ projects }: { projects: Project[] }) {
+  return (
+    <div className="mx-auto mt-8 flex max-w-[1600px] flex-col gap-y-12 px-6 md:gap-y-20 md:px-12">
+      {projects.map((project) => (
+        <ScrollReveal key={project.title} initialTransform="translateY(80px)">
+          <ProjectCard project={project} />
+        </ScrollReveal>
+      ))}
+    </div>
+  );
+}
+
+// ─── JourneyTimeline ──────────────────────────────────────────────────────────
+// The center line draws itself in as you scroll through the section,
+// and each node's dot pops in with a spring when it enters the viewport.
+
+function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 80%", "end 70%"],
+  });
+
+  return (
+    <div ref={ref} className="relative">
+      <motion.div
+        style={{ scaleY: scrollYProgress }}
+        className="absolute left-0 top-0 h-full w-px origin-top bg-gradient-to-b from-[#ff8a3d]/40 via-[#5a3f2a]/30 to-transparent md:left-1/2"
+      />
+
+      {timeline.map((node) => (
+        <ScrollReveal
+          key={node.year}
+          initialTransform="translateY(40px)"
+          className={`relative mb-20 grid grid-cols-12 items-start gap-6 ${
+            node.side === "right" ? "md:flex-row-reverse" : ""
+          }`}
+        >
+          {/* Left Column (Content for left side, empty for right) */}
+          <div
+            className={`col-span-12 pl-8 md:col-span-5 md:pl-0 ${
+              node.side === "left" ? "md:text-right" : "md:hidden"
+            }`}
+          >
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 ${node.side === "left" ? "md:justify-end" : ""}`}>
+              {node.side === "left" && node.logoSrc && (
+                <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
+                  <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
+                </div>
+              )}
+              <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
+                {node.year}
+              </div>
+            </div>
+            <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
+              {node.role}
+            </div>
+            <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
+              {node.desc}
+            </p>
+          </div>
+
+          {/* Center Dot — springs in on first view */}
+          <div className="absolute left-0 top-2 flex h-4 w-4 -translate-x-1/2 items-center justify-center md:left-1/2">
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true, margin: "-15%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 16 }}
+              className="relative flex h-full w-full items-center justify-center"
+            >
+              <div className="h-3 w-3 rounded-full bg-[#ff8a3d] shadow-[0_0_18px_rgba(255,138,61,0.7)] animate-pulse"></div>
+              <div className="absolute h-6 w-6 rounded-full border border-[#5a3f2a]/70 dark:border-[#5a3f2a]/70 light:border-black/10"></div>
+            </motion.div>
+          </div>
+
+          {/* Right Column (Content for right side, empty for left) */}
+          <div
+            className={`col-span-12 pl-8 md:col-span-5 md:col-start-8 md:pl-0 ${
+              node.side === "right" ? "block" : "hidden md:block opacity-0"
+            }`}
+          >
+            {node.side === "right" && (
+              <>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
+                  <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
+                    {node.year}
+                  </div>
+                  {node.logoSrc && (
+                    <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
+                      <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
+                  {node.role}
+                </div>
+                <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
+                  {node.desc}
+                </p>
+              </>
+            )}
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [hoveredPillar, setHoveredPillar] = useState<number | null>(null);
@@ -53,6 +327,12 @@ export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+
+  // Scroll-linked hero exit: title shrinks, drifts down and fades as you scroll away
+  const { scrollY } = useScroll();
+  const heroScale = useTransform(scrollY, [0, 700], [1, 0.9]);
+  const heroOpacity = useTransform(scrollY, [0, 700], [1, 0.15]);
+  const heroY = useTransform(scrollY, [0, 700], [0, 60]);
 
   useEffect(() => {
     setMounted(true);
@@ -235,6 +515,56 @@ export default function Home() {
       <IntroPreloader />
       <ScrollProgressBar />
 
+      {/* Floating quick-access dock — GitHub / LinkedIn / Gmail, always on screen */}
+      <div className="fixed right-5 top-1/2 z-[90] hidden -translate-y-1/2 flex-col gap-3 md:flex">
+        {[
+          {
+            label: "Github",
+            href: "https://github.com/septilex",
+            icon: <Github className="h-[18px] w-[18px]" />,
+          },
+          {
+            label: "LinkedIn",
+            href: "https://www.linkedin.com/in/prajit-balaji-kalidindi-2b706a36a/",
+            icon: <Linkedin className="h-[18px] w-[18px]" />,
+          },
+          {
+            label: "Gmail",
+            href: "mailto:prajitk299@gmail.com",
+            icon: <Mail className="h-[18px] w-[18px]" />,
+          },
+        ].map((item) => (
+          <Magnetic key={item.label} strength={0.35}>
+            <a
+              href={item.href}
+              target={item.href.startsWith("mailto:") ? undefined : "_blank"}
+              rel="noopener noreferrer"
+              aria-label={item.label}
+              className="group relative block rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5"
+            >
+              {/* Warm bloom behind the glass — brightens on hover */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-br from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-60"
+              />
+              {/* Liquid glass circle */}
+              <span className="relative z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/40 text-[#3a322b] backdrop-blur-xl shadow-[0_10px_30px_rgba(58,50,43,0.14),inset_0_1px_0_rgba(255,255,255,0.75),inset_0_-2px_6px_rgba(58,50,43,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d]/50 group-hover:bg-white/60 group-hover:text-[#ff8a3d] group-hover:shadow-[0_14px_40px_rgba(255,138,61,0.28),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-2px_6px_rgba(255,138,61,0.1)]">
+                {/* Specular sheen — the "liquid" top-light */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.85)_0%,rgba(255,255,255,0.25)_28%,rgba(255,255,255,0)_50%)]"
+                />
+                <span className="relative z-10">{item.icon}</span>
+              </span>
+              {/* Hover label — same type treatment as the My Resume button */}
+              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#3a322b]/10 bg-[#f2ece1]/90 px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] text-[#1A1612] opacity-0 shadow-[0_8px_24px_rgba(58,50,43,0.12)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                {item.label}
+              </span>
+            </a>
+          </Magnetic>
+        ))}
+      </div>
+
       {/* Static Glow Orb */}
       <div
         aria-hidden="true"
@@ -258,8 +588,13 @@ export default function Home() {
       >
         <div className="flex items-center justify-between gap-6 rounded-full border border-[#3a2a1c]/10 bg-[#f2ece1]/45 backdrop-blur-xl px-5 py-2.5 shadow-[0_12px_40px_rgba(58,50,43,0.1),0_2px_8px_rgba(58,50,43,0.05),inset_0_1px_0_rgba(255,255,255,0.5)]">
           <a href="#hero" className="flex items-center gap-2 text-sm font-medium tracking-tight">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#ff8a3d] to-[#c2410c] text-white text-[10px] font-bold shadow-[0_0_20px_rgba(255,138,61,0.4)]">
-              P
+            <span className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-[#3a2a1c]/15 shadow-[0_0_15px_rgba(255,138,61,0.2)]">
+              <Image
+                src="/pb_logo.jpg"
+                alt="PB Logo"
+                fill
+                className="object-cover"
+              />
             </span>
             <span className="hidden sm:inline text-[#3a322b] font-researcher font-bold tracking-[0.2em] text-[11px]">
               PRAJIT BALAJI
@@ -317,16 +652,20 @@ export default function Home() {
           {/* ── MASSIVE HERO TITLE — full viewport width, no container constraint ── */}
           <div className="flex flex-1 flex-col justify-center items-center text-center w-full">
             <ScrollReveal initialTransform="translateY(80px)">
-              <h1
-                className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
-                style={{
-                  fontSize: "clamp(2rem, 12.5vw, 18rem)",
-                  lineHeight: "0.85",
-                  letterSpacing: "-0.06em",
-                }}
-              >
-                PRAJIT BALAJI
-              </h1>
+              <motion.div style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}>
+                <Magnetic strength={0.08}>
+                  <h1
+                    className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
+                    style={{
+                      fontSize: "clamp(2rem, 12.5vw, 18rem)",
+                      lineHeight: "0.85",
+                      letterSpacing: "-0.06em",
+                    }}
+                  >
+                    PRAJIT BALAJI
+                  </h1>
+                </Magnetic>
+              </motion.div>
             </ScrollReveal>
 
             {/* Sub-info row — centered directly underneath */}
@@ -353,6 +692,7 @@ export default function Home() {
 
               {/* Liquid-glass glowing resume download button */}
               <ScrollReveal initialTransform="translateY(30px)" className="mt-8 flex justify-center">
+                <Magnetic strength={0.35}>
                 <a
                   href="/Prajit_Balaji_Resume.pdf"
                   download="Prajit_Balaji_Resume.pdf"
@@ -373,6 +713,7 @@ export default function Home() {
                   </span>
                   <span aria-hidden="true" className="glass-button-shadow rounded-full" />
                 </a>
+                </Magnetic>
               </ScrollReveal>
             </div>
           </div>
@@ -535,11 +876,11 @@ export default function Home() {
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
             <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Technology Arsenal</span>
           </div>
-          <ScrollReveal initialTransform="translateY(40px)">
-            <h2 className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] mb-20 md:mb-32 text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
-              A modern arsenal for <span className="text-[#ff8a3d]">building at the edge.</span>
-            </h2>
-          </ScrollReveal>
+          <WordReveal
+            text="A modern arsenal for"
+            accentText="building at the edge."
+            className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] mb-20 md:mb-32 text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
+          />
         </div>
 
         {/* Marquees */}
@@ -570,144 +911,29 @@ export default function Home() {
       <Expertise />
 
       {/* Section 5: Projects */}
-      <section id="projects" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
-        <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
-          <span>05</span>
-          <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-          <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Projects</span>
-        </div>
+      <section id="projects" className="relative py-32 md:py-48">
+        <div className="mx-auto max-w-[1600px] px-6 md:px-12">
+          <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
+            <span>05</span>
+            <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
+            <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Projects</span>
+          </div>
 
-        <div className="mb-20 flex flex-wrap items-end justify-between gap-6">
-          <ScrollReveal initialTransform="translateY(40px)">
-            <h2 className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
-              Projects that <span className="text-[#ff8a3d]">define me.</span>
-            </h2>
-          </ScrollReveal>
-          <div className="text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70 font-researcher">
-            {projects.length} works
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
+            <WordReveal
+              text="Projects that"
+              accentText="define me."
+              className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
+            />
+            <div className="text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70 font-researcher">
+              {projects.length} works
+            </div>
           </div>
         </div>
 
-        <div className="mt-20 flex flex-col gap-y-12 md:gap-y-20">
-          {projects.map((project) => (
-            <ScrollReveal
-              key={project.title}
-              initialTransform="translateY(80px)"
-            >
-              <div className="rainbow-glow relative rounded-[28px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 md:rounded-[40px]">
-              <span aria-hidden="true" className="rainbow-halo"><span className="rainbow-conic" /></span>
-              <span aria-hidden="true" className="rainbow-ring"><span className="rainbow-conic" /></span>
-              <div
-                className="group relative overflow-hidden rounded-[28px] md:rounded-[40px] border border-[#3a322b]/10 bg-gradient-to-br from-white via-[#faf5ec] to-[#f3ecdf] shadow-[0_30px_80px_-30px_rgba(58,50,43,0.28)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[#ff8a3d]/30 hover:shadow-[0_45px_100px_-30px_rgba(255,138,61,0.35)]"
-              >
-                {/* Ambient orange glow on hover */}
-                <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[#ff8a3d]/10 opacity-0 blur-[80px] transition-opacity duration-700 group-hover:opacity-100"></div>
-
-                <div className="relative grid grid-cols-1 items-center gap-10 p-8 md:p-12 lg:grid-cols-2 lg:gap-12 lg:p-16">
-
-                  {/* ── Left: Icons, Title, Description, Tech Tags ── */}
-                  <div className="flex flex-col">
-                    {/* Icon buttons */}
-                    <div className="mb-8 flex items-center gap-4 md:mb-10">
-                      <GlowButton
-                        asChild
-                        mode="rotate"
-                        blur="soft"
-                        glowScale={1.1}
-                        colors={["#ff8a3d", "#3a322b", "#ffaf7a"]}
-                        variant="unstyled"
-                        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1a1612] text-[#f2ece1] transition-all duration-300 hover:scale-110 hover:bg-[#ff8a3d] hover:text-[#1a1612] border-0 outline-none"
-                      >
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`${project.title} source on GitHub`}
-                        >
-                          <Github className="h-5 w-5" />
-                        </a>
-                      </GlowButton>
-                      <GlowButton
-                        asChild
-                        mode="rotate"
-                        blur="soft"
-                        glowScale={1.1}
-                        colors={["#ff8a3d", "#3a322b", "#ffaf7a"]}
-                        variant="unstyled"
-                        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1a1612] text-[#f2ece1] transition-all duration-300 hover:scale-110 hover:bg-[#ff8a3d] hover:text-[#1a1612] border-0 outline-none"
-                      >
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Visit ${project.title} live site`}
-                        >
-                          <Link2 className="h-5 w-5" />
-                        </a>
-                      </GlowButton>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="font-montserrat text-4xl font-black leading-[0.95] tracking-tight text-[#1a1612] transition-colors duration-500 group-hover:text-[#ff8a3d] md:text-5xl xl:text-6xl">
-                      {project.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="font-syne mt-4 w-[90%] max-w-[457px] text-[16px] font-semibold leading-[24px] text-[#95979D]">
-                      {project.desc}
-                    </p>
-
-                    {/* Tech tags */}
-                    <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-                      {project.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="font-syne text-[13px] font-bold uppercase tracking-[0.12em] text-[#3a322b] transition-colors duration-300 group-hover:text-[#1a1612] md:text-[15px]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* ── Right: MacBook mockup ── */}
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Open ${project.title}`}
-                    className="relative block w-full"
-                  >
-                    <div className="relative mx-auto w-full max-w-[580px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1">
-                      {/* Screen + bezel */}
-                      <div className="relative rounded-t-[16px] border-[10px] border-b-0 border-[#2b2b2f] bg-[#2b2b2f] shadow-[0_25px_60px_-20px_rgba(0,0,0,0.5)] md:rounded-t-[20px] md:border-[14px] md:border-b-0">
-                        <div className="relative overflow-hidden rounded-[4px] bg-black">
-                          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#ff8a3d]/25 to-transparent opacity-0 mix-blend-overlay transition-opacity duration-700 group-hover:opacity-100"></div>
-                          <Image
-                            src={project.image}
-                            alt={`${project.title} Preview`}
-                            width={1600}
-                            height={1000}
-                            className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-                            loading="lazy"
-                          />
-                        </div>
-                      </div>
-                      {/* Base / hinge */}
-                      <div className="relative left-1/2 h-3.5 w-[112%] -translate-x-1/2 rounded-b-[10px] bg-gradient-to-b from-[#d8d8db] via-[#bcbcc0] to-[#96969b] shadow-[0_12px_24px_-8px_rgba(0,0,0,0.4)] md:h-4">
-                        {/* Notch */}
-                        <div className="absolute left-1/2 top-0 h-1.5 w-[14%] -translate-x-1/2 rounded-b-[6px] bg-[#7c7c82]"></div>
-                      </div>
-                    </div>
-                  </a>
-
-                </div>
-              </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+        <ProjectsShowcase projects={projects} />
       </section>
+
 
 
 
@@ -722,84 +948,14 @@ export default function Home() {
           <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Journey</span>
         </div>
 
-        <ScrollReveal initialTransform="translateY(40px)">
-          <h2 className="font-display mb-24 max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]">
-            My vision towards <span className="text-[#ff8a3d]">what I am striving to.</span>
-          </h2>
-        </ScrollReveal>
+        <WordReveal
+          text="My vision towards"
+          accentText="what I am striving to."
+          className="font-display mb-24 max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
+        />
 
-        {/* Timeline Grid */}
-        <div className="relative">
-          <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-[#ff8a3d]/40 via-[#5a3f2a]/30 to-transparent md:left-1/2"></div>
-
-          {timeline.map((node, idx) => (
-            <ScrollReveal
-              key={node.year}
-              initialTransform="translateY(40px)"
-              className={`relative mb-20 grid grid-cols-12 items-start gap-6 ${
-                node.side === "right" ? "md:flex-row-reverse" : ""
-              }`}
-            >
-              {/* Left Column (Content for left side, empty for right) */}
-              <div
-                className={`col-span-12 pl-8 md:col-span-5 md:pl-0 ${
-                  node.side === "left" ? "md:text-right" : "md:hidden"
-                }`}
-              >
-                <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 ${node.side === "left" ? "md:justify-end" : ""}`}>
-                  {node.side === "left" && node.logoSrc && (
-                    <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
-                      <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
-                    </div>
-                  )}
-                  <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
-                    {node.year}
-                  </div>
-                </div>
-                <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
-                  {node.role}
-                </div>
-                <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
-                  {node.desc}
-                </p>
-              </div>
-
-              {/* Center Dot */}
-              <div className="absolute left-0 top-2 flex h-4 w-4 -translate-x-1/2 items-center justify-center md:left-1/2">
-                <div className="h-3 w-3 rounded-full bg-[#ff8a3d] shadow-[0_0_18px_rgba(255,138,61,0.7)] animate-pulse"></div>
-                <div className="absolute h-6 w-6 rounded-full border border-[#5a3f2a]/70 dark:border-[#5a3f2a]/70 light:border-black/10"></div>
-              </div>
-
-              {/* Right Column (Content for right side, empty for left) */}
-              <div
-                className={`col-span-12 pl-8 md:col-span-5 md:col-start-8 md:pl-0 ${
-                  node.side === "right" ? "block" : "hidden md:block opacity-0"
-                }`}
-              >
-                {node.side === "right" && (
-                  <>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
-                      <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
-                        {node.year}
-                      </div>
-                      {node.logoSrc && (
-                        <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
-                          <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
-                      {node.role}
-                    </div>
-                    <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
-                      {node.desc}
-                    </p>
-                  </>
-                )}
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+        {/* Timeline Grid — line draws in on scroll, dots spring in */}
+        <JourneyTimeline timeline={timeline} />
       </section>
 
       {/* Section 8: Contact */}
@@ -811,11 +967,11 @@ export default function Home() {
             <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Let&apos;s Talk</span>
           </div>
 
-          <ScrollReveal initialTransform="translateY(40px)">
-            <h2 className="font-display max-w-6xl text-[clamp(2.5rem,8vw,10rem)] font-semibold leading-[0.9] tracking-tight">
-              Let's build the <span className="text-[#ff8a3d]">future.</span>
-            </h2>
-          </ScrollReveal>
+          <WordReveal
+            text="Let's build the"
+            accentText="future."
+            className="font-display max-w-6xl text-[clamp(2.5rem,8vw,10rem)] font-semibold leading-[0.9] tracking-tight"
+          />
 
           <div className="mt-24 grid grid-cols-1 gap-16 md:grid-cols-12">
             {/* Form */}

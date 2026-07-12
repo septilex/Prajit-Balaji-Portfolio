@@ -105,6 +105,73 @@ body {
   background-size: 24px 24px;
 }
 
+/* ─── Custom cursor: orange dot + trailing ring ─────────────────────────── */
+@media (pointer: fine) {
+  .has-custom-cursor body,
+  .has-custom-cursor a,
+  .has-custom-cursor button,
+  .has-custom-cursor input,
+  .has-custom-cursor textarea,
+  .has-custom-cursor select,
+  .has-custom-cursor label {
+    cursor: none !important;
+  }
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #ff8a3d;
+  pointer-events: none;
+  opacity: 0;
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s ease;
+}
+
+.cursor-dot--active {
+  width: 4px;
+  height: 4px;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9998;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 138, 61, 0.5);
+  background: rgba(255, 138, 61, 0);
+  pointer-events: none;
+  opacity: 0;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    background-color 0.35s ease,
+    opacity 0.3s ease;
+}
+
+/* Hovering anything clickable: ring blooms, tint fades in */
+.cursor-ring--active {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(255, 138, 61, 0.85);
+  background: rgba(255, 138, 61, 0.07);
+}
+
+/* Mouse down: tactile contraction */
+.cursor-ring--down {
+  width: 24px;
+  height: 24px;
+}
+
 /* Cinematic warm grain */
 .grain {
   position: fixed;
@@ -181,7 +248,8 @@ body {
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  visibility: hidden; /* fully removed from compositing when idle — no idle GPU cost */
+  transition: opacity 0.4s ease, visibility 0s 0.4s;
   overflow: hidden; /* clips the spinning gradient to a rounded rect → the card on top leaves a thin border */
 }
 
@@ -195,8 +263,14 @@ body {
   pointer-events: none;
   overflow: hidden;
   opacity: 0;
-  filter: blur(16px);
-  transition: opacity 0.4s ease;
+  visibility: hidden; /* fully removed from compositing when idle — no idle GPU cost */
+  transition: opacity 0.4s ease, visibility 0s 0.4s;
+}
+
+/* Blur lives on the ROTATING element so it's rasterized once and spun on the
+   GPU — blurring the parent would re-filter every frame of the spin. */
+.rainbow-halo .rainbow-conic {
+  filter: blur(24px);
 }
 
 /* The big rotating gradient square (sized to always cover the card at any angle) */
@@ -204,7 +278,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 320%;
+  width: 150%; /* covers the card at any rotation angle; 320% was ~5x the pixel area */
   aspect-ratio: 1;
   transform: translate(-50%, -50%) rotate(0deg);
   background: conic-gradient(
@@ -215,10 +289,14 @@ body {
 
 .rainbow-glow:hover .rainbow-ring {
   opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0s;
 }
 
 .rainbow-glow:hover .rainbow-halo {
   opacity: 0.7;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0s;
 }
 
 .rainbow-glow:hover .rainbow-conic {
@@ -227,6 +305,20 @@ body {
 
 @keyframes rainbow-spin {
   to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* GPU-composited spin for GlowButton layers (scale lives in the keyframes
+   because the animation owns the transform property) */
+.glow-spin {
+  animation-name: glow-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes glow-spin {
+  from { transform: scale(var(--glow-scale, 1.45)) rotate(0deg); }
+  to { transform: scale(var(--glow-scale, 1.45)) rotate(360deg); }
 }
 
 /* Glass Button Styles */

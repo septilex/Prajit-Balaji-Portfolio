@@ -5,6 +5,7 @@ import { GeistMono } from 'geist/font/mono';
 import localFont from "next/font/local";
 import "./globals.css";
 import { CursorGlow } from "@/components/CursorGlow";
+import { CustomCursor } from "@/components/CustomCursor";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -65,6 +66,7 @@ export default function RootLayout({
       <head>
       </head>
       <body className="antialiased selection:bg-[rgb(var(--amber))] selection:text-[rgb(var(--bg))] min-h-screen">
+          <CustomCursor />
           <CursorGlow />
           {children}
       </body>

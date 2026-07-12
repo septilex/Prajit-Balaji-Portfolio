@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -8,6 +8,9 @@ import {
   useTransform,
   MotionValue,
 } from "framer-motion";
+
+const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const LOWER = "abcdefghijklmnopqrstuvwxyz";
 
 // ─── MagneticNavItem ──────────────────────────────────────────────────────────
 // Adapts the dock's distance-based MotionValue into a nav pill hover system.
@@ -22,6 +25,45 @@ interface MagneticNavItemProps {
 
 export function MagneticNavItem({ href, label, isActive, mouseX }: MagneticNavItemProps) {
   const ref = useRef<HTMLAnchorElement>(null);
+
+  // Letter-scramble "decode" on hover (case-preserving to avoid width jumps)
+  const [display, setDisplay] = useState(label);
+  const scrambleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startScramble = () => {
+    let iteration = 0;
+    if (scrambleTimer.current) clearInterval(scrambleTimer.current);
+
+    scrambleTimer.current = setInterval(() => {
+      setDisplay(
+        label
+          .split("")
+          .map((ch, i) => {
+            if (ch === " ") return " ";
+            if (i < iteration) return label[i];
+            const pool = ch === ch.toUpperCase() ? UPPER : LOWER;
+            return pool[Math.floor(Math.random() * pool.length)];
+          })
+          .join("")
+      );
+
+      if (iteration >= label.length && scrambleTimer.current) {
+        clearInterval(scrambleTimer.current);
+      }
+      iteration += 1 / 2;
+    }, 28);
+  };
+
+  const stopScramble = () => {
+    if (scrambleTimer.current) clearInterval(scrambleTimer.current);
+    setDisplay(label);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (scrambleTimer.current) clearInterval(scrambleTimer.current);
+    };
+  }, []);
 
   // Distance from cursor center to this element's center (in px)
   const distance = useTransform(mouseX, (val) => {
@@ -50,6 +92,8 @@ export function MagneticNavItem({ href, label, isActive, mouseX }: MagneticNavIt
     <motion.a
       ref={ref}
       href={href}
+      onMouseEnter={startScramble}
+      onMouseLeave={stopScramble}
       style={{
         scale,
         y,
@@ -57,7 +101,7 @@ export function MagneticNavItem({ href, label, isActive, mouseX }: MagneticNavIt
           ? `0 ${Math.round(glow.get() * 12)}px ${Math.round(glow.get() * 28)}px rgba(58,50,43,${(glow.get() * 0.12).toFixed(3)}), inset 0 1px 0 rgba(255,255,255,${(glow.get() * 0.4).toFixed(3)})`
           : undefined,
       }}
-      className={`relative inline-block rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors duration-150 select-none ${
+      className={`font-syne relative inline-block rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors duration-150 select-none ${
         isActive
           ? "text-[#ff8a3d]"
           : "text-[#3a322b]/60 hover:text-[#3a322b]"
@@ -69,7 +113,7 @@ export function MagneticNavItem({ href, label, isActive, mouseX }: MagneticNavIt
         className="absolute inset-0 rounded-full bg-[#3a322b]/[0.04] border border-[#3a322b]/[0.08]"
         style={{ opacity: bgOpacity }}
       />
-      <span className="relative z-10">{label}</span>
+      <span className="relative z-10">{display}</span>
     </motion.a>
   );
 }

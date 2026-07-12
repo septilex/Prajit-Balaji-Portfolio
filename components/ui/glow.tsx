@@ -63,6 +63,27 @@ function GlowEffectLayer({
   transition,
   className,
 }: GlowEffectInnerProps) {
+  // "rotate" is GPU-composited: static conic gradient spun via CSS transform.
+  // (Animating the background string via JS repaints + reblurs every frame.)
+  if (mode === "rotate") {
+    return (
+      <div
+        style={
+          {
+            background: `conic-gradient(from 0deg at 50% 50%, ${colors.join(", ")})`,
+            animationDuration: `${duration}s`,
+            "--glow-scale": scale * 1.45,
+          } as React.CSSProperties
+        }
+        className={cn(
+          "pointer-events-none absolute inset-0 h-full w-full glow-spin",
+          blurClass(blur),
+          className
+        )}
+      />
+    );
+  }
+
   const base: Transition = { repeat: Infinity, duration, ease: "linear" };
 
   const animations: Record<GlowMode, object> = {
