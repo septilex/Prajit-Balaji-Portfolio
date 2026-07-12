@@ -588,7 +588,7 @@ export default function Home() {
       >
         <div className="flex items-center justify-between gap-6 rounded-full border border-[#3a2a1c]/10 bg-[#f2ece1]/45 backdrop-blur-xl px-5 py-2.5 shadow-[0_12px_40px_rgba(58,50,43,0.1),0_2px_8px_rgba(58,50,43,0.05),inset_0_1px_0_rgba(255,255,255,0.5)]">
           <a href="#hero" className="flex items-center gap-2 text-sm font-medium tracking-tight">
-            <span className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-[#3a2a1c]/15 shadow-[0_0_15px_rgba(255,138,61,0.2)]">
+            <span className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[#3a2a1c]/15 shadow-[0_0_15px_rgba(255,138,61,0.2)]">
               <Image
                 src="/pb_logo.jpg"
                 alt="PB Logo"
