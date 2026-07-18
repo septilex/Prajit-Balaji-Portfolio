@@ -137,11 +137,23 @@ interface ProximitySkillListProps {
 export function ProximitySkillList({ skills }: ProximitySkillListProps) {
   const mouseY = useMotionValue(Infinity);
 
+  // rAF-gate the shared mouseY: every set() fans out to a rect read per row,
+  // and mousemove can fire far faster than the display refreshes.
+  const pendingY = useRef(0);
+  const rafPending = useRef(false);
+  const onMouseMove = (e: React.MouseEvent) => {
+    pendingY.current = e.clientY;
+    if (!rafPending.current) {
+      rafPending.current = true;
+      requestAnimationFrame(() => {
+        rafPending.current = false;
+        mouseY.set(pendingY.current);
+      });
+    }
+  };
+
   return (
-    <div
-      onMouseMove={(e) => mouseY.set(e.clientY)}
-      onMouseLeave={() => mouseY.set(Infinity)}
-    >
+    <div onMouseMove={onMouseMove} onMouseLeave={() => mouseY.set(Infinity)}>
       {skills.map((skill, i) => (
         <ExpertiseHoverItem key={skill} name={skill} index={i} mouseY={mouseY} />
       ))}

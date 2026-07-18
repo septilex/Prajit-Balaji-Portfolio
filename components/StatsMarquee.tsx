@@ -46,21 +46,18 @@ function AnimatedValue({ value, started }: { value: string; started: boolean }) 
 export function StatsMarquee() {
   const sectionRef = useRef<HTMLElement>(null);
   const [started, setStarted] = useState(false);
+  const [inView, setInView] = useState(false);
 
-  // Kick off the count-up the first time the strip scrolls into view
+  // One observer, two jobs: kick off the count-up the first time the strip
+  // appears, and pause the marquee animation whenever it's off screen.
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setStarted(true);
-          observer.unobserve(el);
-        }
-      },
-      { threshold: 0.3 }
-    );
+    const observer = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+      if (entry.isIntersecting) setStarted(true);
+    });
 
     observer.observe(el);
     return () => observer.disconnect();
@@ -69,12 +66,16 @@ export function StatsMarquee() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-4 sm:py-5 border-y border-[#3a2a1c]/10 bg-[#f2ece1] shadow-[0_10px_30px_rgba(58,50,43,0.05),0_-10px_30px_rgba(58,50,43,0.05)] overflow-hidden z-20"
+      className="relative w-full py-2 sm:py-2.5 border-y border-white/10 bg-[#1F1C17] shadow-[0_8px_24px_rgba(0,0,0,0.22),0_-8px_24px_rgba(0,0,0,0.22)] overflow-hidden z-20"
     >
       <div className="relative z-0 flex overflow-hidden whitespace-nowrap group/marquee">
         <div
           className="flex flex-nowrap items-center gap-12 sm:gap-16 md:gap-24 w-max animate-marquee hover:[animation-play-state:paused] group-hover/marquee:[animation-play-state:paused]"
-          style={{ willChange: "transform" }}
+          style={{
+            willChange: "transform",
+            animationDuration: "60s",
+            animationPlayState: inView ? undefined : "paused",
+          }}
         >
           {[...Array(4)].map((_, i) => (
             <React.Fragment key={i}>
@@ -82,10 +83,13 @@ export function StatsMarquee() {
                 <div key={`${i}-${j}`} className="flex items-center gap-12 sm:gap-16 md:gap-24 group">
                   {/* Stat Item */}
                   <div className="flex items-baseline gap-2 sm:gap-3 cursor-default transition-all duration-[600ms] ease-out hover:-translate-y-1">
-                    <span className="font-display font-bold text-3xl sm:text-4xl text-[#3a322b] tracking-tight group-hover:text-[#ff8a3d] transition-colors duration-500">
+                    <span className="font-display font-bold text-2xl sm:text-3xl text-[#f6f2ec] tracking-tight transition-colors duration-500 group-hover:text-[#ff8a3d]">
                       <AnimatedValue value={stat.value} started={started} />
                     </span>
-                    <span className="text-[10px] sm:text-xs font-semibold tracking-[0.25em] uppercase text-[#7a6f62]/80 group-hover:text-[#3a322b] transition-colors duration-500 font-researcher">
+                    <span
+                      className="text-[10px] sm:text-xs font-semibold tracking-[0.25em] uppercase text-[#ff8a3d]/70 group-hover:text-[#ff8a3d] transition-colors duration-500 font-researcher"
+                      style={{ textShadow: "0 0 12px rgba(255,138,61,0.45)" }}
+                    >
                       {stat.label}
                     </span>
                   </div>

@@ -1,6 +1,7 @@
 @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400,900&f[]=switzer@400,500,600,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montenegrin+Gothic+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=Space+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @variant light (&:where(.light, .light *));
@@ -85,10 +86,10 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   overflow-x: clip;
   background-color: #f2ece1;
-  background-image: 
+  background-image:
     linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: 36px 36px;
   color: #3a322b;
   transition: background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1), color 0.8s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -99,10 +100,10 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  background-image: 
+  background-image:
     linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: 36px 36px;
 }
 
 /* ─── Custom cursor: orange dot + trailing ring ─────────────────────────── */
@@ -185,8 +186,10 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 100;
-  opacity: 0.11;
-  mix-blend-mode: overlay;
+  /* Plain low-opacity compositing — a fixed mix-blend-mode layer forces the
+     GPU to re-blend the entire viewport against scrolling content every
+     frame; simple src-over compositing of a cached texture is near-free. */
+  opacity: 0.055;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E");
 }
 
@@ -373,4 +376,251 @@ body {
 
 .glass-button-wrap:hover .glass-button-shadow {
   opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SWISS-INTERNATIONAL HERO
+   Full-bleed red, brutalist grid, 2px cream borders as the only decoration.
+   No rounded corners, no shadows, no gradients inside this block.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --sw-red: #E8220F;
+  --sw-cream: #F6F2EC;
+  --sw-ink: #120C0A;
+  --sw-blush: #F8CFC9;
+}
+
+.sw-hero {
+  background: var(--sw-red);
+  color: var(--sw-cream);
+}
+
+/* ── NAV: 4-col grid; container owns the bottom border, cells own right
+      borders (last cell none) → no doubled borders anywhere ── */
+.sw-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 2px solid var(--sw-cream);
+}
+
+.sw-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 48px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sw-cream);
+  border-right: 2px solid var(--sw-cream);
+  transition: background-color 150ms, color 150ms;
+}
+.sw-nav > .sw-cell:last-child {
+  border-right: 0;
+}
+.sw-cell-between {
+  justify-content: space-between;
+}
+.sw-cell-multi a {
+  color: inherit;
+  outline: none;
+}
+
+/* Hover / keyboard focus: full inversion, no transforms */
+a.sw-cell:hover,
+a.sw-cell:focus-visible,
+.sw-cell-multi:hover,
+.sw-cell-multi:focus-within {
+  background: var(--sw-cream);
+  color: var(--sw-red);
+  outline: none;
+}
+
+/* ── NAME ── */
+.sw-name {
+  font-family: 'Anton', sans-serif;
+  font-size: min(20.8vw, 400px);
+  line-height: 0.84;
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--sw-cream);
+  user-select: none;
+}
+.sw-name-ink {
+  color: var(--sw-ink);
+}
+
+/* ── MID BAND: auto 1fr auto; side cells own their inner border ── */
+.sw-midband {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: stretch;
+  border-top: 2px solid var(--sw-cream);
+  border-bottom: 2px solid var(--sw-cream);
+}
+.sw-mid-left,
+.sw-mid-right {
+  display: flex;
+  align-items: center;
+  padding: 20px 48px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2.5px;
+  white-space: nowrap;
+}
+.sw-mid-left {
+  border-right: 2px solid var(--sw-cream);
+  gap: 12px;
+}
+.sw-mid-right {
+  border-left: 2px solid var(--sw-cream);
+}
+.sw-mid-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 900;
+  font-size: 30px;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.sw-dot {
+  display: inline-block;
+  animation: sw-pulse 2s ease-in-out infinite;
+}
+@keyframes sw-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ── FOOTER ROW ── */
+.sw-foot {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 150px;
+  padding: 0 48px;
+}
+.sw-foot-left {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2.5px;
+  line-height: 1.7;
+  color: var(--sw-blush);
+}
+.sw-cta {
+  justify-self: center;
+  padding: 22px 64px;
+  background: var(--sw-ink);
+  color: var(--sw-cream);
+  font-family: 'Archivo', sans-serif;
+  font-weight: 900;
+  font-size: 17px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: background-color 150ms, color 150ms;
+}
+.sw-cta:hover,
+.sw-cta:focus-visible {
+  background: var(--sw-cream);
+  color: var(--sw-red);
+  outline: none;
+}
+.sw-foot-social {
+  justify-self: end;
+  display: flex;
+  gap: 28px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+.sw-foot-social a {
+  color: var(--sw-cream);
+  padding: 4px 6px;
+  transition: background-color 150ms, color 150ms;
+  outline: none;
+}
+.sw-foot-social a:hover,
+.sw-foot-social a:focus-visible {
+  background: var(--sw-cream);
+  color: var(--sw-red);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1023px) {
+  .sw-nav {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sw-cell {
+    padding: 20px 28px;
+  }
+  /* 2×2: even cells end their row; top row gets a bottom border,
+     bottom row uses the container's border — never doubled */
+  .sw-nav > .sw-cell:nth-child(2n) {
+    border-right: 0;
+  }
+  .sw-nav > .sw-cell:nth-child(-n + 2) {
+    border-bottom: 2px solid var(--sw-cream);
+  }
+  .sw-mid-center {
+    font-size: 20px;
+  }
+  .sw-mid-left,
+  .sw-mid-right {
+    padding: 16px 28px;
+  }
+}
+
+@media (max-width: 639px) {
+  .sw-nav {
+    grid-template-columns: 1fr;
+  }
+  .sw-nav > .sw-cell {
+    border-right: 0;
+    border-bottom: 2px solid var(--sw-cream);
+  }
+  .sw-nav > .sw-cell:last-child {
+    border-bottom: 0;
+  }
+  .sw-midband {
+    grid-template-columns: 1fr;
+  }
+  .sw-mid-left {
+    border-right: 0;
+    border-bottom: 2px solid var(--sw-cream);
+  }
+  .sw-mid-right {
+    border-left: 0;
+    border-top: 2px solid var(--sw-cream);
+  }
+  .sw-mid-center {
+    font-size: 17px;
+    padding: 16px;
+  }
+  .sw-foot {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 28px 24px;
+    justify-items: start;
+  }
+  .sw-cta {
+    justify-self: stretch;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-dot {
+    animation: none;
+  }
 }

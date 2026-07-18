@@ -268,30 +268,65 @@ export default function MeshText({
         resize()
         rebuildTex()
 
+        // Pointer state: raw client coords stored per event; converted to clip
+        // space once per FRAME in tick (a rect read per pointermove event would
+        // run up to 500×/s on high-poll mice).
         const cursor = { x: 99, y: 99, px: 99, py: 99, vx: 0, vy: 0, inside: false }
+        const pointer = { cx: 0, cy: 0 }
+
+        // ── Sleep system: the sim + draw loop only runs while the mesh is
+        // visible AND (cursor inside OR mesh still settling). Otherwise zero
+        // CPU/GPU cost per frame.
+        let rafId = 0
+        let running = false
+        let visible = true
+
+        const wake = () => {
+            if (!running && visible && !cancelled) {
+                running = true
+                rafId = requestAnimationFrame(tick)
+            }
+        }
+
         const onMove = (e: PointerEvent) => {
-            const rect = canvas.getBoundingClientRect()
-            const nx = (e.clientX - rect.left) / rect.width
-            const ny = (e.clientY - rect.top) / rect.height
-            const x = nx * 2 - 1
-            const y = 1 - ny * 2
-            if (!cursor.inside) { cursor.px = x; cursor.py = y; cursor.inside = true }
-            cursor.x = x; cursor.y = y
+            pointer.cx = e.clientX
+            pointer.cy = e.clientY
+            cursor.inside = true
+            wake()
         }
         const onLeave = () => {
             cursor.inside = false; cursor.x = 99; cursor.y = 99; cursor.vx = 0; cursor.vy = 0
+            wake() // let the mesh spring back, then the loop sleeps itself
         }
         wrapper.addEventListener("pointermove", onMove)
         wrapper.addEventListener("pointerleave", onLeave)
 
-        let rafId = 0
+        // Pause entirely when scrolled off screen; wake on return
+        const io = new IntersectionObserver(([entry]) => {
+            visible = entry.isIntersecting
+            if (visible) wake()
+        })
+        io.observe(wrapper)
+
         const tick = () => {
+            if (!visible || cancelled) { running = false; return }
+
+            // Convert pointer → clip space once per frame
+            if (cursor.inside) {
+                const rect = canvas.getBoundingClientRect()
+                const x = ((pointer.cx - rect.left) / rect.width) * 2 - 1
+                const y = 1 - ((pointer.cy - rect.top) / rect.height) * 2
+                if (cursor.x === 99) { cursor.px = x; cursor.py = y }
+                cursor.x = x; cursor.y = y
+            }
+
             cursor.vx = cursor.x - cursor.px
             cursor.vy = cursor.y - cursor.py
             const vmag = Math.hypot(cursor.vx, cursor.vy)
             if (vmag > 0.3) { cursor.vx = 0; cursor.vy = 0 }
             cursor.px = cursor.x; cursor.py = cursor.y
 
+            let energy = 0
             for (let i = 0; i < vertCount; i++) {
                 const i2 = i * 2
                 const px = positions[i2]; const py = positions[i2 + 1]
@@ -310,6 +345,8 @@ export default function MeshText({
                 if (ndx > 1) ndx = 1; else if (ndx < -1) ndx = -1
                 if (ndy > 1) ndy = 1; else if (ndy < -1) ndy = -1
                 disp[i2] = ndx; disp[i2 + 1] = ndy
+                const sq = ndx * ndx + ndy * ndy + vx * vx + vy * vy
+                if (sq > energy) energy = sq
             }
 
             gl.bindBuffer(gl.ARRAY_BUFFER, dispBuf)
@@ -337,13 +374,22 @@ export default function MeshText({
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
             gl.bindVertexArray(vao)
             gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_INT, 0)
+
+            // Mesh fully settled and cursor gone → sleep (this frame already
+            // drew the settled state). onMove / IO wake it back up.
+            if (!cursor.inside && energy < 1e-8) {
+                running = false
+                return
+            }
             rafId = requestAnimationFrame(tick)
         }
+        running = true
         rafId = requestAnimationFrame(tick)
 
         return () => {
             cancelled = true
             cancelAnimationFrame(rafId)
+            io.disconnect()
             ro.disconnect()
             wrapper.removeEventListener("pointermove", onMove)
             wrapper.removeEventListener("pointerleave", onLeave)

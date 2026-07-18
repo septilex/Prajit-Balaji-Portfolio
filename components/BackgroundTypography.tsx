@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export interface BackgroundTypographyProps {
   rows?: string[];
@@ -21,11 +21,13 @@ function ParallaxText({
   direction,
   duration,
   strokeWidth = 1,
+  playing,
 }: {
   children: string;
   direction: "normal" | "reverse";
   duration: number;
   strokeWidth: number;
+  playing: boolean;
 }) {
   return (
     <div className="flex flex-nowrap overflow-hidden whitespace-nowrap leading-[0.8] m-0 py-2">
@@ -34,6 +36,7 @@ function ParallaxText({
         style={{
           animationDuration: `${duration}s`,
           animationDirection: direction,
+          animationPlayState: playing ? "running" : "paused",
         }}
       >
         {[...Array(4)].map((_, i) => (
@@ -59,8 +62,22 @@ export function BackgroundTypography({
   opacity = 0.04,
   strokeWidth = 1,
 }: BackgroundTypographyProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(true);
+
+  // These are four giant stroked-text layers — pause them the moment the
+  // hero scrolls out of view instead of animating them forever.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div
+      ref={ref}
       className="absolute inset-0 z-0 flex flex-col justify-center overflow-hidden pointer-events-none select-none text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
       style={{ opacity }}
       aria-hidden="true"
@@ -71,6 +88,7 @@ export function BackgroundTypography({
           direction={i % 2 === 0 ? "normal" : "reverse"}
           duration={60 + i * 8}
           strokeWidth={strokeWidth}
+          playing={inView}
         >
           {row}
         </ParallaxText>

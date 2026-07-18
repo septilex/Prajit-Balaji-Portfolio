@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -55,13 +55,7 @@ export function TechPill({ tech, pillKey, mouseX, dimmed = false }: TechPillProp
     <motion.span
       ref={ref}
       key={pillKey}
-      style={{
-        scale,
-        y,
-        boxShadow: shadowStrength.get() > 0.05
-          ? `0 ${Math.round(shadowStrength.get() * 20)}px ${Math.round(shadowStrength.get() * 36)}px -10px rgba(255,138,61,${(shadowStrength.get() * 0.22).toFixed(3)}), 0 ${Math.round(shadowStrength.get() * 6)}px ${Math.round(shadowStrength.get() * 14)}px rgba(58,50,43,${(shadowStrength.get() * 0.08).toFixed(3)})`
-          : undefined,
-      }}
+      style={{ scale, y }}
       className={`relative inline-flex items-center px-7 py-4 rounded-full border select-none transition-colors duration-200
         ${dimmed
           ? "border-[#3a322b]/10 bg-[#3a322b]/[0.02] text-[#5a5046]"
@@ -71,6 +65,14 @@ export function TechPill({ tech, pillKey, mouseX, dimmed = false }: TechPillProp
         hover:border-[#ff8a3d]/40 hover:bg-[#ff8a3d]/[0.06] hover:text-[#ff8a3d]
       `}
     >
+      {/* Proximity shadow — pre-rendered box-shadow faded via opacity
+          (animating box-shadow itself repaints the pill every frame) */}
+      <motion.span
+        aria-hidden
+        className="absolute inset-0 rounded-full pointer-events-none shadow-[0_16px_30px_-10px_rgba(255,138,61,0.22),0_5px_12px_rgba(58,50,43,0.08)]"
+        style={{ opacity: shadowStrength }}
+      />
+
       {/* Proximity border glow overlay */}
       <motion.span
         aria-hidden
@@ -108,24 +110,60 @@ export function ProximityPillRow({
   animClass,
 }: ProximityPillRowProps) {
   const mouseX = useMotionValue(Infinity);
-  // Triple the array for seamless looping (same as original)
-  const tripled = [...techs, ...techs, ...techs];
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(true);
+
+  // rAF-gate the shared mouseX: mousemove fires up to 500×/s on high-poll
+  // mice, and every set() fans out to a rect read per pill. One update per
+  // frame is all the springs can use anyway.
+  const pendingX = useRef(0);
+  const rafPending = useRef(false);
+  const onMouseMove = (e: React.MouseEvent) => {
+    pendingX.current = e.pageX;
+    if (!rafPending.current) {
+      rafPending.current = true;
+      requestAnimationFrame(() => {
+        rafPending.current = false;
+        mouseX.set(pendingX.current);
+      });
+    }
+  };
+
+  // Pause the marquee entirely when scrolled off screen
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Two copies: the -50% marquee loop is seamless with exactly 2 (with 3 the
+  // seam jumps by half a copy), and it's a third fewer live spring systems.
+  const doubled = [...techs, ...techs];
 
   return (
     <div
-      className={`flex w-max ${animClass} gap-4 md:gap-6 whitespace-nowrap`}
-      style={reverse ? { animationDirection: "reverse" } : undefined}
-      onMouseMove={(e) => mouseX.set(e.pageX)}
+      ref={rowRef}
+      className={`flex w-max ${animClass} whitespace-nowrap`}
+      style={{
+        animationDirection: reverse ? "reverse" : undefined,
+        animationPlayState: inView ? "running" : "paused",
+      }}
+      onMouseMove={onMouseMove}
       onMouseLeave={() => mouseX.set(Infinity)}
     >
-      {tripled.map((tech, i) => (
-        <TechPill
-          key={`${rowKey}-${i}`}
-          pillKey={`${rowKey}-${i}`}
-          tech={tech}
-          mouseX={mouseX}
-          dimmed={dimmed}
-        />
+      {/* Spacing lives INSIDE each item (not flex gap) so the -50% loop
+          point aligns exactly — with gap, the seam is off by half a gap. */}
+      {doubled.map((tech, i) => (
+        <span key={`${rowKey}-${i}`} className="pr-4 md:pr-6">
+          <TechPill
+            pillKey={`${rowKey}-${i}`}
+            tech={tech}
+            mouseX={mouseX}
+            dimmed={dimmed}
+          />
+        </span>
       ))}
     </div>
   );

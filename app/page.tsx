@@ -4,8 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
-  Sun,
-  Moon,
   ArrowDown,
   ArrowUpRight,
   Sparkles,
@@ -33,7 +31,9 @@ import { WordReveal } from "@/components/ui/WordReveal";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { GlowButton } from "@/components/ui/glow";
-import MeshText from "@/components/ui/MeshText";
+import { TimePill } from "@/components/TimePill";
+import { StatsCard } from "@/components/StatsCard";
+import { BottomTicker } from "@/components/BottomTicker";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -614,7 +614,7 @@ export default function Home() {
                 className="object-cover"
               />
             </span>
-            <span className="hidden sm:inline text-[#3a322b] font-researcher font-bold tracking-[0.2em] text-[11px]">
+            <span className="hidden sm:inline text-[#3a322b] font-researcher font-bold tracking-[0.2em] text-[11px] whitespace-nowrap">
               PRAJIT BALAJI
             </span>
           </a>
@@ -622,6 +622,8 @@ export default function Home() {
           <MagneticNavGroup items={navItems} activeSection={activeSection} />
 
           <div className="flex items-center gap-2">
+            {/* IST Time Pill — only visible md+ */}
+            <TimePill />
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMenuOpen((v) => !v)}
@@ -673,13 +675,13 @@ export default function Home() {
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen w-full overflow-hidden">
         {/* Background Typography */}
-        <BackgroundTypography 
+        <BackgroundTypography
            rows={[
             "PRAJIT BALAJI • CREATIVE ENGINEER •",
             "ARTIFICIAL INTELLIGENCE • NEXT.JS • REACT •",
             "SYSTEM ARCHITECTURE • UI/UX PRO MAX •",
             "BUILDING THE FUTURE • SCALING SYSTEMS •"
-           ]} 
+           ]}
            opacity={0.06}
         />
 
@@ -693,7 +695,7 @@ export default function Home() {
         </div>
 
         {/* Hero layout: flex column filling full viewport height */}
-        <div className="relative z-10 flex min-h-screen flex-col justify-between pb-12 pt-32">
+        <div className="relative z-10 flex min-h-[100svh] flex-col justify-between pt-32 pb-10">
 
           {/* Top metadata row — constrained to 1600px */}
           <ScrollReveal
@@ -711,7 +713,8 @@ export default function Home() {
           </ScrollReveal>
 
           {/* ── MASSIVE HERO TITLE — full viewport width, no container constraint ── */}
-          <div className="flex flex-1 flex-col justify-center items-center text-center w-full">
+          {/* Circular badge floats at left; title is full-width centred */}
+          <div className="relative flex flex-1 flex-col justify-center items-center text-center w-full">
             <ScrollReveal initialTransform="translateY(80px)">
               <motion.div style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}>
                 <Magnetic strength={0.08}>
@@ -724,26 +727,7 @@ export default function Home() {
                       position: "relative",
                     }}
                   >
-                    {/* Desktop: invisible text drives layout, MeshText canvas renders on top.
-                        Touch devices: plain text — the WebGL mesh is cursor-driven, so it
-                        would only burn battery there. */}
-                    <span
-                      style={{
-                        opacity: isFinePointer ? 0 : 1,
-                        display: "block",
-                        color: "#1a1612",
-                      }}
-                    >
-                      PRAJIT BALAJI
-                    </span>
-                    {isFinePointer && (
-                      <MeshText
-                        text="PRAJIT BALAJI"
-                        color="#1a1612"
-                        colorSplit={true}
-                        customColors={["#ff8a3d", "#c2410c"]}
-                      />
-                    )}
+                    PRAJIT BALAJI
                   </h1>
                 </Magnetic>
               </motion.div>
@@ -753,6 +737,7 @@ export default function Home() {
             <div className="mt-12 flex flex-col items-center justify-center gap-6 px-6 md:px-12 w-full max-w-[1600px]">
               <ScrollReveal
                 initialTransform="translateY(30px)"
+                className="relative w-full flex justify-center"
               >
                 <p className="font-display text-2xl leading-tight tracking-tight md:text-4xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-center">
                   Full-Stack AI Engineer
@@ -771,30 +756,9 @@ export default function Home() {
                 <div className="mt-1">Building the <span className="text-[#ff8a3d] font-bold">next decade</span></div>
               </ScrollReveal>
 
-              {/* Liquid-glass glowing resume download button */}
-              <ScrollReveal initialTransform="translateY(30px)" className="mt-8 flex justify-center">
-                <Magnetic strength={0.35}>
-                <a
-                  href="/Prajit_Balaji_Resume.pdf"
-                  download="Prajit_Balaji_Resume.pdf"
-                  aria-label="Download my resume"
-                  className="glass-button-wrap group relative rounded-full"
-                >
-                  {/* Animated orange glow */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg transition-opacity duration-500 group-hover:opacity-80 animate-pulse"
-                  />
-                  {/* Liquid glass pill */}
-                  <span className="glass-button relative z-10 flex items-center gap-3 rounded-full px-7 py-4">
-                    <Download className="h-4 w-4 text-[#ff8a3d] transition-transform duration-500 group-hover:translate-y-0.5" />
-                    <span className="font-researcher font-bold text-[11px] uppercase tracking-[0.3em] text-[#1A1612]">
-                      My Resume
-                    </span>
-                  </span>
-                  <span aria-hidden="true" className="glass-button-shadow rounded-full" />
-                </a>
-                </Magnetic>
+              {/* Stats card + resume */}
+              <ScrollReveal initialTransform="translateY(30px)" className="mt-8 flex justify-center w-full">
+                <StatsCard />
               </ScrollReveal>
             </div>
           </div>
@@ -812,6 +776,11 @@ export default function Home() {
           </ScrollReveal>
         </div>
       </section>
+
+      {/* ── Bottom Ticker — fixed to viewport bottom, visible immediately ── */}
+      <div className="fixed bottom-0 left-0 w-full z-[60]">
+        <BottomTicker />
+      </div>
 
       {/* Section 1: About */}
       <section id="about" className="relative mx-auto max-w-[1600px] px-0 py-0 overflow-hidden">
