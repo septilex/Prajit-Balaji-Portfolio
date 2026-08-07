@@ -136,6 +136,8 @@ export function Credentials() {
                 <button
                   key={`${cred.id}-${idx}`}
                   onClick={() => setActiveId(cred.id)}
+                  onMouseEnter={() => setActiveId(cred.id)}
+                  onFocus={() => setActiveId(cred.id)}
                   className={`group relative flex items-center gap-4 whitespace-nowrap transition-all duration-300 outline-none ${
                     isActive ? "opacity-100 scale-105" : "opacity-40 hover:opacity-80"
                   }`}
@@ -163,10 +165,10 @@ export function Credentials() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeId}
-            initial={{ opacity: 0, filter: "blur(10px)", y: 15 }}
+            initial={{ opacity: 0, filter: "blur(6px)", y: 10 }}
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-            exit={{ opacity: 0, filter: "blur(10px)", y: -15 }}
-            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            exit={{ opacity: 0, filter: "blur(6px)", y: -10 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start lg:items-center"
           >
             {/* Left: Certificate Image Container (50%) */}

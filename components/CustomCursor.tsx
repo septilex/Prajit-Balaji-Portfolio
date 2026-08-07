@@ -25,8 +25,6 @@ export function CustomCursor() {
 
     let mx = -100;
     let my = -100;
-    let rx = -100;
-    let ry = -100;
     let visible = false;
     let raf = 0;
 
@@ -36,8 +34,6 @@ export function CustomCursor() {
 
       if (!visible) {
         visible = true;
-        rx = mx;
-        ry = my;
         dot.style.opacity = "1";
         ring.style.opacity = "1";
       }
@@ -60,13 +56,10 @@ export function CustomCursor() {
     const onUp = () => ring.classList.remove("cursor-ring--down");
 
     const loop = () => {
-      // Dot: 1:1, instant
-      dot.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
-
-      // Ring: soft trailing lerp
-      rx += (mx - rx) * 0.2;
-      ry += (my - ry) * 0.2;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+      // Both dot and ring track the pointer 1:1 — no trailing delay
+      const t = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
+      dot.style.transform = t;
+      ring.style.transform = t;
 
       raf = requestAnimationFrame(loop);
     };
