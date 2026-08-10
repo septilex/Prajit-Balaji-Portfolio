@@ -518,7 +518,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="relative min-h-screen w-full overflow-x-clip bg-[#f2ece1] transition-colors duration-700 ease-in-out">
+    <main className="relative min-h-screen w-full overflow-x-clip bg-[var(--bg-base)] transition-colors duration-700 ease-in-out">
       <IntroPreloader />
       <ScrollProgressBar />
 
@@ -566,7 +566,7 @@ export default function Home() {
                 className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
               />
               {/* Liquid glass circle */}
-              <span className="relative z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/40 text-[#3a322b] backdrop-blur-xl shadow-[0_10px_30px_rgba(58,50,43,0.14),inset_0_1px_0_rgba(255,255,255,0.75),inset_0_-2px_6px_rgba(58,50,43,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d]/50 group-hover:bg-white/60 group-hover:text-[#ff8a3d] group-hover:shadow-[0_14px_40px_rgba(255,138,61,0.28),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-2px_6px_rgba(255,138,61,0.1)]">
+              <span className="relative z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[var(--dock-glass-border)] bg-[var(--dock-glass-bg)] text-[var(--fg-body)] backdrop-blur-xl shadow-[var(--dock-glass-shadow)] transition-all duration-300 group-hover:border-[var(--amber)]/50 group-hover:text-[var(--amber)] group-hover:shadow-[var(--dock-glass-hover-shadow)]">
                 {/* Specular sheen */}
                 <span
                   aria-hidden="true"
@@ -575,7 +575,7 @@ export default function Home() {
                 <span className="relative z-10">{item.icon}</span>
               </span>
               {/* Hover label — glowing orange text */}
-              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a3d]/30 bg-[#f2ece1]/90 px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.2),0_0_12px_rgba(255,138,61,0.15)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block" style={{ color: "#ff8a3d", textShadow: "0 0 8px rgba(255,138,61,0.7), 0 0 20px rgba(255,138,61,0.4)" }}>
+              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[var(--amber)]/30 bg-[var(--dock-label-bg)] px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.2),0_0_12px_rgba(255,138,61,0.15)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block" style={{ color: "var(--amber)", textShadow: "0 0 8px rgba(255,138,61,0.7), 0 0 20px rgba(255,138,61,0.4)" }}>
                 {item.label}
               </span>
             </a>
@@ -604,9 +604,9 @@ export default function Home() {
           transform: mounted ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-40px)",
         }}
       >
-        <div className="flex items-center justify-between gap-6 rounded-full border border-[#3a2a1c]/10 bg-[#f2ece1]/45 backdrop-blur-xl px-5 py-2.5 shadow-[0_12px_40px_rgba(58,50,43,0.1),0_2px_8px_rgba(58,50,43,0.05),inset_0_1px_0_rgba(255,255,255,0.5)]">
+        <div className="flex items-center justify-between gap-6 rounded-full border border-[var(--nav-border)] bg-[var(--nav-bg)] backdrop-blur-xl px-5 py-2.5 shadow-[var(--nav-shadow)]">
           <a href="#hero" className="flex items-center gap-2 text-sm font-medium tracking-tight">
-            <span className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[#3a2a1c]/15 shadow-[0_0_15px_rgba(255,138,61,0.2)]">
+            <span className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[var(--nav-border)] shadow-[0_0_15px_rgba(255,138,61,0.2)]">
               <Image
                 src="/pb_logo.jpg"
                 alt="PB Logo"
@@ -614,7 +614,7 @@ export default function Home() {
                 className="object-cover"
               />
             </span>
-            <span className="hidden sm:inline text-[#3a322b] font-researcher font-bold tracking-[0.2em] text-[11px] whitespace-nowrap">
+            <span className="hidden sm:inline text-[var(--fg-body)] font-researcher font-bold tracking-[0.2em] text-[11px] whitespace-nowrap">
               PRAJIT BALAJI
             </span>
           </a>
@@ -629,7 +629,7 @@ export default function Home() {
               onClick={() => setMenuOpen((v) => !v)}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-[#3a322b] transition-colors hover:text-[#ff8a3d] md:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--fg-body)] transition-colors hover:text-[var(--amber)] md:hidden"
             >
               {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -638,9 +638,9 @@ export default function Home() {
 
         {/* Mobile dropdown — glass panel */}
         <div
-          className={`mt-2 overflow-hidden rounded-3xl border bg-[#f2ece1]/90 backdrop-blur-xl shadow-[0_20px_60px_rgba(58,50,43,0.15)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden ${
+          className={`mt-2 overflow-hidden rounded-3xl border bg-[var(--dropdown-bg)] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden ${
             menuOpen
-              ? "max-h-96 border-[#3a2a1c]/10 opacity-100"
+              ? "max-h-96 border-[var(--border-subtle)] opacity-100"
               : "max-h-0 border-transparent opacity-0"
           }`}
         >
@@ -652,8 +652,8 @@ export default function Home() {
                 onClick={() => setMenuOpen(false)}
                 className={`font-syne rounded-2xl px-4 py-3 text-[15px] font-semibold transition-colors ${
                   activeSection === item.id
-                    ? "bg-[#ff8a3d]/10 text-[#ff8a3d]"
-                    : "text-[#3a322b]/70 active:bg-[#3a322b]/5"
+                    ? "bg-[var(--dropdown-active-bg)] text-[var(--amber)]"
+                    : "text-[var(--fg-body)]/70 active:bg-[var(--fg-body)]/5"
                 }`}
               >
                 {item.label}
@@ -663,9 +663,9 @@ export default function Home() {
               href="/Prajit_Balaji_Resume.pdf"
               download="Prajit_Balaji_Resume.pdf"
               onClick={() => setMenuOpen(false)}
-              className="font-syne mt-1 flex items-center gap-2 rounded-2xl border-t border-[#3a2a1c]/10 px-4 py-3 text-[15px] font-semibold text-[#3a322b]"
+              className="font-syne mt-1 flex items-center gap-2 rounded-2xl border-t border-[var(--border-subtle)] px-4 py-3 text-[15px] font-semibold text-[var(--fg-body)]"
             >
-              <Download className="h-4 w-4 text-[#ff8a3d]" />
+              <Download className="h-4 w-4 text-[var(--amber)]" />
               My Resume
             </a>
           </div>
