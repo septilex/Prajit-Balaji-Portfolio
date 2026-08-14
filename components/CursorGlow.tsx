@@ -25,13 +25,8 @@ export function CursorGlow() {
 
     let rafId: number;
     const update = () => {
-      // Single lerp — one element, no blur filter
-      const speed = 0.06;
-      current.current.x += (mouse.current.x - current.current.x) * speed;
-      current.current.y += (mouse.current.y - current.current.y) * speed;
-
       if (glowRef.current) {
-        glowRef.current.style.transform = `translate3d(${current.current.x - 200}px, ${current.current.y - 200}px, 0)`;
+        glowRef.current.style.transform = `translate3d(${mouse.current.x - 200}px, ${mouse.current.y - 200}px, 0)`;
       }
 
       rafId = requestAnimationFrame(update);

@@ -64,10 +64,10 @@ export function TimePill() {
         IST
       </span>
 
-      {/* Live time — monospace so digits don't shift */}
+      {/* Live time — Syne font wide digits */}
       <span
-        className="font-mono text-[11px] font-semibold tabular-nums"
-        style={{ color: "rgba(255,255,255,0.9)", letterSpacing: "0.05em" }}
+        className="font-syne text-[11px] font-bold tabular-nums tracking-wider"
+        style={{ color: "rgba(255,255,255,0.9)" }}
       >
         {time || "00:00:00"}
       </span>

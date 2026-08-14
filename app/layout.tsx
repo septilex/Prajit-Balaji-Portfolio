@@ -7,6 +7,8 @@ import "./globals.css";
 import { CursorGlow } from "@/components/CursorGlow";
 import { CustomCursor } from "@/components/CustomCursor";
 
+import { SmoothScroll } from "@/components/SmoothScroll";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--next-font-inter",
@@ -68,7 +70,9 @@ export default function RootLayout({
       <body className="antialiased min-h-screen">
           <CustomCursor />
           <CursorGlow />
-          {children}
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
       </body>
     </html>
   );

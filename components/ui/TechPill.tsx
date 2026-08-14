@@ -61,7 +61,7 @@ export function TechPill({ tech, pillKey, mouseX, dimmed = false }: TechPillProp
           ? "border-[#3a322b]/10 bg-[#3a322b]/[0.02] text-[#5a5046]"
           : "border-[#3a322b]/10 bg-[#3a322b]/[0.02] text-[#3a322b]"
         }
-        text-[15px] md:text-[17px] font-semibold tracking-tight
+        font-syne text-[15px] md:text-[17px] font-bold tracking-wide
         hover:border-[#ff8a3d]/40 hover:bg-[#ff8a3d]/[0.06] hover:text-[#ff8a3d]
       `}
     >
@@ -80,10 +80,8 @@ export function TechPill({ tech, pillKey, mouseX, dimmed = false }: TechPillProp
         style={{ opacity: borderGlow }}
       />
 
-      {/* AI dot indicator */}
-      {isAI && (
-        <span className={`w-2 h-2 rounded-full bg-[#ff8a3d] mr-3 shrink-0 ${dimmed ? "animate-pulse" : ""} shadow-[0_0_12px_rgba(255,138,61,0.6)]`} />
-      )}
+      {/* Orange dot indicator */}
+      <span className={`w-2 h-2 rounded-full bg-[#ff8a3d] mr-3 shrink-0 ${dimmed ? "animate-pulse" : ""} shadow-[0_0_12px_rgba(255,138,61,0.6)]`} />
 
       <span className="relative z-10">{tech}</span>
     </motion.span>
