@@ -6,12 +6,12 @@ import Lenis from "lenis";
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const lenis = new Lenis({
-      lerp: 0.1,
-      wheelMultiplier: 0.9,
+      lerp: 0.12,
+      wheelMultiplier: 1.0,
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      touchMultiplier: 1.5,
+      touchMultiplier: 1.0,
     });
 
     let rafId: number;

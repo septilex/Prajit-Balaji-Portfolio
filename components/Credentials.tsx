@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { motion, AnimatePresence, useAnimationFrame, useMotionValue, useTransform } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 
@@ -78,25 +78,19 @@ export const CREDENTIALS: Credential[] = [
 export function Credentials() {
   const [activeId, setActiveId] = useState(CREDENTIALS[0].id);
   const activeCredential = CREDENTIALS.find(c => c.id === activeId) || CREDENTIALS[0];
+  const [inView, setInView] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  const [isHovered, setIsHovered] = useState(false);
-  const baseX = useMotionValue(0);
-
-  // Smooth framer-motion infinite loop that pauses on hover
-  useAnimationFrame((_, delta) => {
-    if (isHovered) return;
-    // Speed: moves 50% in roughly 40-45 seconds
-    let currentX = baseX.get() - (delta * 0.0012);
-    if (currentX <= -50) {
-      currentX += 50;
-    }
-    baseX.set(currentX);
-  });
-
-  const x = useTransform(baseX, (v) => `${v}%`);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <section id="credentials" className="relative mx-auto w-full pt-16 pb-20 md:pt-20 md:pb-24 z-10 block min-h-[90vh]">
+    <section ref={sectionRef} id="credentials" className="relative mx-auto w-full pt-16 pb-20 md:pt-20 md:pb-24 z-10 block min-h-[90vh]">
       {/* Background soft glow effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ff8a3d]/[0.02] rounded-full blur-[80px] pointer-events-none"></div>
 
@@ -117,20 +111,21 @@ export function Credentials() {
         className="relative z-[100] w-full pb-4 pt-2"
       >
         <div 
-          className="relative w-full border-y border-[#110e0c]/5 bg-[#f2ece1]/45 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.02)] overflow-hidden"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          className="group/ticker relative w-full border-y border-[#110e0c]/5 bg-[#f2ece1]/45 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.02)] overflow-hidden"
         >
           {/* Edge Fade Masks */}
           <div className="absolute inset-y-0 left-0 w-24 md:w-32 bg-gradient-to-r from-[#f2ece1] via-[#f2ece1]/50 to-transparent z-20 pointer-events-none"></div>
           <div className="absolute inset-y-0 right-0 w-24 md:w-32 bg-gradient-to-l from-[#f2ece1] via-[#f2ece1]/50 to-transparent z-20 pointer-events-none"></div>
           
-          <motion.div
-            style={{ x }}
-            className="flex w-max py-5 md:py-6 pr-16 gap-12 md:gap-16 items-center"
+          <div
+            className="flex w-max py-5 md:py-6 pr-16 gap-12 md:gap-16 items-center animate-marquee hover:[animation-play-state:paused] group-hover/ticker:[animation-play-state:paused] will-change-transform"
+            style={{
+              animationDuration: "40s",
+              animationPlayState: inView ? undefined : "paused",
+            }}
           >
-            {/* We duplicate the credentials arrays to create enough width for a seamless 50% loop */}
-            {[...CREDENTIALS, ...CREDENTIALS, ...CREDENTIALS, ...CREDENTIALS].map((cred, idx) => {
+            {/* Duplicated credentials arrays for seamless CSS loop */}
+            {[...CREDENTIALS, ...CREDENTIALS].map((cred, idx) => {
               const isActive = activeId === cred.id;
               return (
                 <button
@@ -156,7 +151,7 @@ export function Credentials() {
                 </button>
               );
             })}
-          </motion.div>
+          </div>
         </div>
       </div>
 

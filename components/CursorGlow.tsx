@@ -16,27 +16,27 @@ export function CursorGlow() {
     current.current.x = mouse.current.x;
     current.current.y = mouse.current.y;
 
+    let rafId: number | null = null;
+
     const handleMouseMove = (e: MouseEvent) => {
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
+
+      if (rafId === null) {
+        rafId = requestAnimationFrame(() => {
+          if (glowRef.current) {
+            glowRef.current.style.transform = `translate3d(${mouse.current.x - 200}px, ${mouse.current.y - 200}px, 0)`;
+          }
+          rafId = null;
+        });
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    let rafId: number;
-    const update = () => {
-      if (glowRef.current) {
-        glowRef.current.style.transform = `translate3d(${mouse.current.x - 200}px, ${mouse.current.y - 200}px, 0)`;
-      }
-
-      rafId = requestAnimationFrame(update);
-    };
-
-    rafId = requestAnimationFrame(update);
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, []);
 

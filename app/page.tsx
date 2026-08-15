@@ -20,7 +20,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { BackgroundTypography } from "@/components/BackgroundTypography";
 import { StatsMarquee } from "@/components/StatsMarquee";
 import { Credentials } from "@/components/Credentials";
-import { Education } from "@/components/Education";
+import { About } from "@/components/About";
 import { Expertise } from "@/components/Expertise";
 import { TypewriterTitle } from "@/components/TypewriterTitle";
 import { IntroPreloader } from "@/components/IntroPreloader";
@@ -34,6 +34,7 @@ import { GlowButton } from "@/components/ui/glow";
 import { TimePill } from "@/components/TimePill";
 import { StatsCard } from "@/components/StatsCard";
 import { BottomTicker } from "@/components/BottomTicker";
+import { DinoRunner } from "@/components/DinoRunner";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -621,6 +622,7 @@ export default function Home() {
                 src="/pb_logo.jpg"
                 alt="PB Logo"
                 fill
+                sizes="40px"
                 className="object-cover"
               />
             </span>
@@ -703,6 +705,9 @@ export default function Home() {
           <div className="absolute bottom-[-10%] left-1/2 h-[350px] w-[70%] -translate-x-1/2 rounded-full bg-[#b87333]/18 blur-[80px] light:bg-[#b87333]/8 light:blur-[80px]"></div>
           <div className="absolute inset-x-0 bottom-0 h-[40vh] bg-gradient-to-t from-[#1a0d05]/80 via-[#0d0807]/40 to-transparent dark:from-[#1a0d05]/80 dark:via-[#0d0807]/40 light:from-[#f5efe6] light:to-transparent"></div>
         </div>
+
+        {/* Ambient pixel-art infinite runner Easter egg */}
+        <DinoRunner />
 
         {/* Hero layout: flex column filling full viewport height */}
         <div className="relative z-10 flex min-h-[100svh] flex-col justify-between pt-32 pb-10">
@@ -940,8 +945,8 @@ export default function Home() {
       {/* Stats Marquee Strip */}
       <StatsMarquee />
 
-      {/* Section 2: Education */}
-      <Education />
+      {/* Section 2: About */}
+      <About />
 
       {/* Section 3: Technology Arsenal */}
       <section id="stack" className="relative mx-auto max-w-[1600px] pt-32 pb-24 md:pt-48 md:pb-32 overflow-hidden">
@@ -1192,7 +1197,7 @@ export default function Home() {
           <div className="relative mx-auto max-w-[1600px] px-6 py-16 md:px-12">
             <ScrollReveal initialTransform="translateY(100px)">
               <h3 className="font-montserrat text-balance text-[clamp(3.5rem,12vw,12rem)] font-black leading-[0.85] tracking-[-0.06em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow">
-                PRAJIT BALAJI
+                HIRE ME !!
               </h3>
             </ScrollReveal>
 

@@ -26,7 +26,14 @@ export function CustomCursor() {
     let mx = -100;
     let my = -100;
     let visible = false;
-    let raf = 0;
+    let rafId: number | null = null;
+
+    const updateCursor = () => {
+      const t = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
+      dot.style.transform = t;
+      ring.style.transform = t;
+      rafId = null;
+    };
 
     const onMove = (e: MouseEvent) => {
       mx = e.clientX;
@@ -44,6 +51,10 @@ export function CustomCursor() {
       );
       ring.classList.toggle("cursor-ring--active", interactive);
       dot.classList.toggle("cursor-dot--active", interactive);
+
+      if (rafId === null) {
+        rafId = requestAnimationFrame(updateCursor);
+      }
     };
 
     const onLeave = () => {
@@ -55,23 +66,13 @@ export function CustomCursor() {
     const onDown = () => ring.classList.add("cursor-ring--down");
     const onUp = () => ring.classList.remove("cursor-ring--down");
 
-    const loop = () => {
-      // Both dot and ring track the pointer 1:1 — no trailing delay
-      const t = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
-      dot.style.transform = t;
-      ring.style.transform = t;
-
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-
     window.addEventListener("mousemove", onMove, { passive: true });
     document.documentElement.addEventListener("mouseleave", onLeave);
     window.addEventListener("mousedown", onDown);
     window.addEventListener("mouseup", onUp);
 
     return () => {
-      cancelAnimationFrame(raf);
+      if (rafId !== null) cancelAnimationFrame(rafId);
       window.removeEventListener("mousemove", onMove);
       document.documentElement.removeEventListener("mouseleave", onLeave);
       window.removeEventListener("mousedown", onDown);

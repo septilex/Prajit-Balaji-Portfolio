@@ -47,19 +47,6 @@ export function ExpertiseHoverItem({ name, index, mouseY }: ExpertiseHoverItemPr
     { mass: 0.1, stiffness: 240, damping: 22 }
   );
 
-  // ── Proximity from shared mouseY (weak neighbor influence) ──────────────────
-  const proximity = useTransform(mouseY, (val) => {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return 0;
-    const center = rect.top + rect.height / 2;
-    const dist = Math.abs(val - center);
-    return Math.max(0, 1 - dist / 110); // 110px falloff radius
-  });
-  const neighborScale = useSpring(
-    useTransform(proximity, [0, 1], [1, 1.009]),
-    { mass: 0.1, stiffness: 200, damping: 22 }
-  );
-
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     localX.set((e.clientX - rect.left - rect.width / 2) / rect.width);
