@@ -59,7 +59,7 @@ export const About = () => {
               </div>
 
               {/* Institution */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-right">
+              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] scale-x-[1.25] origin-right inline-block">
                 SRM University AP
               </h3>
 
@@ -142,7 +142,7 @@ export const About = () => {
               </h4>
 
               {/* Subjects */}
-              <p className="font-syne mt-4 text-base md:text-2xl lg:text-[30px] font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
+              <p className="mt-4 font-syne text-base md:text-2xl lg:text-[30px] font-semibold tracking-wide text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                 Physics &bull; Chemistry &bull; Biology
               </p>
 

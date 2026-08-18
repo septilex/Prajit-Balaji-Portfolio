@@ -35,6 +35,7 @@ import { TimePill } from "@/components/TimePill";
 import { StatsCard } from "@/components/StatsCard";
 import { BottomTicker } from "@/components/BottomTicker";
 import { DinoRunner } from "@/components/DinoRunner";
+import { HireMeModal } from "@/components/HireMeModal";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -327,6 +328,7 @@ export default function Home() {
   const [formState, setFormState] = useState<"idle" | "loading" | "success">("idle");
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hireMeOpen, setHireMeOpen] = useState(false);
   // Mouse-driven effects (WebGL hero mesh) only make sense with a fine pointer
   const [isFinePointer, setIsFinePointer] = useState(false);
 
@@ -636,6 +638,7 @@ export default function Home() {
           <div className="flex items-center gap-2">
             {/* IST Time Pill — only visible md+ */}
             <TimePill />
+
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMenuOpen((v) => !v)}
@@ -671,6 +674,17 @@ export default function Home() {
                 {item.label}
               </a>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                setHireMeOpen(true);
+              }}
+              className="font-syne mt-1 flex items-center justify-between rounded-2xl bg-[var(--amber)]/15 border border-[var(--amber)]/40 px-4 py-3 text-[15px] font-bold text-[var(--amber)] transition-colors"
+            >
+              <span>HIRE ME</span>
+              <Sparkles className="h-4 w-4 text-[var(--amber)]" />
+            </button>
             <a
               href="/Prajit_Balaji_Resume.pdf"
               download="Prajit_Balaji_Resume.pdf"
@@ -683,6 +697,53 @@ export default function Home() {
           </div>
         </div>
       </nav>
+
+      {/* Top-Right Fixed HIRE ME Button (Aligned horizontally with navbar, vertically above side social dock) */}
+      <div
+        className="fixed top-4 right-5 z-50 hidden md:block transition-all duration-700"
+        style={{
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? "translateY(0)" : "translateY(-40px)",
+        }}
+      >
+        <Magnetic strength={0.35}>
+          <button
+            type="button"
+            onClick={() => setHireMeOpen(true)}
+            className="group relative flex h-[62px] items-center justify-center rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95"
+            aria-label="Hire Me"
+          >
+            {/* Always-on pulsing orange glow — matches dock buttons */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
+            />
+
+            {/* Pill capsule: solid black & white text at default, turns solid orange & pure black on hover */}
+            <span className="relative z-10 flex h-12 items-center gap-2 rounded-full border border-white/10 bg-[#0f0d0b] px-5 shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d] group-hover:bg-[#ff8a3d] group-hover:shadow-[0_0_30px_rgba(255,138,61,0.65),inset_0_1px_0_rgba(255,255,255,0.4)]">
+              {/* Subtle top specular border highlight */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.03)_28%,transparent_50%)] transition-opacity duration-300 group-hover:opacity-0"
+              />
+
+              {/* Pulsing indicator dot — orange at default, turns pure black on hover */}
+              <span className="relative z-10 flex h-2 w-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff8a3d] opacity-75 transition-colors duration-300 group-hover:bg-black" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff8a3d] transition-colors duration-300 group-hover:bg-black" />
+              </span>
+
+              {/* Text — pure white at default, turns pure black on hover */}
+              <span className="relative z-10 font-researcher text-[11px] font-black uppercase tracking-[0.25em] text-white transition-colors duration-300 group-hover:text-black whitespace-nowrap">
+                HIRE ME
+              </span>
+            </span>
+          </button>
+        </Magnetic>
+      </div>
+
+      {/* Hire Me Premium Modal */}
+      <HireMeModal isOpen={hireMeOpen} onClose={() => setHireMeOpen(false)} />
 
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen w-full overflow-hidden">
@@ -911,21 +972,21 @@ export default function Home() {
               <Magnetic strength={0.2}>
                 <a
                   href="#projects"
-                  className="group relative block rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5"
+                  className="group relative block rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:scale-105 active:scale-95"
                 >
-                  {/* Pulsing orange glow */}
+                  {/* Always-on pulsing orange glow */}
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
+                    className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
                   />
-                  {/* Liquid glass pill */}
-                  <span className="relative z-10 flex h-12 px-8 items-center justify-center gap-2 overflow-hidden rounded-full border border-[var(--dock-glass-border)] bg-[var(--dock-glass-bg)] text-[var(--fg-body)] backdrop-blur-xl shadow-[var(--dock-glass-shadow)] transition-all duration-300 group-hover:border-[var(--amber)]/50 group-hover:text-[var(--amber)] group-hover:shadow-[var(--dock-glass-hover-shadow)] text-[13px] font-bold uppercase tracking-[0.3em]">
-                    {/* Specular sheen */}
+                  {/* Pill capsule: solid black & white text at default, turns solid orange & pure black on hover */}
+                  <span className="relative z-10 flex h-12 px-8 items-center justify-center gap-2 rounded-full border border-white/10 bg-[#0f0d0b] text-white shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d] group-hover:bg-[#ff8a3d] group-hover:text-black group-hover:shadow-[0_0_30px_rgba(255,138,61,0.65),inset_0_1px_0_rgba(255,255,255,0.4)] text-[11px] font-black uppercase tracking-[0.25em] font-researcher whitespace-nowrap">
+                    {/* Subtle top specular border highlight */}
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.85)_0%,rgba(255,255,255,0.25)_28%,rgba(255,255,255,0)_50%)]"
+                      className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.03)_28%,transparent_50%)] transition-opacity duration-300 group-hover:opacity-0"
                     />
-                    <span className="relative z-10 mt-px">View Work</span>
+                    <span className="relative z-10">VIEW WORK</span>
                     <ArrowUpRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </span>
                 </a>
