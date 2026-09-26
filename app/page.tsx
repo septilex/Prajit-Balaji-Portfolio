@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
+import { LiquidGlassCarousel } from "@/components/ui/liquid-glass-carousel";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { BackgroundTypography } from "@/components/BackgroundTypography";
 import { StatsMarquee } from "@/components/StatsMarquee";
@@ -433,6 +434,18 @@ export default function Home() {
   const projects = [
     {
       num: "/01",
+      title: "CARDIOVANTA",
+      cat: "ML • HEALTHCARE",
+      desc: "A containerized cardiovascular risk assessment platform with calibrated ML prediction. FastAPI serves the model while Next.js delivers the assessment experience.",
+      tags: ["NEXT.JS", "FASTAPI", "DOCKER"],
+      status: "Live",
+      year: "2026",
+      link: "https://cardio-vanta-prod.vercel.app/CardioVanta",
+      github: "https://github.com/septilex/CardioVanta",
+      image: "/cardiovanta-preview.png",
+    },
+    {
+      num: "/02",
       title: "KADENCE",
       cat: "MUSIC • 3D UNIVERSE",
       desc: "Step into a living, breathing 3D universe of music where every artist and album becomes a world to explore.",
@@ -444,7 +457,7 @@ export default function Home() {
       image: "/kadence-preview.png",
     },
     {
-      num: "/02",
+      num: "/03",
       title: "VELARI",
       cat: "AI • GENERATIVE ART",
       desc: "An AI canvas that turns your imagination into mesmerizing, gallery-worthy generative art in real time.",
@@ -456,7 +469,19 @@ export default function Home() {
       image: "/velari-preview.png",
     },
     {
-      num: "/03",
+      num: "/04",
+      title: "SKETCHDUEL",
+      cat: "AI • GAMING",
+      desc: "A real-time drawing duel where an AI watches your sketch and races to guess the secret word. Continuous vision, memory and voice turn the AI into a live game opponent.",
+      tags: ["VANILLA JAVASCRIPT", "HTML/CSS", "GEMINI API"],
+      status: "Live",
+      year: "2026",
+      link: "https://sketch-duel.vercel.app",
+      github: "https://github.com/septilex/SketchDuel",
+      image: "/sketchduel-preview.png",
+    },
+    {
+      num: "/05",
       title: "DevMentor AI",
       cat: "AI • ENGINEERING ASSISTANT",
       desc: "An AI pair programmer that thinks like a senior engineer — auditing, architecting, and documenting your code at superhuman speed.",
@@ -468,7 +493,7 @@ export default function Home() {
       image: "/devmentor-preview.png",
     },
     {
-      num: "/04",
+      num: "/06",
       title: "DevScore",
       cat: "AI • DEVELOPER ANALYSIS",
       desc: "The ultimate verdict on your code: scans your GitHub to reveal your true skill, growth, and developer DNA.",
@@ -1053,7 +1078,7 @@ export default function Home() {
 
       {/* Section 5: Projects */}
       <section id="projects" className="relative py-32 md:py-48">
-        <div className="mx-auto max-w-[1600px] px-6 md:px-12">
+        <div className="mx-auto max-w-[1920px] px-6 md:px-12">
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
             <span>05</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
@@ -1070,9 +1095,25 @@ export default function Home() {
               {projects.length} works
             </div>
           </div>
-        </div>
 
-        <ProjectsShowcase projects={projects} />
+          <div className="w-full mt-16 overflow-hidden relative rounded-2xl">
+            <LiquidGlassCarousel 
+              items={projects.map(p => ({
+                src: p.image,
+                title: p.title,
+                cat: p.cat,
+                desc: p.desc,
+                tags: p.tags,
+                github: p.github,
+                link: p.link,
+                status: p.status,
+                year: p.year
+              }))}
+              background="#f2ece1"
+              entry={true}
+            />
+          </div>
+        </div>
       </section>
 
 

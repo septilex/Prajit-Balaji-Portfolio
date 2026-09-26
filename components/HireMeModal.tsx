@@ -286,11 +286,11 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
                 {/* Resume Card — clean, centered, no border, no glow, no tilt */}
                 <div 
                   className="relative w-full max-w-[450px] mx-auto rounded-[16px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.08)] overflow-hidden" 
-                  style={{ aspectRatio: "8.5 / 11.5" }}
+                  style={{ aspectRatio: "8.5 / 11" }}
                 >
                   <iframe
                     src="/Prajit_Balaji_Resume.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0"
-                    className="absolute -top-[4px] -left-[6px] w-[calc(100%+12px)] h-[calc(100%+8px)] pointer-events-none border-none bg-white"
+                    className="absolute -top-[20px] -left-[20px] w-[calc(100%+40px)] h-[calc(100%+40px)] pointer-events-none border-none bg-white"
                     title="Prajit Balaji Resume"
                   />
                   <div className="absolute inset-0 z-10" />

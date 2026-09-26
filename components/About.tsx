@@ -78,7 +78,7 @@ export const About = () => {
                 <span className="font-researcher text-[12px] md:text-[14px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                   CGPA
                 </span>
-                <span className="mt-1 font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-[#ff8a3d]">
+                <span className="mt-1 font-syne text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-[#ff8a3d]">
                   8.92
                 </span>
               </div>
@@ -151,7 +151,7 @@ export const About = () => {
                 <span className="font-researcher text-[12px] md:text-[14px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                   Percentage
                 </span>
-                <span className="mt-1 font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-[#ff8a3d]">
+                <span className="mt-1 font-syne text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-[#ff8a3d]">
                   93%
                 </span>
               </div>
@@ -224,7 +224,7 @@ export const About = () => {
                 <span className="font-researcher text-[12px] md:text-[14px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                   Duration
                 </span>
-                <span className="mt-1 font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-[#ff8a3d]">
+                <span className="mt-1 font-syne text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-[#ff8a3d]">
                   3 MONTHS
                 </span>
               </div>
@@ -297,7 +297,7 @@ export const About = () => {
                 <span className="font-researcher text-[12px] md:text-[14px] font-bold uppercase tracking-[0.25em] text-[#a89c8d] dark:text-[#a89c8d] light:text-[#7a6f62]">
                   Duration
                 </span>
-                <span className="mt-1 font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-[#ff8a3d]">
+                <span className="mt-1 font-syne text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-[#ff8a3d]">
                   2 MONTHS
                 </span>
               </div>
