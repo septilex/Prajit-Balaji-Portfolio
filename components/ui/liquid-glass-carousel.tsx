@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/liquid-glass-carousel-utils/webgl-error-boundary";
 import { GlowButton } from "@/components/ui/glow";
 import { Magnetic } from "@/components/ui/Magnetic";
+import { TiltCard } from "@/components/ui/TiltCard";
 import { Link2, X } from "lucide-react";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
@@ -1537,13 +1538,19 @@ export function LiquidGlassCarousel({
         )}
       >
         {/* LEFT: Title + Tech Stack - shifted left for breathing room */}
-        <div className="flex-1 flex flex-col items-end text-right pr-8 sm:pr-12 md:pr-16 lg:pr-24 max-w-[460px] pointer-events-auto">
+        <div className="flex-1 flex flex-col items-end text-right pr-8 sm:pr-12 md:pr-16 lg:pr-24 max-w-[600px] pointer-events-auto">
           <div className="flex items-center justify-end gap-3 text-[#ff8a3d] font-researcher text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black mb-2 md:mb-3">
               {current?.cat}
           </div>
-          <h3 className="font-montserrat text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black leading-[0.95] tracking-tight text-black drop-shadow-sm">
-            {current?.title}
-          </h3>
+          <div className="w-full flex justify-end">
+            <Magnetic strength={0.2}>
+              <TiltCard maxTilt={15} className="inline-block cursor-pointer">
+                <h3 className="font-montserrat text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-[0.95] tracking-tight text-black drop-shadow-sm break-words transition-colors duration-300 hover:text-[#ff8a3d] text-right">
+                  {current?.title}
+                </h3>
+              </TiltCard>
+            </Magnetic>
+          </div>
           <div className="mt-4 md:mt-6 flex flex-wrap items-center justify-end gap-x-2 md:gap-x-4 gap-y-2">
             {current?.tags?.map((tag) => (
               <span
@@ -1616,15 +1623,24 @@ export function LiquidGlassCarousel({
         </div>
       </div>
 
-      <p
+      <div
         ref={counterRef}
         className={cn(
-          "pointer-events-none absolute bottom-[6%] left-1/2 z-10 m-0 text-center text-[13px] font-medium tabular-nums tracking-[-0.02em] text-[#a89c8d] sm:text-[15px] transition-opacity duration-300",
+          "pointer-events-none absolute bottom-[6%] left-1/2 z-10 m-0 flex flex-col items-center justify-center text-center transition-opacity duration-300",
           focused ? "opacity-0" : "opacity-100"
         )}
       >
-        {pad(active + 1)}/{pad(items.length)}
-      </p>
+        <Magnetic strength={0.25}>
+          <TiltCard maxTilt={18} className="pointer-events-auto mb-1 cursor-pointer inline-block">
+            <span className="inline-block font-researcher text-[12px] md:text-[14px] font-black uppercase tracking-[0.2em] text-[#1a1612] [-webkit-text-stroke:0.5px_#1a1612] transition-colors duration-300 hover:text-[#ff8a3d] hover:[-webkit-text-stroke:0.5px_#ff8a3d]">
+              {current?.title}
+            </span>
+          </TiltCard>
+        </Magnetic>
+        <span className="text-[13px] font-medium tabular-nums tracking-[-0.02em] text-[#a89c8d] sm:text-[15px]">
+          {pad(active + 1)}/{pad(items.length)}
+        </span>
+      </div>
 
       <div
         ref={cursorRef}

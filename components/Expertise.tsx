@@ -198,8 +198,7 @@ const ExpertiseCategoryBlock = React.forwardRef<
 
       {/* Category title */}
       <h3 
-        className="font-normal text-3xl md:text-5xl text-[#3a322b] tracking-wide leading-[1.05] uppercase"
-        style={{ fontFamily: "'Anton', sans-serif" }}
+        className="font-syne font-bold text-2xl md:text-3xl lg:text-4xl text-[#3a322b] tracking-tight leading-[1.05] uppercase"
       >
         {category.title}
       </h3>
@@ -244,30 +243,44 @@ export function Expertise() {
     return () => observer.unobserve(el);
   }, []);
 
-  // Scroll spy — update active index using IntersectionObserver (highly performant)
+  // Scroll spy — update active index based on the section closest to the center of the screen
   useEffect(() => {
-    const refs = categoryRefs.current;
-    if (!refs.length) return;
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const refs = categoryRefs.current;
+          const center = window.innerHeight / 2;
+          let closestIndex = 0;
+          let minDistance = Infinity;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = refs.indexOf(entry.target as HTMLDivElement);
-            if (index !== -1) {
-              setActiveIndex(index);
+          refs.forEach((ref, index) => {
+            if (!ref) return;
+            const rect = ref.getBoundingClientRect();
+            // Calculate distance from center of viewport to center of the element
+            const elCenter = rect.top + rect.height / 2;
+            const dist = Math.abs(elCenter - center);
+            if (dist < minDistance) {
+              minDistance = dist;
+              closestIndex = index;
             }
-          }
+          });
+          
+          setActiveIndex((prev) => (prev !== closestIndex ? closestIndex : prev));
+          ticking = false;
         });
-      },
-      { rootMargin: "-30% 0px -30% 0px", threshold: 0 }
-    );
+        ticking = true;
+      }
+    };
 
-    refs.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
+    handleScroll(); // initial check
 
-    return () => observer.disconnect();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
   const setCategoryRef = useCallback(

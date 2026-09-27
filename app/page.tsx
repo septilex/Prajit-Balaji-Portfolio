@@ -603,17 +603,12 @@ export default function Home() {
                 aria-hidden="true"
                 className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
               />
-              {/* Liquid glass circle */}
-              <span className="relative z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[var(--dock-glass-border)] bg-[var(--dock-glass-bg)] text-[var(--fg-body)] backdrop-blur-xl shadow-[var(--dock-glass-shadow)] transition-all duration-300 group-hover:border-[var(--amber)]/50 group-hover:text-[var(--amber)] group-hover:shadow-[var(--dock-glass-hover-shadow)]">
-                {/* Specular sheen */}
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.85)_0%,rgba(255,255,255,0.25)_28%,rgba(255,255,255,0)_50%)]"
-                />
-                <span className="relative z-10">{item.icon}</span>
+              {/* Solid color circle */}
+              <span className="relative z-10 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-transparent bg-[#1a1612] text-[#ff8a3d] shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 group-hover:bg-[#ff8a3d] group-hover:text-[#1a1612] group-hover:shadow-[0_8px_32px_rgba(255,138,61,0.4)]">
+                <span className="relative z-10 scale-110">{item.icon}</span>
               </span>
-              {/* Hover label — glowing orange text */}
-              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-3 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[var(--amber)]/30 bg-[var(--dock-label-bg)] px-3.5 py-2 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.2),0_0_12px_rgba(255,138,61,0.15)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block" style={{ color: "var(--amber)", textShadow: "0 0 8px rgba(255,138,61,0.7), 0 0 20px rgba(255,138,61,0.4)" }}>
+              {/* Hover label — orange bg with black text */}
+              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-4 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a3d] bg-[#ff8a3d] px-4 py-2.5 font-researcher text-[11px] font-black uppercase tracking-[0.3em] text-[#1a1612] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.3)] transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block">
                 {item.label}
               </span>
             </a>
