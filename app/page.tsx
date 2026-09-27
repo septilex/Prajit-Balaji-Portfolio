@@ -26,7 +26,7 @@ import { Expertise } from "@/components/Expertise";
 import { TypewriterTitle } from "@/components/TypewriterTitle";
 import { IntroPreloader } from "@/components/IntroPreloader";
 import { MagneticNavGroup } from "@/components/ui/MagneticNavItem";
-import { ProximityPillRow } from "@/components/ui/TechPill";
+import { TechnologyArsenal } from "@/components/TechnologyArsenal";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
 import { WordReveal } from "@/components/ui/WordReveal";
 import { TiltCard } from "@/components/ui/TiltCard";
@@ -1030,41 +1030,7 @@ export default function Home() {
       <About />
 
       {/* Section 3: Technology Arsenal */}
-      <section id="stack" className="relative mx-auto max-w-[1600px] pt-32 pb-24 md:pt-48 md:pb-32 overflow-hidden">
-        <div className="px-6 md:px-12">
-          <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
-            <span>03</span>
-            <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
-            <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Technology Arsenal</span>
-          </div>
-          <WordReveal
-            text="A modern arsenal for"
-            accentText="building at the edge."
-            className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] mb-20 md:mb-32 text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
-          />
-        </div>
-
-        {/* Marquees */}
-        <ScrollReveal initialTransform="translateY(40px)" delay={200}>
-          <div className="flex flex-col gap-6 select-none mt-10 w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] overflow-hidden">
-            {/* Row 1 */}
-            <ProximityPillRow
-              techs={["React", "Next.js", "TypeScript", "TailwindCSS", "Node.js", "Express", "MongoDB", "PostgreSQL", "OpenAI", "LLMs"]}
-              rowKey="row1"
-              animClass="animate-marquee"
-            />
-
-            {/* Row 2 */}
-            <ProximityPillRow
-              techs={["RAG", "AI Agents", "Docker", "AWS", "Vercel", "GitHub", "REST APIs", "Authentication", "Prompt Engineering", "AI Workflows"]}
-              rowKey="row2"
-              reverse
-              dimmed
-              animClass="animate-marquee-slow"
-            />
-          </div>
-        </ScrollReveal>
-      </section>
+      <TechnologyArsenal />
 
 
 

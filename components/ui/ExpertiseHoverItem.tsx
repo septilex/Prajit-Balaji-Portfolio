@@ -9,11 +9,6 @@ import {
   MotionValue,
 } from "framer-motion";
 
-// ─── ExpertiseHoverItem ───────────────────────────────────────────────────────
-// A single skill row that uses pointer-within-row coordinates to produce a
-// cinematic 3D pop-out.  mouseY is the shared page-Y value from the parent
-// ProximitySkillList so neighbouring rows react faintly to the cursor.
-
 interface ExpertiseHoverItemProps {
   name: string;
   index: number;
@@ -24,7 +19,6 @@ export function ExpertiseHoverItem({ name, index, mouseY }: ExpertiseHoverItemPr
   const padded = String(index + 1).padStart(2, "0");
   const ref = useRef<HTMLDivElement>(null);
 
-  // ── Per-row local pointer tracking (strong primary 3D tilt) ────────────────
   const localX = useMotionValue(0);
   const localY = useMotionValue(0);
 
@@ -32,20 +26,19 @@ export function ExpertiseHoverItem({ name, index, mouseY }: ExpertiseHoverItemPr
 
   const rotateX = useSpring(useTransform(localY, [-0.5, 0.5], [8, -8]), springBase);
   const rotateY = useSpring(useTransform(localX, [-0.5, 0.5], [-10, 10]), springBase);
-  const translateZ = useSpring(useTransform(localX, [-0.5, 0.5], [0, 0]), {
-    ...springBase,
-  });
+  const translateZ = useSpring(useTransform(localX, [-0.5, 0.5], [0, 0]), springBase);
 
-  // Lift on Y-local hover
-  const liftY = useSpring(useTransform(localY, [-0.5, 0.5], [0, 0]), springBase);
-
-  // Hover-activated glow scale
   const hovered = useMotionValue(0);
   const glowOpacity = useSpring(hovered, { mass: 0.1, stiffness: 200, damping: 20 });
-  const scaleSync = useSpring(
-    useTransform(hovered, [0, 1], [1, 1.018]),
-    { mass: 0.1, stiffness: 240, damping: 22 }
-  );
+  const scaleSync = useSpring(useTransform(hovered, [0, 1], [1, 1.018]), {
+    mass: 0.1,
+    stiffness: 240,
+    damping: 22,
+  });
+
+  // Keep the shared MotionValue wired in so the current ProximitySkillList API remains intact.
+  void mouseY;
+  void translateZ;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -77,7 +70,6 @@ export function ExpertiseHoverItem({ name, index, mouseY }: ExpertiseHoverItemPr
         }}
         className="flex items-center justify-between py-4 px-4 -mx-4 origin-center"
       >
-        {/* Left accent bar */}
         <motion.div
           className="absolute left-0 top-0 w-[3px] rounded-r-full bg-[#ff8a3d] origin-top"
           style={{
@@ -86,14 +78,12 @@ export function ExpertiseHoverItem({ name, index, mouseY }: ExpertiseHoverItemPr
           }}
         />
 
-        {/* Soft highlight backdrop */}
         <motion.div
           aria-hidden
           className="absolute inset-0 rounded-sm bg-gradient-to-r from-[#ff8a3d]/[0.03] to-transparent"
           style={{ opacity: glowOpacity }}
         />
 
-        {/* Skill name — deeper in 3D */}
         <motion.span
           className="relative font-sans text-sm text-[#3a322b]/65 transition-colors duration-300 group-hover/skill:text-[#3a322b]"
           style={{ translateZ: 14 }}
@@ -101,7 +91,6 @@ export function ExpertiseHoverItem({ name, index, mouseY }: ExpertiseHoverItemPr
           {name}
         </motion.span>
 
-        {/* Index — slightly shallower */}
         <motion.span
           className="relative font-researcher text-xs tracking-wider text-[#3a322b]/25 transition-colors duration-300 group-hover/skill:text-[#ff8a3d]"
           style={{ translateZ: 8 }}
@@ -113,21 +102,15 @@ export function ExpertiseHoverItem({ name, index, mouseY }: ExpertiseHoverItemPr
   );
 }
 
-// ─── ProximitySkillList ───────────────────────────────────────────────────────
-// Wraps a list of skill names and shares a single mouseY MotionValue so each
-// ExpertiseHoverItem can react faintly to the cursor even when not directly hovered.
-
 interface ProximitySkillListProps {
   skills: string[];
 }
 
 export function ProximitySkillList({ skills }: ProximitySkillListProps) {
   const mouseY = useMotionValue(Infinity);
-
-  // rAF-gate the shared mouseY: every set() fans out to a rect read per row,
-  // and mousemove can fire far faster than the display refreshes.
   const pendingY = useRef(0);
   const rafPending = useRef(false);
+
   const onMouseMove = (e: React.MouseEvent) => {
     pendingY.current = e.clientY;
     if (!rafPending.current) {
