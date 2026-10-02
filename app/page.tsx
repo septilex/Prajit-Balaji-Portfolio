@@ -28,6 +28,7 @@ import { IntroPreloader } from "@/components/IntroPreloader";
 import { MagneticNavGroup } from "@/components/ui/MagneticNavItem";
 import { TechnologyArsenal } from "@/components/TechnologyArsenal";
 import { AnimatedHeroHeading } from "@/components/ui/AnimatedHeroHeading";
+import { ElasticHeroTitle } from "@/components/ui/ElasticHeroTitle";
 import { WordReveal } from "@/components/ui/WordReveal";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { Magnetic } from "@/components/ui/Magnetic";
@@ -814,7 +815,7 @@ export default function Home() {
             <ScrollReveal initialTransform="translateY(80px)">
               <motion.div style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}>
                 <Magnetic strength={0.08}>
-                  <h1
+                  <ElasticHeroTitle
                     className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
                     style={{
                       fontSize: "clamp(2rem, 12.5vw, 18rem)",
@@ -822,9 +823,7 @@ export default function Home() {
                       letterSpacing: "-0.06em",
                       position: "relative",
                     }}
-                  >
-                    PRAJIT BALAJI
-                  </h1>
+                  />
                 </Magnetic>
               </motion.div>
             </ScrollReveal>
