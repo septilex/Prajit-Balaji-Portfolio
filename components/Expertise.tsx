@@ -386,24 +386,8 @@ function HUDCounterRadar() {
       >
         {/* Main targeting HUD around the 01 */}
         <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="390" cy="452" r="211" stroke="#3a2a1c" strokeOpacity="0.36" />
-          <circle cx="390" cy="452" r="186" stroke="#3a2a1c" strokeOpacity="0.44" strokeDasharray="2 6" />
-          <circle cx="390" cy="452" r="165" stroke="#ff8a3d" strokeOpacity="0.64" strokeDasharray="260 780" transform="rotate(-34 390 452)" />
           <circle cx="390" cy="452" r="150" stroke="#3a2a1c" strokeOpacity="0.42" strokeDasharray="1.5 5" />
           <circle cx="390" cy="452" r="131" stroke="#3a2a1c" strokeOpacity="0.33" />
-          <circle cx="390" cy="452" r="228" stroke="#ff8a3d" strokeOpacity="0.38" strokeDasharray="116 116" transform="rotate(145 390 452)" />
-        </g>
-
-        {/* Radial tick ring */}
-        <g stroke="#ff8a3d" strokeOpacity="0.75" strokeWidth="1">
-          {Array.from({ length: 30 }).map((_, i) => {
-            const angle = (-70 + i * 5) * (Math.PI / 180);
-            const x1 = 390 + Math.cos(angle) * 174;
-            const y1 = 452 + Math.sin(angle) * 174;
-            const x2 = 390 + Math.cos(angle) * (i % 3 === 0 ? 182 : 178);
-            const y2 = 452 + Math.sin(angle) * (i % 3 === 0 ? 182 : 178);
-            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />;
-          })}
         </g>
       </svg>
     </div>
@@ -605,7 +589,7 @@ export function Expertise() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen w-full flex flex-col justify-center overflow-hidden px-6 md:px-12 py-24 md:py-32">
-      <ExpertiseHudBackground activeIndex={activeIndex} />
+      {/* <ExpertiseHudBackground activeIndex={activeIndex} /> */}
 
       <div className="relative z-10 max-w-7xl mx-auto w-full mt-auto mb-auto">
           <div
@@ -620,8 +604,8 @@ export function Expertise() {
             <span className="font-researcher text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em] uppercase block mb-4">
               04 / Expertise
             </span>
-            <h2 className="font-display font-black text-[clamp(3rem,7vw,8rem)] text-[#f2ece1] light:text-[#1a1612] leading-[0.9] tracking-[-0.03em]">
-              My <span className="text-[#ff8a3d]">Expertise</span>
+            <h2 className="font-syne uppercase font-black text-[clamp(1.5rem,3.5vw,4rem)] text-[#f2ece1] light:text-[#1a1612] leading-[0.9] tracking-[-0.03em]">
+              <span className="text-[0.7em]"><span className="text-[1.25em]">M</span>Y</span> <span className="text-[#ff8a3d]"><span className="text-[1.25em]">E</span>XPERTISE</span>
             </h2>
           </div>
 

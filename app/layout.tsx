@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, Instrument_Serif, Montserrat, Syne } from "next/font/google";
+import { Inter, Space_Grotesk, Instrument_Serif, Montserrat, Syne, Geist } from "next/font/google";
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import localFont from "next/font/local";
@@ -8,6 +8,9 @@ import { CursorGlow } from "@/components/CursorGlow";
 import { CustomCursor } from "@/components/CustomCursor";
 
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -62,7 +65,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`light ${inter.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${montserrat.variable} ${researcher.variable} ${GeistSans.variable} ${GeistMono.variable} ${syne.variable}`}
+      className={cn("light", inter.variable, spaceGrotesk.variable, instrumentSerif.variable, montserrat.variable, researcher.variable, GeistSans.variable, GeistMono.variable, syne.variable, "font-sans", geist.variable)}
       suppressHydrationWarning
     >
       <head>

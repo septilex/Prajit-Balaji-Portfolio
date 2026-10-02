@@ -29,26 +29,34 @@ export function WordReveal({
       : []),
   ];
 
+  const cleanedClassName = className.replace(/\bfont-display\b/g, "").trim();
+
   return (
-    <h2 className={className}>
-      {words.map((item, i) => (
-        <React.Fragment key={i}>
-          <motion.span
-            className={`inline-block ${item.accent ? accentClassName : ""}`}
-            initial={{ opacity: 0, y: "0.4em" }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{
-              duration: 0.5,
-              ease: [0.16, 1, 0.3, 1],
-              delay: i * 0.05,
-            }}
-          >
-            {item.w}
-          </motion.span>
-          {i < words.length - 1 ? " " : null}
-        </React.Fragment>
-      ))}
+    <h2 className={`${cleanedClassName} font-syne uppercase`}>
+      {words.map((item, i) => {
+        const upperWord = item.w.toUpperCase();
+        const first = upperWord.charAt(0);
+        const rest = upperWord.slice(1);
+        
+        return (
+          <React.Fragment key={i}>
+            <motion.span
+              className={`inline-block ${item.accent ? accentClassName : "text-[0.7em]"}`}
+              initial={{ opacity: 0, y: "0.4em" }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{
+                duration: 0.5,
+                ease: [0.16, 1, 0.3, 1],
+                delay: i * 0.05,
+              }}
+            >
+              <span className="text-[1.25em]">{first}</span>{rest}
+            </motion.span>
+            {i < words.length - 1 ? " " : null}
+          </React.Fragment>
+        );
+      })}
     </h2>
   );
 }

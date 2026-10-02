@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { LiquidGlassCarousel } from "@/components/ui/liquid-glass-carousel";
+import { ProjectWheel3D } from "@/components/ui/ProjectWheel3D";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { BackgroundTypography } from "@/components/BackgroundTypography";
 import { StatsMarquee } from "@/components/StatsMarquee";
@@ -240,9 +241,13 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
 
   return (
     <div ref={ref} className="relative">
+      {/* Background track line (dimmed) */}
+      <div className="absolute left-0 top-0 h-full w-[2px] md:w-[3px] -translate-x-1/2 bg-[#ff8a3d]/10 md:left-1/2" />
+      
+      {/* Glowing progress line */}
       <motion.div
         style={{ scaleY: scrollYProgress }}
-        className="absolute left-0 top-0 h-full w-px origin-top bg-gradient-to-b from-[#ff8a3d]/40 via-[#5a3f2a]/30 to-transparent md:left-1/2"
+        className="absolute left-0 top-0 h-full w-[2px] md:w-[3px] -translate-x-1/2 origin-top bg-gradient-to-b from-[#ff8a3d] via-[#ff8a3d] to-transparent md:left-1/2 shadow-[0_0_15px_rgba(255,138,61,0.9)]"
       />
 
       {timeline.map((node) => (
@@ -269,10 +274,22 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
                 {node.year}
               </div>
             </div>
-            <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
-              {node.role}
+            <div className="mt-4 uppercase font-syne text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-extrabold">
+              {node.role.split(" ").map((w, i, arr) => {
+                const cleanWord = w.replace(/[^a-zA-Z0-9&]/g, "").toUpperCase();
+                const isOrange = ["INTERNSHIP", "DATA", "SCIENTIST", "LLM", "VISION", "MISSION"].includes(cleanWord);
+                return (
+                  <React.Fragment key={i}>
+                    <span className={`inline-block ${isOrange ? "text-[#ff8a3d]" : ""}`}>
+                      <span className="text-[1.25em] leading-none">{w.charAt(0)}</span>
+                      <span>{w.slice(1)}</span>
+                    </span>
+                    {i < arr.length - 1 && " "}
+                  </React.Fragment>
+                );
+              })}
             </div>
-            <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
+            <p className="mt-4 text-xl md:text-2xl text-[#110e0c] font-syne leading-relaxed">
               {node.desc}
             </p>
           </div>
@@ -309,10 +326,22 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
                     </div>
                   )}
                 </div>
-                <div className="mt-4 font-display text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-medium">
-                  {node.role}
+                <div className="mt-4 uppercase font-syne text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-extrabold">
+                  {node.role.split(" ").map((w, i, arr) => {
+                    const cleanWord = w.replace(/[^a-zA-Z0-9&]/g, "").toUpperCase();
+                    const isOrange = ["INTERNSHIP", "DATA", "SCIENTIST", "LLM", "VISION", "MISSION"].includes(cleanWord);
+                    return (
+                      <React.Fragment key={i}>
+                        <span className={`inline-block ${isOrange ? "text-[#ff8a3d]" : ""}`}>
+                          <span className="text-[1.25em] leading-none">{w.charAt(0)}</span>
+                          <span>{w.slice(1)}</span>
+                        </span>
+                        {i < arr.length - 1 && " "}
+                      </React.Fragment>
+                    );
+                  })}
                 </div>
-                <p className="mt-2 text-sm text-[#a89c8d]/70 font-syne">
+                <p className="mt-4 text-xl md:text-2xl text-[#110e0c] font-syne leading-relaxed">
                   {node.desc}
                 </p>
               </>
@@ -435,18 +464,6 @@ export default function Home() {
   const projects = [
     {
       num: "/01",
-      title: "CARDIOVANTA",
-      cat: "ML • HEALTHCARE",
-      desc: "A containerized cardiovascular risk assessment platform with calibrated ML prediction. FastAPI serves the model while Next.js delivers the assessment experience.",
-      tags: ["NEXT.JS", "FASTAPI", "DOCKER"],
-      status: "Live",
-      year: "2026",
-      link: "https://cardio-vanta-prod.vercel.app/CardioVanta",
-      github: "https://github.com/septilex/CardioVanta",
-      image: "/cardiovanta-preview.png",
-    },
-    {
-      num: "/02",
       title: "KADENCE",
       cat: "MUSIC • 3D UNIVERSE",
       desc: "Step into a living, breathing 3D universe of music where every artist and album becomes a world to explore.",
@@ -456,6 +473,18 @@ export default function Home() {
       link: "https://kadence-musicz.vercel.app/",
       github: "https://github.com/septilex",
       image: "/kadence-preview.png",
+    },
+    {
+      num: "/02",
+      title: "CARDIOVANTA",
+      cat: "ML • HEALTHCARE",
+      desc: "A containerized cardiovascular risk assessment platform with calibrated ML prediction. FastAPI serves the model while Next.js delivers the assessment experience.",
+      tags: ["NEXT.JS", "FASTAPI", "DOCKER"],
+      status: "Live",
+      year: "2026",
+      link: "https://cardio-vanta-prod.vercel.app/CardioVanta",
+      github: "https://github.com/septilex/CardioVanta",
+      image: "/cardiovanta-preview.png",
     },
     {
       num: "/03",
@@ -605,7 +634,7 @@ export default function Home() {
                 className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
               />
               {/* Solid color circle */}
-              <span className="relative z-10 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-transparent bg-[#1a1612] text-[#ff8a3d] shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 group-hover:bg-[#ff8a3d] group-hover:text-[#1a1612] group-hover:shadow-[0_8px_32px_rgba(255,138,61,0.4)]">
+              <span className="relative z-10 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-transparent bg-[#0a0a0a] text-[#ff8a3d] shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 group-hover:bg-[#ff8a3d] group-hover:text-[#0a0a0a] group-hover:shadow-[0_8px_32px_rgba(255,138,61,0.4)]">
                 <span className="relative z-10 scale-110">{item.icon}</span>
               </span>
               {/* Hover label — orange bg with black text */}
@@ -1028,10 +1057,6 @@ export default function Home() {
       {/* Section 2: About */}
       <About />
 
-      {/* Section 3: Technology Arsenal */}
-      <TechnologyArsenal />
-
-
 
       {/* Section 4: Expertise */}
       <Expertise />
@@ -1049,30 +1074,28 @@ export default function Home() {
             <WordReveal
               text="Projects that"
               accentText="define me."
-              className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
+              className="font-display max-w-5xl text-[clamp(1.5rem,3.5vw,4rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
             />
             <div className="text-[11px] uppercase tracking-[0.25em] text-[#a89c8d]/70 font-researcher">
               {projects.length} works
             </div>
           </div>
+        </div>
 
-          <div className="w-full mt-16 overflow-hidden relative rounded-2xl">
-            <LiquidGlassCarousel 
-              items={projects.map(p => ({
-                src: p.image,
-                title: p.title,
-                cat: p.cat,
-                desc: p.desc,
-                tags: p.tags,
-                github: p.github,
-                link: p.link,
-                status: p.status,
-                year: p.year
-              }))}
-              background="#f2ece1"
-              entry={true}
-            />
-          </div>
+        <div className="w-full mt-16 overflow-hidden">
+          <ProjectWheel3D
+            items={projects.map(p => ({
+              src: p.image,
+              title: p.title,
+              cat: p.cat,
+              desc: p.desc,
+              tags: p.tags,
+              github: p.github,
+              link: p.link,
+              status: p.status,
+              year: p.year
+            }))}
+          />
         </div>
       </section>
 
@@ -1093,7 +1116,7 @@ export default function Home() {
         <WordReveal
           text="My vision towards"
           accentText="what I am striving to."
-          className="font-display mb-24 max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
+          className="font-display mb-24 max-w-5xl text-[clamp(1.5rem,3.5vw,4rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
         />
 
         {/* Timeline Grid — line draws in on scroll, dots spring in */}
@@ -1112,7 +1135,7 @@ export default function Home() {
           <WordReveal
             text="Let's build the"
             accentText="future."
-            className="font-display max-w-6xl text-[clamp(2.5rem,8vw,10rem)] font-semibold leading-[0.9] tracking-tight"
+            className="font-display max-w-6xl text-[clamp(1.25rem,4vw,5rem)] font-semibold leading-[0.9] tracking-tight"
           />
 
           <div className="mt-24 grid grid-cols-1 gap-16 md:grid-cols-12">

@@ -34,6 +34,8 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
   const loopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scheduleNextRef = useRef<(() => void) | null>(null);
   const mountedRef = useRef(true);
+  const usageRef = useRef({ word1: 0, word2: 0 });
+  const recentLettersRef = useRef<number[]>([]);
 
   // Indices of actual letters (not spaces)
   const letterIndices = TITLE_CHARS
@@ -128,66 +130,83 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
   const scheduleNext = useCallback(() => {
     if (!mountedRef.current) return;
 
-    // Enforce 2 to 4 active letters
     const activeCount = animatingRef.current.size;
-    const minRequired = Math.max(0, 2 - activeCount);
-    const maxAllowed = 4 - activeCount;
+    const numAvailableDirs = 4 - activeCount;
 
-    if (maxAllowed > 0) {
-      const availableDirs = DIRECTIONS.filter(
-        (d) => !activeDirsRef.current.has(d)
-      );
+    // Enforce 2 to 4 active letters per cycle. Wait if < 2 available.
+    if (numAvailableDirs < 2) {
+      if (loopRef.current) clearTimeout(loopRef.current);
+      loopRef.current = setTimeout(() => {
+        if (mountedRef.current) scheduleNext();
+      }, 200 + Math.random() * 200);
+      return;
+    }
 
-      const maxPossible = Math.min(maxAllowed, availableDirs.length);
+    const availableDirs = DIRECTIONS.filter((d) => !activeDirsRef.current.has(d));
+    const numToAnimate = Math.floor(Math.random() * (numAvailableDirs - 2 + 1)) + 2;
 
-      if (maxPossible >= minRequired && maxPossible > 0) {
-        let numToAnimate = 0;
-        if (minRequired > 0) {
-          numToAnimate = Math.floor(Math.random() * (maxPossible - minRequired + 1)) + minRequired;
-        } else {
-          // If we already have >= 2 active, we occasionally add more randomly
-          if (Math.random() > 0.5) {
-            numToAnimate = Math.floor(Math.random() * maxPossible) + 1;
-          }
-        }
-        
-        if (numToAnimate > 0) {
-          const availableIndices = letterIndices.filter(
-            (idx) => !animatingRef.current.has(idx)
-          );
+    const word1 = [0, 1, 2, 3, 4, 5]; // PRAJIT
+    const word2 = [7, 8, 9, 10, 11, 12]; // BALAJI
 
-          const shuffledIndices = [...availableIndices].sort(() => Math.random() - 0.5);
-          const selectedIndices = shuffledIndices.slice(0, numToAnimate);
+    let pickW1 = 0;
+    let pickW2 = 0;
 
-          const shuffledDirs = [...availableDirs].sort(() => Math.random() - 0.5);
-
-          selectedIndices.forEach((idx, i) => {
-            const dir = shuffledDirs[i];
-            activeDirsRef.current.add(dir);
-            animatingRef.current.add(idx);
-
-            const delay = Math.random() * 150; 
-            setTimeout(() => {
-              if (mountedRef.current) {
-                animatingRef.current.delete(idx);
-                activeDirsRef.current.delete(dir);
-                animateLetter(idx, dir);
-              } else {
-                animatingRef.current.delete(idx);
-                activeDirsRef.current.delete(dir);
-              }
-            }, delay);
-          });
-        }
+    if (numToAnimate === 2) {
+      pickW1 = 1; pickW2 = 1;
+    } else if (numToAnimate === 4) {
+      pickW1 = 2; pickW2 = 2;
+    } else if (numToAnimate === 3) {
+      if (usageRef.current.word1 <= usageRef.current.word2) {
+        pickW1 = 2; pickW2 = 1;
+      } else {
+        pickW1 = 1; pickW2 = 2;
       }
     }
+
+    usageRef.current.word1 += pickW1;
+    usageRef.current.word2 += pickW2;
+
+    const availableWord1 = word1.filter((i) => !animatingRef.current.has(i));
+    const availableWord2 = word2.filter((i) => !animatingRef.current.has(i));
+
+    let w1Candidates = availableWord1.filter((i) => !recentLettersRef.current.includes(i));
+    if (w1Candidates.length < pickW1) w1Candidates = availableWord1;
+
+    let w2Candidates = availableWord2.filter((i) => !recentLettersRef.current.includes(i));
+    if (w2Candidates.length < pickW2) w2Candidates = availableWord2;
+
+    const selectedW1 = [...w1Candidates].sort(() => Math.random() - 0.5).slice(0, pickW1);
+    const selectedW2 = [...w2Candidates].sort(() => Math.random() - 0.5).slice(0, pickW2);
+    
+    const selectedIndices = [...selectedW1, ...selectedW2].sort(() => Math.random() - 0.5);
+    const shuffledDirs = [...availableDirs].sort(() => Math.random() - 0.5);
+
+    recentLettersRef.current = [...recentLettersRef.current, ...selectedIndices].slice(-6);
+
+    selectedIndices.forEach((idx, i) => {
+      const dir = shuffledDirs[i];
+      activeDirsRef.current.add(dir);
+      animatingRef.current.add(idx);
+
+      const delay = Math.random() * 150; 
+      setTimeout(() => {
+        if (mountedRef.current) {
+          animatingRef.current.delete(idx);
+          activeDirsRef.current.delete(dir);
+          animateLetter(idx, dir);
+        } else {
+          animatingRef.current.delete(idx);
+          activeDirsRef.current.delete(dir);
+        }
+      }, delay);
+    });
 
     if (loopRef.current) clearTimeout(loopRef.current);
     const nextDelay = 300 + Math.random() * 900;
     loopRef.current = setTimeout(() => {
       if (mountedRef.current) scheduleNext();
     }, nextDelay);
-  }, [letterIndices, animateLetter]);
+  }, [animateLetter]);
 
   useEffect(() => {
     scheduleNextRef.current = scheduleNext;

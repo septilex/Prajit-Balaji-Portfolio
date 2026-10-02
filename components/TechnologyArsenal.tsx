@@ -152,7 +152,7 @@ export function TechnologyArsenal() {
           <WordReveal
             text="A modern arsenal for"
             accentText="building at the edge."
-            className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] mb-20 md:mb-32 text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
+            className="font-display max-w-5xl text-[clamp(1.5rem,3.5vw,4rem)] font-black leading-[0.9] tracking-[-0.03em] mb-20 md:mb-32 text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612]"
           />
         </div>
 

@@ -101,8 +101,8 @@ export function Credentials() {
           <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Credentials</span>
         </div>
         
-        <h2 className="font-display max-w-5xl text-[clamp(3rem,7vw,8rem)] font-black leading-[0.9] tracking-[-0.03em] mb-8 md:mb-12 text-[#110e0c]">
-          Verified <span className="text-[#ff8a3d]">Expertise.</span>
+        <h2 className="font-syne uppercase max-w-5xl text-[clamp(1.5rem,3.5vw,4rem)] font-black leading-[0.9] tracking-[-0.03em] mb-8 md:mb-12 text-[#110e0c]">
+          <span className="text-[0.7em]"><span className="text-[1.25em]">V</span>ERIFIED</span> <span className="text-[#ff8a3d]"><span className="text-[1.25em]">E</span>XPERTISE.</span>
         </h2>
       </div>
 
@@ -143,10 +143,18 @@ export function Credentials() {
                     <div className="absolute inset-0 rounded-full border border-[#ff8a3d]/40 animate-ping"></div>
                   </div>
                   
-                  <span className={`font-display text-2xl md:text-3xl font-semibold tracking-tight transition-colors duration-300 ${
+                  <span className={`font-syne uppercase text-2xl md:text-3xl font-semibold tracking-tight transition-colors duration-300 flex items-center ${
                     isActive ? "text-[#110e0c]" : "text-[#8c7d6e]"
                   }`}>
-                    {cred.tickerLabel}
+                    {cred.tickerLabel.split(" ").map((w, i, arr) => (
+                      <React.Fragment key={i}>
+                        <span className="inline-block">
+                          <span className="text-[1.25em] leading-none">{w.charAt(0)}</span>
+                          <span>{w.slice(1)}</span>
+                        </span>
+                        {i < arr.length - 1 && <span className="mr-2"></span>}
+                      </React.Fragment>
+                    ))}
                   </span>
                 </button>
               );
@@ -195,8 +203,13 @@ export function Credentials() {
                   <span>VERIFIED • {activeCredential.date.split(" ").pop()}</span>
                 </div>
                 
-                <h3 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight text-[#110e0c]">
-                  {activeCredential.title}
+                <h3 className="font-syne uppercase text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight text-[#110e0c] flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  {activeCredential.title.split(" ").map((w, i) => (
+                    <span key={i} className="inline-block">
+                      <span className="text-[1.25em] leading-none">{w.charAt(0)}</span>
+                      <span>{w.slice(1)}</span>
+                    </span>
+                  ))}
                 </h3>
                 
                 <p className="font-syne text-lg md:text-xl font-medium text-[#8c7d6e]">
