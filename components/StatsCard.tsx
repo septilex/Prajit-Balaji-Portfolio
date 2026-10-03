@@ -80,31 +80,25 @@ export function StatsCard() {
       <div className="relative z-10 block sm:hidden h-px bg-white/40" />
 
       {/* Resume CTA */}
-      <motion.a
+      <a
         href="/Prajit_Balaji_Resume.pdf"
         download="Prajit_Balaji_Resume.pdf"
         aria-label="Download my resume"
-        className="group relative z-10 flex items-center justify-center gap-2.5 px-6 py-4 sm:py-5"
+        className="glass-corner-btn group relative z-10 flex items-center justify-center gap-2.5 px-6 py-4 sm:py-5"
         style={{
-          backgroundColor: "rgb(26, 22, 18)",
-          color: "#f2ece1",
           textDecoration: "none",
           minWidth: "9rem",
         }}
-        whileHover={{ backgroundColor: "rgb(255, 138, 61)", color: "#1a1612" }}
-        transition={{ duration: 0.22 }}
       >
         <Download
-          className="h-3.5 w-3.5 shrink-0 transition-transform duration-400 group-hover:translate-y-0.5"
-          style={{ color: "inherit" }}
+          className="relative z-10 h-3.5 w-3.5 shrink-0 transition-transform duration-400 group-hover:translate-y-0.5"
         />
         <span
-          className="font-researcher text-[9px] font-bold uppercase tracking-[0.3em] whitespace-nowrap"
-          style={{ color: "inherit" }}
+          className="relative z-10 font-researcher text-[9px] font-bold uppercase tracking-[0.3em] whitespace-nowrap"
         >
-          My Resume
+          MY RESUME
         </span>
-      </motion.a>
+      </a>
     </motion.div>
   );
 }

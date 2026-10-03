@@ -581,6 +581,105 @@ export default function Home() {
       <ScrollProgressBar />
 
       {/* Floating quick-access dock — GitHub / LinkedIn / Gmail / Instagram, always on screen */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .glass-icon-btn, .glass-pill-btn, .glass-corner-btn {
+          color: #bd6a2b;
+          background: linear-gradient(180deg, rgba(40,40,40,0.85) 0%, rgba(15,15,15,0.95) 100%);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-top: 1px solid rgba(255,255,255,0.25);
+          box-shadow: 
+            inset 0 1px 1px rgba(255,255,255,0.25),
+            inset 0 -2px 6px rgba(0,0,0,0.8),
+            0 6px 0px rgba(10,10,10,0.95),
+            0 6px 4px rgba(255,255,255,0.15),
+            0 14px 20px rgba(0,0,0,0.5),
+            0 0 15px rgba(255,255,255,0.15);
+          text-shadow: 0 0 4px rgba(255,255,255,0.2);
+          transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s, text-shadow 0.25s, background 0.3s;
+        }
+        .glass-icon-btn, .glass-pill-btn { border: 1px solid rgba(0,0,0,0.8); border-top: 1px solid rgba(255,255,255,0.25); }
+        .glass-corner-btn { border-left: 1px solid rgba(0,0,0,0.8); }
+        .glass-icon-btn { margin-bottom: 6px; }
+        .glass-pill-btn { margin-bottom: 0px; }
+        
+        .glass-icon-btn svg, .glass-pill-btn svg, .glass-corner-btn svg {
+          filter: drop-shadow(0 0 4px rgba(255,255,255,0.2));
+          transition: filter 0.25s;
+        }
+        .glass-icon-btn:hover, .glass-pill-btn:hover, .glass-corner-btn:hover {
+          color: #ffffff;
+          background: linear-gradient(180deg, rgba(50,50,50,0.9) 0%, rgba(20,20,20,0.98) 100%);
+          border-top: 1px solid rgba(255,255,255,0.5);
+          box-shadow: 
+            inset 0 1px 2px rgba(255,255,255,0.6),
+            inset 0 -2px 6px rgba(0,0,0,0.8),
+            0 6px 0px rgba(10,10,10,0.95),
+            0 6px 6px rgba(255,255,255,0.4),
+            0 16px 25px rgba(255,255,255,0.2),
+            0 0 40px rgba(255,255,255,0.8),
+            0 0 80px rgba(255,255,255,0.4);
+          text-shadow: 0 0 12px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.9), 0 0 35px rgba(255,255,255,0.6);
+        }
+        .glass-icon-btn:hover svg, .glass-pill-btn:hover svg, .glass-corner-btn:hover svg {
+          filter: drop-shadow(0 0 16px rgba(255,255,255,1)) drop-shadow(0 0 24px rgba(255,255,255,0.8));
+        }
+        .glass-icon-btn:active, .glass-pill-btn:active, .glass-corner-btn:active {
+          transform: translateY(6px);
+          box-shadow: 
+            inset 0 1px 1px rgba(255,255,255,0.15),
+            inset 0 -1px 4px rgba(0,0,0,0.9),
+            0 0px 0px rgba(10,10,10,0.95),
+            0 0px 0px rgba(255,138,61,0.15),
+            0 4px 10px rgba(0,0,0,0.4),
+            0 0 20px rgba(255,138,61,0.4);
+        }
+        .glass-icon-btn::before, .glass-pill-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 10%;
+          right: 10%;
+          height: 35%;
+          background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+          border-radius: 50px 50px 0 0;
+          pointer-events: none;
+        }
+        .glass-corner-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 35%;
+          background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+          pointer-events: none;
+        }
+        .glass-icon-btn:hover svg, .glass-pill-btn:hover svg {
+          filter: drop-shadow(0 0 12px rgba(255,138,61,1));
+        }
+        .glass-icon-btn:active, .glass-pill-btn:active {
+          transform: translateY(6px);
+          box-shadow: 
+            inset 0 1px 1px rgba(255,255,255,0.15),
+            inset 0 -1px 4px rgba(0,0,0,0.9),
+            0 0px 0px rgba(10,10,10,0.95),
+            0 0px 0px rgba(255,138,61,0.15),
+            0 4px 10px rgba(0,0,0,0.4),
+            0 0 20px rgba(255,138,61,0.4);
+        }
+        .glass-icon-btn::before, .glass-pill-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 10%;
+          right: 10%;
+          height: 35%;
+          background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+          border-radius: 50px 50px 0 0;
+          pointer-events: none;
+        }
+      `}} />
       <div className="fixed z-[90] flex gap-3 max-md:bottom-5 max-md:left-1/2 max-md:-translate-x-1/2 max-md:flex-row md:right-5 md:top-1/2 md:-translate-y-1/2 md:flex-col">
         {[
           {
@@ -626,17 +725,9 @@ export default function Home() {
               target={item.href.startsWith("mailto:") ? undefined : "_blank"}
               rel="noopener noreferrer"
               aria-label={item.label}
-              className="group relative block rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5"
+              className="glass-icon-btn group relative z-10 flex h-14 w-14 items-center justify-center rounded-full"
             >
-              {/* Always-on pulsing orange glow — same as the resume button */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
-              />
-              {/* Solid color circle */}
-              <span className="relative z-10 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-transparent bg-[#0a0a0a] text-[#ff8a3d] shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 group-hover:bg-[#ff8a3d] group-hover:text-[#0a0a0a] group-hover:shadow-[0_8px_32px_rgba(255,138,61,0.4)]">
-                <span className="relative z-10 scale-110">{item.icon}</span>
-              </span>
+              <span className="relative z-10 scale-110">{item.icon}</span>
               {/* Hover label — orange bg with black text */}
               <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-4 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a3d] bg-[#ff8a3d] px-4 py-2.5 font-researcher text-[11px] font-black uppercase tracking-[0.3em] text-[#1a1612] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.3)] transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block">
                 {item.label}
@@ -757,38 +848,25 @@ export default function Home() {
         }}
       >
         <Magnetic strength={0.35}>
-          <button
-            type="button"
-            onClick={() => setHireMeOpen(true)}
-            className="group relative flex h-[62px] items-center justify-center rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95"
-            aria-label="Hire Me"
-          >
-            {/* Always-on pulsing orange glow — matches dock buttons */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
-            />
-
-            {/* Pill capsule: solid black & white text at default, turns solid orange & pure black on hover */}
-            <span className="relative z-10 flex h-12 items-center gap-2 rounded-full border border-white/10 bg-[#0f0d0b] px-5 shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d] group-hover:bg-[#ff8a3d] group-hover:shadow-[0_0_30px_rgba(255,138,61,0.65),inset_0_1px_0_rgba(255,255,255,0.4)]">
-              {/* Subtle top specular border highlight */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.03)_28%,transparent_50%)] transition-opacity duration-300 group-hover:opacity-0"
-              />
-
-              {/* Pulsing indicator dot — orange at default, turns pure black on hover */}
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={() => setHireMeOpen(true)}
+              className="glass-pill-btn relative z-10 flex h-[48px] items-center gap-2.5 rounded-full px-6 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              aria-label="Hire Me"
+            >
+              {/* Pulsing indicator dot */}
               <span className="relative z-10 flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff8a3d] opacity-75 transition-colors duration-300 group-hover:bg-black" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff8a3d] transition-colors duration-300 group-hover:bg-black" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ffffff] opacity-75 transition-colors duration-300" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ffffff] transition-colors duration-300" />
               </span>
 
-              {/* Text — pure white at default, turns pure black on hover */}
-              <span className="relative z-10 font-researcher text-[11px] font-black uppercase tracking-[0.25em] text-white transition-colors duration-300 group-hover:text-black whitespace-nowrap">
+              {/* Text */}
+              <span className="relative z-10 font-researcher text-[11px] font-black uppercase tracking-[0.25em] transition-colors duration-300 whitespace-nowrap">
                 HIRE ME
               </span>
-            </span>
-          </button>
+            </button>
+          </div>
         </Magnetic>
       </div>
 
@@ -1018,26 +1096,15 @@ export default function Home() {
             {/* CTA links */}
             <div className="mt-10 flex items-center gap-6">
               <Magnetic strength={0.2}>
-                <a
-                  href="#projects"
-                  className="group relative block rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:scale-105 active:scale-95"
-                >
-                  {/* Always-on pulsing orange glow */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] opacity-40 blur-lg animate-pulse transition-opacity duration-500 group-hover:opacity-80"
-                  />
-                  {/* Pill capsule: solid black & white text at default, turns solid orange & pure black on hover */}
-                  <span className="relative z-10 flex h-12 px-8 items-center justify-center gap-2 rounded-full border border-white/10 bg-[#0f0d0b] text-white shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-300 group-hover:border-[#ff8a3d] group-hover:bg-[#ff8a3d] group-hover:text-black group-hover:shadow-[0_0_30px_rgba(255,138,61,0.65),inset_0_1px_0_rgba(255,255,255,0.4)] text-[11px] font-black uppercase tracking-[0.25em] font-researcher whitespace-nowrap">
-                    {/* Subtle top specular border highlight */}
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(155deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.03)_28%,transparent_50%)] transition-opacity duration-300 group-hover:opacity-0"
-                    />
-                    <span className="relative z-10">VIEW WORK</span>
+                <div className="group relative block">
+                  <a
+                    href="#projects"
+                    className="glass-pill-btn relative z-10 flex h-[48px] px-8 items-center justify-center gap-2 rounded-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                  >
+                    <span className="relative z-10 font-researcher text-[11px] font-black uppercase tracking-[0.25em] whitespace-nowrap">VIEW WORK</span>
                     <ArrowUpRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </span>
-                </a>
+                  </a>
+                </div>
               </Magnetic>
               <span className="h-px w-8 bg-[#3a322b]/15" />
               <a

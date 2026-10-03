@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { Magnetic } from "@/components/ui/Magnetic";
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -24,30 +25,63 @@ export interface ProjectWheel3DProps {
   autoRotate?: boolean;
 }
 
-/* ─── Curved Project Card ───────────────────────────────────────────────────── */
+/* ─── Faceted Curved Project Card ──────────────────────────────────────────── */
 /*
- * Each card is sliced into STRIPS thin vertical panels, each slightly rotated
- * around Y. Together they form a physically curved surface — like a bent glass
- * display panel. The image is shown via CSS background-image with offset so
- * each strip shows the correct column of the original screenshot.
+ * Each card is divided into FACETS wide vertical segments with progressive
+ * rotation angles. The center segment faces the camera; outer segments bend
+ * away with increasing angles, forming a faceted curved glass display.
+ * The image is laminated inside a thick liquid-glass slab:
+ *   glass front → project image → glass back + visible 3D edge thickness.
  */
 
-const STRIPS = 14;
-const BEND_DEGREES = 24; // total arc across the card width
+const FACETS = 7;
+const GLASS_DEPTH = 10; // half-thickness in px; total slab depth = 20px
+// Progressive Y-rotation per facet: center flat, edges bend away
+const FACET_ROTATIONS = [-16, -7, -2.5, 0, 2.5, 7, 16];
+
+/** Compute facet center (x, z) so adjacent facets connect edge-to-edge. */
+function computeFacetCenters(segW: number) {
+  const N = FACET_ROTATIONS.length;
+  const mid = Math.floor(N / 2);
+  const cx: number[] = new Array(N).fill(0);
+  const cz: number[] = new Array(N).fill(0);
+
+  // Walk right from center
+  for (let i = mid; i < N - 1; i++) {
+    const ti = (FACET_ROTATIONS[i] * Math.PI) / 180;
+    const tj = (FACET_ROTATIONS[i + 1] * Math.PI) / 180;
+    const rx = cx[i] + (segW / 2) * Math.cos(ti);
+    const rz = cz[i] - (segW / 2) * Math.sin(ti);
+    cx[i + 1] = rx + (segW / 2) * Math.cos(tj);
+    cz[i + 1] = rz - (segW / 2) * Math.sin(tj);
+  }
+
+  // Walk left from center
+  for (let i = mid; i > 0; i--) {
+    const ti = (FACET_ROTATIONS[i] * Math.PI) / 180;
+    const tj = (FACET_ROTATIONS[i - 1] * Math.PI) / 180;
+    const lx = cx[i] - (segW / 2) * Math.cos(ti);
+    const lz = cz[i] + (segW / 2) * Math.sin(ti);
+    cx[i - 1] = lx - (segW / 2) * Math.cos(tj);
+    cz[i - 1] = lz + (segW / 2) * Math.sin(tj);
+  }
+
+  return FACET_ROTATIONS.map((rot, i) => ({ x: cx[i], z: cz[i], rot }));
+}
 
 function CurvedProjectCard({
   item,
   cardWidth,
   cardHeight,
+  isFocused,
 }: {
   item: ProjectWheelItem;
   cardWidth: number;
   cardHeight: number;
+  isFocused: boolean;
 }) {
-  const bendRad = (BEND_DEGREES * Math.PI) / 180;
-  const stripWidth = cardWidth / STRIPS;
-  // Radius of the card's own internal curvature
-  const R = cardWidth / (2 * Math.sin(bendRad / 2));
+  const segW = cardWidth / FACETS;
+  const facets = React.useMemo(() => computeFacetCenters(segW), [segW]);
 
   return (
     <div
@@ -58,260 +92,78 @@ function CurvedProjectCard({
         transformStyle: "preserve-3d",
       }}
     >
-      {/* ═══════════════════════════════════════════════════════════════════
-           THICK LIQUID-GLASS SLAB — 7 layers creating realistic depth
-           ═══════════════════════════════════════════════════════════════════ */}
+      {/* ═══ FACETED LIQUID-GLASS SLAB ═══
+           Glass Back → Image Inside → Glass Front + 3D Thickness Edges */}
 
-      {/* Layer 1 — Outermost diffuse glow (ambient orange warmth) */}
+      {/* ── Ambient outer glow (behind everything) ── */}
       <div
-        className="absolute rounded-[28px]"
+        className="absolute pointer-events-none rounded-[28px]"
         style={{
           inset: "-18px",
-          transform: "translateZ(-16px)",
+          transform: "translateZ(-22px)",
           background: `radial-gradient(
             ellipse at 50% 40%,
-            rgba(255, 180, 120, 0.08) 0%,
-            rgba(255, 138, 61, 0.04) 40%,
+            rgba(255, 180, 120, 0.07) 0%,
+            rgba(255, 138, 61, 0.035) 40%,
             transparent 70%
           )`,
-          boxShadow: `
-            0 0 80px rgba(255, 138, 61, 0.06),
-            0 30px 100px rgba(0, 0, 0, 0.1)
-          `,
-          filter: "blur(4px)",
+          boxShadow: "0 0 70px rgba(255,138,61,0.05), 0 30px 90px rgba(0,0,0,0.10)",
+          filter: "blur(3px)",
         }}
       />
 
-      {/* Layer 2 — Thick translucent glass body (the main slab) */}
-      <div
-        className="absolute rounded-[24px]"
-        style={{
-          inset: "-14px",
-          transform: "translateZ(-10px)",
-          background: `linear-gradient(
-            165deg,
-            rgba(255, 255, 255, 0.28) 0%,
-            rgba(255, 235, 215, 0.18) 8%,
-            rgba(255, 220, 190, 0.12) 18%,
-            rgba(220, 180, 140, 0.08) 35%,
-            rgba(200, 160, 120, 0.06) 50%,
-            rgba(220, 180, 140, 0.08) 65%,
-            rgba(255, 220, 190, 0.14) 82%,
-            rgba(255, 255, 255, 0.22) 92%,
-            rgba(255, 235, 215, 0.18) 100%
-          )`,
-          boxShadow: `
-            inset 0 2px 4px rgba(255, 255, 255, 0.35),
-            inset 0 -2px 4px rgba(200, 140, 80, 0.12),
-            inset 2px 0 4px rgba(255, 255, 255, 0.08),
-            inset -2px 0 4px rgba(255, 255, 255, 0.06),
-            0 0 0 1px rgba(255, 255, 255, 0.08),
-            0 12px 40px rgba(0, 0, 0, 0.08)
-          `,
-        }}
-      />
+      {/* ── Per-facet panel stack ── */}
+      {facets.map((f, i) => {
+        const isFirst = i === 0;
+        const isLast = i === FACETS - 1;
+        const edgeR = isFirst
+          ? "16px 0 0 16px"
+          : isLast
+          ? "0 16px 16px 0"
+          : "0";
 
-      {/* Layer 3 — Inner glass refraction ring (sharper edge definition) */}
-      <div
-        className="absolute rounded-[22px]"
-        style={{
-          inset: "-10px",
-          transform: "translateZ(-7px)",
-          background: `linear-gradient(
-            170deg,
-            rgba(255, 255, 255, 0.45) 0%,
-            rgba(255, 255, 255, 0.12) 12%,
-            transparent 25%,
-            transparent 75%,
-            rgba(255, 255, 255, 0.1) 88%,
-            rgba(255, 240, 220, 0.3) 100%
-          )`,
-          boxShadow: `
-            inset 0 1px 0 rgba(255, 255, 255, 0.55),
-            inset 0 -1px 0 rgba(200, 160, 120, 0.18)
-          `,
-        }}
-      />
-
-      {/* Layer 4 — Glass depth layer (creates the "sealed inside" feeling) */}
-      <div
-        className="absolute rounded-[20px]"
-        style={{
-          inset: "-6px",
-          transform: "translateZ(-4px)",
-          background: `linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.06) 0%,
-            rgba(255, 245, 235, 0.04) 30%,
-            rgba(255, 220, 190, 0.03) 60%,
-            rgba(200, 150, 100, 0.05) 100%
-          )`,
-          boxShadow: `
-            inset 0 0 12px rgba(255, 255, 255, 0.06),
-            0 0 0 1px rgba(255, 220, 190, 0.06)
-          `,
-        }}
-      />
-
-      {/* Layer 5 — Left glass edge (thick dimensional highlight) */}
-      <div
-        className="pointer-events-none absolute top-0 bottom-0 rounded-l-[20px]"
-        style={{
-          left: "-14px",
-          width: "22px",
-          transform: "translateZ(-3px)",
-          background: `linear-gradient(to right,
-            rgba(255, 255, 255, 0.25) 0%,
-            rgba(255, 240, 220, 0.15) 30%,
-            rgba(255, 220, 190, 0.06) 60%,
-            transparent 100%
-          )`,
-        }}
-      />
-
-      {/* Layer 5b — Right glass edge */}
-      <div
-        className="pointer-events-none absolute top-0 bottom-0 rounded-r-[20px]"
-        style={{
-          right: "-14px",
-          width: "22px",
-          transform: "translateZ(-3px)",
-          background: `linear-gradient(to left,
-            rgba(255, 255, 255, 0.22) 0%,
-            rgba(255, 240, 220, 0.12) 30%,
-            rgba(255, 220, 190, 0.05) 60%,
-            transparent 100%
-          )`,
-        }}
-      />
-
-      {/* Layer 6 — Bottom copper/bronze glass edge (thick, warm) */}
-      <div
-        className="pointer-events-none absolute inset-x-0 rounded-b-[22px]"
-        style={{
-          bottom: "-14px",
-          height: "32px",
-          transform: "translateZ(-3px)",
-          background: `linear-gradient(
-            to top,
-            rgba(180, 120, 60, 0.35) 0%,
-            rgba(200, 150, 90, 0.2) 25%,
-            rgba(255, 200, 150, 0.1) 50%,
-            transparent 100%
-          )`,
-          boxShadow: "0 4px 16px rgba(180, 120, 60, 0.12)",
-        }}
-      />
-
-      {/* Layer 6b — Top glass edge highlight */}
-      <div
-        className="pointer-events-none absolute inset-x-0 rounded-t-[22px]"
-        style={{
-          top: "-14px",
-          height: "24px",
-          transform: "translateZ(-3px)",
-          background: `linear-gradient(
-            to bottom,
-            rgba(255, 255, 255, 0.3) 0%,
-            rgba(255, 245, 235, 0.15) 40%,
-            transparent 100%
-          )`,
-        }}
-      />
-
-      {/* Layer 7 — Inner specular highlight (top, in front of image) */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 rounded-t-2xl"
-        style={{
-          height: "40%",
-          transform: "translateZ(4px)",
-          background:
-            "linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, transparent 100%)",
-        }}
-      />
-
-      {/* Layer 7b — Inner left refraction (in front of image) */}
-      <div
-        className="pointer-events-none absolute top-0 bottom-0 left-0 rounded-l-2xl"
-        style={{
-          width: "24px",
-          transform: "translateZ(3px)",
-          background: `linear-gradient(to right,
-            rgba(255, 255, 255, 0.14) 0%,
-            rgba(255, 235, 215, 0.06) 40%,
-            transparent 100%
-          )`,
-        }}
-      />
-
-      {/* Layer 7c — Inner right refraction (in front of image) */}
-      <div
-        className="pointer-events-none absolute top-0 bottom-0 right-0 rounded-r-2xl"
-        style={{
-          width: "24px",
-          transform: "translateZ(3px)",
-          background: `linear-gradient(to left,
-            rgba(255, 255, 255, 0.12) 0%,
-            rgba(255, 235, 215, 0.05) 40%,
-            transparent 100%
-          )`,
-        }}
-      />
-
-      {/* Layer 7d — Inner bottom copper edge (in front of image) */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-2xl"
-        style={{
-          height: "36px",
-          transform: "translateZ(3px)",
-          background: `linear-gradient(
-            to top,
-            rgba(200, 140, 80, 0.25) 0%,
-            rgba(255, 180, 120, 0.08) 50%,
-            transparent 100%
-          )`,
-        }}
-      />
-
-      {/* ── Curved image surface made of strips ──────────────────────── */}
-      <div
-        className="absolute inset-0"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {Array.from({ length: STRIPS }).map((_, i) => {
-          const angle = -bendRad / 2 + (i + 0.5) * (bendRad / STRIPS);
-          const x = R * Math.sin(angle);
-          const z = R * (Math.cos(angle) - 1);
-          const rotDeg = (angle * 180) / Math.PI;
-
-          return (
+        return (
+          <motion.div
+            key={i}
+            className="absolute top-0"
+            initial={false}
+            animate={{
+              x: isFocused ? (i - Math.floor(FACETS / 2)) * segW - segW / 2 : f.x - segW / 2,
+              z: isFocused ? 0 : f.z,
+              rotateY: isFocused ? 0 : f.rot,
+            }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              width: `${segW + 1.5}px`,
+              height: "100%",
+              left: "50%",
+              transformStyle: "preserve-3d",
+            }}
+          >
+            {/* Glass Back Surface */}
             <div
-              key={i}
-              className="absolute top-0 overflow-hidden"
+              className="absolute inset-0 pointer-events-none"
               style={{
-                width: `${stripWidth + 1.5}px`, // +1.5px overlap prevents sub-pixel gaps
-                height: "100%",
-                left: "50%",
-                transformStyle: "preserve-3d",
-                transform: `
-                  translateX(${x - stripWidth / 2}px)
-                  translateZ(${z}px)
-                  rotateY(${rotDeg}deg)
-                `,
-                borderRadius:
-                  i === 0
-                    ? "16px 0 0 16px"
-                    : i === STRIPS - 1
-                    ? "0 16px 16px 0"
-                    : "0",
+                borderRadius: edgeR,
+                transform: `translateZ(${-GLASS_DEPTH}px)`,
+                background: `linear-gradient(180deg,
+                  rgba(255,245,230,0.06) 0%,
+                  rgba(220,180,140,0.04) 50%,
+                  rgba(200,150,100,0.07) 100%)`,
+                boxShadow: "inset 0 0 10px rgba(255,200,150,0.03)",
               }}
+            />
+
+            {/* Project Image — clean, no overlays */}
+            <div
+              className="absolute inset-0 overflow-hidden"
+              style={{ borderRadius: edgeR }}
             >
-              {/* Pure image slice — no overlays or gradients to cause vertical bands */}
               <div
                 className="absolute top-0 h-full"
                 style={{
                   width: `${cardWidth}px`,
-                  left: `${-i * stripWidth}px`,
+                  left: `${-i * segW}px`,
                   backgroundImage: `url(${item.src})`,
                   backgroundSize: `${cardWidth}px ${cardHeight}px`,
                   backgroundPosition: "0 0",
@@ -319,102 +171,347 @@ function CurvedProjectCard({
                 }}
               />
             </div>
-          );
-        })}
-      </div>
 
-      {/* ── Single continuous bottom shadow for text legibility (flat plane) ── */}
+            {/* Glass Front Surface */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                borderRadius: edgeR,
+                transform: `translateZ(${GLASS_DEPTH}px)`,
+                background: `linear-gradient(175deg,
+                  rgba(255,255,255,0.09) 0%,
+                  rgba(255,255,255,0.025) 18%,
+                  transparent 40%,
+                  transparent 70%,
+                  rgba(255,225,195,0.02) 88%,
+                  rgba(255,200,150,0.05) 100%)`,
+              }}
+            />
+
+            {/* Top thickness edge — shows glass depth from above */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                width: `${segW + 1.5}px`,
+                height: `${GLASS_DEPTH * 2}px`,
+                left: 0,
+                top: `${-GLASS_DEPTH}px`,
+                transformOrigin: "50% 50%",
+                transform: "rotateX(90deg)",
+                borderRadius:
+                  isFirst ? "8px 0 0 0" : isLast ? "0 8px 0 0" : "0",
+                background: `linear-gradient(180deg,
+                  rgba(255,255,255,0.18) 0%,
+                  rgba(255,245,230,0.10) 35%,
+                  rgba(255,220,190,0.06) 65%,
+                  rgba(200,160,120,0.03) 100%)`,
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25)",
+              }}
+            />
+
+            {/* Bottom thickness edge — warm copper tone */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                width: `${segW + 1.5}px`,
+                height: `${GLASS_DEPTH * 2}px`,
+                left: 0,
+                bottom: `${-GLASS_DEPTH}px`,
+                transformOrigin: "50% 50%",
+                transform: "rotateX(90deg)",
+                borderRadius:
+                  isFirst ? "0 0 0 8px" : isLast ? "0 0 8px 0" : "0",
+                background: `linear-gradient(0deg,
+                  rgba(200,140,80,0.22) 0%,
+                  rgba(255,180,120,0.14) 30%,
+                  rgba(255,220,190,0.07) 65%,
+                  rgba(255,245,235,0.03) 100%)`,
+                boxShadow: "0 4px 12px rgba(180,120,60,0.08)",
+              }}
+            />
+
+            {/* Left outer glass edge (first facet only) */}
+            {isFirst && (
+              <div
+                className="absolute pointer-events-none"
+                style={{
+                  width: `${GLASS_DEPTH * 2}px`,
+                  height: "100%",
+                  left: `${-GLASS_DEPTH}px`,
+                  top: 0,
+                  transformOrigin: "50% 50%",
+                  transform: "rotateY(-90deg)",
+                  borderRadius: "12px 0 0 12px",
+                  background: `linear-gradient(90deg,
+                    rgba(255,220,190,0.20) 0%,
+                    rgba(255,200,150,0.12) 30%,
+                    rgba(200,160,120,0.05) 70%,
+                    rgba(180,140,100,0.02) 100%)`,
+                  boxShadow: `
+                    inset 0 2px 4px rgba(255,255,255,0.18),
+                    inset 0 -2px 6px rgba(200,140,80,0.10),
+                    0 0 8px rgba(255,180,120,0.05)`,
+                }}
+              />
+            )}
+
+            {/* Right outer glass edge (last facet only) */}
+            {isLast && (
+              <div
+                className="absolute pointer-events-none"
+                style={{
+                  width: `${GLASS_DEPTH * 2}px`,
+                  height: "100%",
+                  right: `${-GLASS_DEPTH}px`,
+                  top: 0,
+                  transformOrigin: "50% 50%",
+                  transform: "rotateY(90deg)",
+                  borderRadius: "0 12px 12px 0",
+                  background: `linear-gradient(-90deg,
+                    rgba(255,220,190,0.20) 0%,
+                    rgba(255,200,150,0.12) 30%,
+                    rgba(200,160,120,0.05) 70%,
+                    rgba(180,140,100,0.02) 100%)`,
+                  boxShadow: `
+                    inset 0 2px 4px rgba(255,255,255,0.18),
+                    inset 0 -2px 6px rgba(200,140,80,0.10),
+                    0 0 8px rgba(255,180,120,0.05)`,
+                }}
+              />
+            )}
+
+            {/* ── Curved Title Text Below Card (Fades out when focused) ── */}
+            <motion.div
+              className="absolute top-full left-0 overflow-hidden pointer-events-none mt-6 md:mt-8"
+              initial={false}
+              animate={{ opacity: isFocused ? 0 : 1 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                width: `${segW + 1.5}px`,
+                height: "60px",
+                transform: `translateZ(${GLASS_DEPTH}px)`,
+              }}
+            >
+              <div
+                className="absolute top-0 flex flex-col items-center justify-start"
+                style={{
+                  width: `${cardWidth}px`,
+                  left: `${-i * segW}px`,
+                }}
+              >
+                <h3 className="font-researcher text-[14px] md:text-[18px] font-black uppercase tracking-[0.25em] text-black transition-colors group-hover:text-[#ff8a3d] drop-shadow-[0_0_10px_rgba(255,138,61,0.3)]">
+                  {item.title}
+                </h3>
+                {item.cat && (
+                  <p className="mt-1.5 font-syne text-[10px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-black/40">
+                    {item.cat}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        );
+      })}
+
+      {/* ── Floating specular highlight (in front, no image interference) ── */}
       <div
-        className="pointer-events-none absolute inset-0 rounded-b-[16px]"
+        className="pointer-events-none absolute inset-x-0 top-0 rounded-t-2xl"
         style={{
-          transform: "translateZ(6px)",
-          background: `linear-gradient(
-            to top,
-            rgba(0, 0, 0, 0.8) 0%,
-            rgba(0, 0, 0, 0.2) 25%,
-            transparent 45%
-          )`,
+          height: "35%",
+          transform: `translateZ(${GLASS_DEPTH + 3}px)`,
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 100%)",
         }}
       />
 
-      {/* ── Title text overlay (flat, floating in front of curve) ─────── */}
+      {/* ── Subtle orange edge reflections (float in front of glass) ── */}
       <div
-        className="pointer-events-none absolute bottom-0 left-0 right-0 p-4 md:p-5"
-        style={{ transform: "translateZ(8px)" }}
+        className="pointer-events-none absolute top-0 bottom-0 left-0 rounded-l-2xl"
+        style={{
+          width: "28px",
+          transform: `translateZ(${GLASS_DEPTH + 2}px)`,
+          background:
+            "linear-gradient(to right, rgba(255,160,80,0.06) 0%, rgba(255,138,61,0.02) 50%, transparent 100%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute top-0 bottom-0 right-0 rounded-r-2xl"
+        style={{
+          width: "28px",
+          transform: `translateZ(${GLASS_DEPTH + 2}px)`,
+          background:
+            "linear-gradient(to left, rgba(255,160,80,0.06) 0%, rgba(255,138,61,0.02) 50%, transparent 100%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 rounded-b-2xl"
+        style={{
+          height: "36px",
+          transform: `translateZ(${GLASS_DEPTH + 2}px)`,
+          background:
+            "linear-gradient(to top, rgba(200,140,80,0.12) 0%, rgba(255,180,120,0.04) 60%, transparent 100%)",
+        }}
+      />
+
+      {/* ── Flat Title & Buttons (Fades in when focused) ── */}
+      <motion.div
+        className="absolute top-[20%] right-full mr-8 md:mr-12 w-[220px] md:w-[280px] flex flex-col items-end text-right"
+        initial={false}
+        animate={{ opacity: isFocused ? 1 : 0, x: isFocused ? 0 : 20 }}
+        transition={{ duration: 0.5, delay: isFocused ? 0.2 : 0, ease: [0.16, 1, 0.3, 1] }}
+        style={{ transform: `translateZ(${GLASS_DEPTH}px)`, pointerEvents: isFocused ? "auto" : "none" }}
       >
-        <h3 className="font-syne text-sm md:text-lg font-extrabold uppercase tracking-wider text-white drop-shadow-lg">
+        <h3 className="font-researcher text-[16px] md:text-[22px] font-black uppercase tracking-[0.25em] text-black drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] leading-tight">
           {item.title}
         </h3>
         {item.cat && (
-          <p className="mt-1 font-researcher text-[8px] md:text-[10px] uppercase tracking-[0.25em] text-white/60">
+          <p className="mt-2 font-syne text-[10px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-black/40">
             {item.cat}
           </p>
         )}
-      </div>
+        <div className="mt-6 flex flex-col gap-3 items-end">
+          {item.link && (
+            <Magnetic strength={0.3}>
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-btn-black relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-researcher text-[9px] md:text-[10px] uppercase tracking-widest"
+              >
+                Vercel / Live
+              </a>
+            </Magnetic>
+          )}
+          {item.github && (
+            <Magnetic strength={0.3}>
+              <a
+                href={item.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-btn-white relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-researcher text-[9px] md:text-[10px] uppercase tracking-widest"
+              >
+                GitHub
+              </a>
+            </Magnetic>
+          )}
+        </div>
+      </motion.div>
+
+      {/* (Text overlay and bottom shadow removed since title is now below the card) */}
     </div>
   );
 }
 
-/* ─── Glass Rim Segment ─────────────────────────────────────────────────────── */
-
-function GlassRimSegment({
-  angle,
-  radius,
-  height,
-  segmentWidth,
-}: {
-  angle: number;
-  radius: number;
-  height: number;
-  segmentWidth: number;
-}) {
-  return (
-    <div
-      className="absolute"
-      style={{
-        width: `${segmentWidth + 2}px`,
-        height: `${height}px`,
-        left: `${-segmentWidth / 2}px`,
-        top: `${-height / 2}px`,
-        transformStyle: "preserve-3d",
-        transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
-      }}
-    >
-      <div
-        className="h-full w-full"
-        style={{
-          background: `linear-gradient(
-            180deg,
-            rgba(255, 220, 190, 0.02) 0%,
-            rgba(255, 200, 160, 0.06) 20%,
-            rgba(255, 180, 130, 0.1) 40%,
-            rgba(200, 150, 100, 0.15) 70%,
-            rgba(180, 130, 80, 0.18) 85%,
-            rgba(160, 110, 60, 0.12) 100%
-          )`,
-          borderLeft: "1px solid rgba(255, 220, 190, 0.1)",
-          borderRight: "1px solid rgba(255, 220, 190, 0.06)",
-          boxShadow: `
-            inset 0 -8px 20px rgba(200, 140, 80, 0.08),
-            inset 0 2px 10px rgba(255, 255, 255, 0.04),
-            0 0 12px rgba(255, 138, 61, 0.03)
-          `,
-        }}
-      />
-    </div>
-  );
-}
 
 /* ─── Main Wheel Component ──────────────────────────────────────────────────── */
+
+const glassStyles = `
+  .glass-btn-black {
+    color: #bd6a2b;
+    background: linear-gradient(180deg, rgba(40,40,40,0.85) 0%, rgba(15,15,15,0.95) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,0,0,0.8);
+    border-top: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 
+      inset 0 1px 1px rgba(255,255,255,0.25),
+      inset 0 -2px 6px rgba(0,0,0,0.8),
+      0 6px 0px rgba(10,10,10,0.95),
+      0 6px 4px rgba(255,138,61,0.15),
+      0 14px 20px rgba(0,0,0,0.5),
+      0 0 15px rgba(255,138,61,0.15);
+    text-shadow: 0 0 4px rgba(255,138,61,0.2);
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), text-shadow 0.25s, color 0.25s, background 0.3s;
+    margin-bottom: 6px;
+  }
+  .glass-btn-black:hover {
+    color: #ffebd6;
+    background: linear-gradient(180deg, rgba(50,50,50,0.9) 0%, rgba(20,20,20,0.98) 100%);
+    border-top: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 
+      inset 0 1px 2px rgba(255,255,255,0.4),
+      inset 0 -2px 6px rgba(0,0,0,0.8),
+      0 6px 0px rgba(10,10,10,0.95),
+      0 6px 6px rgba(255,138,61,0.25),
+      0 16px 25px rgba(255,138,61,0.1),
+      0 0 35px rgba(255,138,61,0.6);
+    text-shadow: 0 0 12px rgba(255,138,61,1), 0 0 20px rgba(255,138,61,0.8);
+  }
+  .glass-btn-black:active {
+    transform: translateY(6px);
+    box-shadow: 
+      inset 0 1px 1px rgba(255,255,255,0.15),
+      inset 0 -1px 4px rgba(0,0,0,0.9),
+      0 0px 0px rgba(10,10,10,0.95),
+      0 0px 0px rgba(255,138,61,0.15),
+      0 4px 10px rgba(0,0,0,0.4),
+      0 0 20px rgba(255,138,61,0.4);
+  }
+
+  .glass-btn-white {
+    color: #000000;
+    background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(220,220,220,0.4) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(255,255,255,0.9);
+    box-shadow: 
+      inset 0 1px 1px rgba(255,255,255,1),
+      inset 0 -2px 6px rgba(0,0,0,0.15),
+      0 6px 0px rgba(170,170,170,0.6),
+      0 6px 4px rgba(255,255,255,0.3),
+      0 14px 20px rgba(0,0,0,0.15),
+      0 0 15px rgba(255,255,255,0.4);
+    text-shadow: none;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), text-shadow 0.25s, color 0.25s, background 0.3s;
+    margin-bottom: 6px;
+  }
+  .glass-btn-white:hover {
+    color: #ffffff;
+    background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(240,240,240,0.5) 100%);
+    border-top: 1px solid rgba(255,255,255,1);
+    box-shadow: 
+      inset 0 1px 2px rgba(255,255,255,1),
+      inset 0 -2px 6px rgba(0,0,0,0.15),
+      0 6px 0px rgba(170,170,170,0.6),
+      0 6px 6px rgba(255,255,255,0.5),
+      0 16px 25px rgba(0,0,0,0.2),
+      0 0 35px rgba(255,255,255,0.8);
+    text-shadow: 0 0 12px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,0.8);
+  }
+  .glass-btn-white:active {
+    transform: translateY(6px);
+    box-shadow: 
+      inset 0 1px 1px rgba(255,255,255,0.8),
+      inset 0 -1px 4px rgba(0,0,0,0.1),
+      0 0px 0px rgba(170,170,170,0.6),
+      0 0px 0px rgba(255,255,255,0.3),
+      0 4px 10px rgba(0,0,0,0.1),
+      0 0 20px rgba(255,255,255,0.6);
+  }
+
+  /* Reflection highlights */
+  .glass-btn-black::before, .glass-btn-white::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8%;
+    right: 8%;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+    border-radius: 50px 50px 0 0;
+    pointer-events: none;
+  }
+  .glass-btn-white::before {
+    background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%);
+  }
+`;
 
 export function ProjectWheel3D({
   items,
   autoSpeed = 8,
   autoRotate = true,
 }: ProjectWheel3DProps) {
-  const count = items.length;
-  const angleStep = 360 / count;
-
   /* ── Responsive sizing ─────────────────────────────────────────────────── */
   const [dims, setDims] = useState({ w: 1200, h: 700 });
   useEffect(() => {
@@ -433,6 +530,24 @@ export function ProjectWheel3D({
   const cardWidth = isMobile ? 280 : Math.min(dims.w * 0.42, 800);
   const cardHeight = cardWidth * 0.62;
 
+  // Dynamically duplicate items to form a dense, continuous horizontal bracelet
+  const displayItems = React.useMemo(() => {
+    const targetGap = isMobile ? 15 : 25;
+    const targetChord = cardWidth + targetGap;
+    const val = targetChord / (2 * radius);
+    const idealTheta = 2 * Math.asin(Math.min(val, 1)) * (180 / Math.PI);
+    const idealCount = Math.max(items.length, Math.round(360 / idealTheta));
+    
+    let arr = [...items];
+    while (arr.length < idealCount) {
+      arr = [...arr, ...items];
+    }
+    return arr.slice(0, idealCount);
+  }, [items, isMobile, cardWidth, radius]);
+
+  const count = displayItems.length;
+  const angleStep = 360 / count;
+
   /* ── Rotation state — all ref-based to avoid React re-renders ────────── */
   const rotationRef = useRef(0);       // current visual rotation
   const targetRotation = useRef(0);    // where we're easing toward
@@ -449,6 +564,7 @@ export function ProjectWheel3D({
 
   /* ── Focused project ───────────────────────────────────────────────────── */
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  const [frozenAngle, setFrozenAngle] = useState<number>(0);
 
   /* ── Animation loop — direct DOM writes, zero React re-renders ─────── */
   useEffect(() => {
@@ -506,6 +622,10 @@ export function ProjectWheel3D({
 
   /* ── Pointer handlers with velocity tracking ───────────────────────────── */
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    if (focusedIndex !== null) {
+      setFocusedIndex(null);
+      return;
+    }
     isDragging.current = true;
     wasDragged.current = false;
     velocityRef.current = 0; // kill momentum on grab
@@ -514,7 +634,7 @@ export function ProjectWheel3D({
     dragStartRotation.current = targetRotation.current;
     lastInteraction.current = performance.now();
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-  }, []);
+  }, [focusedIndex]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging.current) return;
@@ -542,18 +662,30 @@ export function ProjectWheel3D({
   const handleCardClick = useCallback(
     (index: number) => {
       if (wasDragged.current) return;
-      if (focusedIndex === index) {
-        setFocusedIndex(null);
+      
+      // If ANY card is already focused, do not open a new one. 
+      // The onPointerDown handler on the container will handle dismissing it.
+      if (focusedIndex !== null) {
+        if (focusedIndex === index) {
+          setFocusedIndex(null);
+        }
         return;
       }
+      
       velocityRef.current = 0; // kill momentum on click
-      const targetAngle = -index * angleStep;
-      const currentMod = ((targetRotation.current % 360) + 360) % 360;
-      const targetMod = ((targetAngle % 360) + 360) % 360;
-      let diff = targetMod - currentMod;
+      
+      // Calculate the angle needed to center this card
+      const cardAngle = index * angleStep;
+      const targetAngle = -cardAngle;
+      
+      // Find the shortest path to the target angle to prevent spinning the long way around
+      const current = targetRotation.current;
+      let diff = (targetAngle - current) % 360;
       if (diff > 180) diff -= 360;
-      if (diff < -180) diff += 360;
-      targetRotation.current += diff;
+      else if (diff < -180) diff += 360;
+      
+      targetRotation.current = current + diff;
+      
       lastInteraction.current = performance.now();
       setFocusedIndex(index);
     },
@@ -565,6 +697,7 @@ export function ProjectWheel3D({
 
   return (
     <div className="relative w-full">
+      <style>{glassStyles}</style>
       {/* 3D Scene — straight-on camera */}
       <div
         className="relative mx-auto select-none py-10"
@@ -581,6 +714,12 @@ export function ProjectWheel3D({
         onPointerLeave={handlePointerUp}
         onWheel={handleWheel}
       >
+        {/* Click anywhere on the container background to reset focus */}
+        <div 
+          className="absolute inset-0 z-0" 
+          onClick={() => setFocusedIndex(null)}
+        />
+        
         {/* Rotating cylinder — transform driven by rAF via ref, not React state */}
         <div
           ref={cylinderRef}
@@ -599,175 +738,52 @@ export function ProjectWheel3D({
         >
 
           {/* ── Curved Project Cards ─────────────────────────────────── */}
-          {items.map((item, i) => {
+          {displayItems.map((item, i) => {
             const cardAngle = i * angleStep;
+            const isFocused = focusedIndex === i;
 
             return (
-              <div
+              <motion.div
                 key={i}
                 className="absolute"
+                initial={false}
+                animate={{
+                  transform: isFocused 
+                    ? `rotateY(${cardAngle}deg) translateZ(${radius + 120}px) scale(1.1)`
+                    : `rotateY(${cardAngle}deg) translateZ(${radius}px) scale(1)`,
+                  filter: focusedIndex !== null && !isFocused ? "blur(8px)" : "blur(0px)",
+                  opacity: focusedIndex !== null && !isFocused ? 0.4 : 1,
+                }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   width: `${cardWidth}px`,
                   height: `${cardHeight}px`,
                   left: `${-cardWidth / 2}px`,
                   top: `${-cardHeight / 2}px`,
                   transformStyle: "preserve-3d",
-                  transform: `
-                    rotateY(${cardAngle}deg)
-                    translateZ(${radius}px)
-                  `,
-                  backfaceVisibility: "hidden",
+                  backfaceVisibility: "hidden" as any,
                 }}
-                onClick={() => handleCardClick(i)}
+                onPointerDown={(e) => {
+                  if (isFocused) {
+                    e.stopPropagation();
+                  }
+                }}
+                onClick={(e) => {
+                  e.stopPropagation(); // prevent background click from triggering
+                  handleCardClick(i);
+                }}
               >
                 <CurvedProjectCard
                   item={item}
                   cardWidth={cardWidth}
                   cardHeight={cardHeight}
+                  isFocused={isFocused}
                 />
-              </div>
+              </motion.div>
             );
           })}
         </div>
       </div>
-
-      {/* ── Focused project overlay ─────────────────────────────────────── */}
-      <AnimatePresence>
-        {focusedIndex !== null && items[focusedIndex] && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            onClick={() => setFocusedIndex(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.75, y: 40 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.85, y: 30 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mx-4 max-w-3xl w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Liquid glass border */}
-              <div
-                className="absolute -inset-[4px] rounded-3xl"
-                style={{
-                  background: `linear-gradient(
-                    140deg,
-                    rgba(255, 255, 255, 0.55) 0%,
-                    rgba(255, 138, 61, 0.25) 25%,
-                    rgba(255, 255, 255, 0.1) 50%,
-                    rgba(255, 138, 61, 0.3) 75%,
-                    rgba(255, 255, 255, 0.5) 100%
-                  )`,
-                  boxShadow: `
-                    0 0 60px rgba(255, 138, 61, 0.3),
-                    0 25px 80px rgba(0, 0, 0, 0.4),
-                    inset 0 1px 2px rgba(255, 255, 255, 0.5)
-                  `,
-                }}
-              />
-
-              <div className="relative overflow-hidden rounded-3xl bg-[#0d0b09]">
-                <div className="relative aspect-video w-full">
-                  <Image
-                    src={items[focusedIndex].src}
-                    alt={items[focusedIndex].title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 95vw, 800px"
-                    priority
-                  />
-                </div>
-                <div className="p-6 md:p-8">
-                  <h3 className="font-syne text-2xl md:text-3xl font-extrabold uppercase tracking-wider text-white">
-                    {items[focusedIndex].title}
-                  </h3>
-                  {items[focusedIndex].cat && (
-                    <p className="mt-2 font-researcher text-[10px] uppercase tracking-[0.3em] text-[#ff8a3d]">
-                      {items[focusedIndex].cat}
-                    </p>
-                  )}
-                  {items[focusedIndex].desc && (
-                    <p className="mt-4 text-sm leading-relaxed text-white/60 font-syne">
-                      {items[focusedIndex].desc}
-                    </p>
-                  )}
-                  {items[focusedIndex].tags &&
-                    items[focusedIndex].tags!.length > 0 && (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {items[focusedIndex].tags!.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-full border border-white/10 px-3 py-1 font-researcher text-[9px] uppercase tracking-[0.2em] text-white/50"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  <div className="mt-6 flex gap-4">
-                    {items[focusedIndex].link && (
-                      <a
-                        href={items[focusedIndex].link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#ff8a3d] px-6 py-2.5 font-researcher text-[10px] font-black uppercase tracking-[0.3em] text-black transition-all duration-300 hover:bg-[#ffaa6d] hover:shadow-[0_0_30px_rgba(255,138,61,0.5)]"
-                      >
-                        View Live
-                        <svg
-                          className="h-3 w-3"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2.5}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M7 17L17 7M17 7H7M17 7v10"
-                          />
-                        </svg>
-                      </a>
-                    )}
-                    {items[focusedIndex].github && (
-                      <a
-                        href={items[focusedIndex].github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-2.5 font-researcher text-[10px] uppercase tracking-[0.3em] text-white/70 transition-all duration-300 hover:border-white/30 hover:text-white"
-                      >
-                        GitHub
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setFocusedIndex(null)}
-                className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#1a1612] text-white/70 shadow-lg transition-colors hover:bg-[#ff8a3d] hover:text-black"
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

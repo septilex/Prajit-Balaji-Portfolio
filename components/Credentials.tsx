@@ -228,8 +228,18 @@ export function Credentials() {
                   <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#8c7d6e] font-researcher">Skills Validated</h4>
                   <div className="flex flex-wrap gap-2">
                     {activeCredential.skills.map(skill => (
-                      <span key={skill} className="px-3 py-1.5 rounded-lg border border-[#e6e0d8] bg-white text-xs md:text-sm font-medium text-[#110e0c] shadow-sm transition-all duration-300 hover:border-[#ff8a3d]/40 hover:text-[#ff8a3d] hover:shadow-[0_4px_12px_rgba(255,138,61,0.08)]">
-                        {skill}
+                      <span key={skill} className="px-3 py-1.5 rounded-lg border border-[#e6e0d8] bg-white text-xs md:text-sm text-[#110e0c] shadow-sm transition-all duration-300 hover:border-[#ff8a3d]/40 hover:text-[#ff8a3d] hover:shadow-[0_4px_12px_rgba(255,138,61,0.08)]">
+                        <span className="font-syne uppercase font-bold tracking-wider flex items-baseline gap-x-1">
+                          {skill.split(" ").map((w, i, arr) => (
+                            <React.Fragment key={i}>
+                              <span className="inline-block">
+                                <span className="text-[1.25em] leading-none">{w.charAt(0)}</span>
+                                <span>{w.slice(1)}</span>
+                              </span>
+                              {i < arr.length - 1 && <span className="mr-1"></span>}
+                            </React.Fragment>
+                          ))}
+                        </span>
                       </span>
                     ))}
                   </div>

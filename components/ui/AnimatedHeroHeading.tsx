@@ -54,13 +54,14 @@ export function AnimatedHeroHeading({
 
         return (
           // overflow-hidden is the key — it clips the translate-Y travel
-          <div key={lineIdx} className="overflow-hidden">
+          // We add a tiny bit of negative margin and positive padding so wide glyphs don't clip at the right edge
+          <div key={lineIdx} className="overflow-hidden -mr-4 -mb-2">
             <motion.div
               custom={lineIdx}
               variants={lineVariants}
               initial="hidden"
               animate={inView ? "visible" : "hidden"}
-              className="flex flex-wrap"
+              className="flex flex-wrap pr-4 pb-2"
               style={{
                 // Critical: Syne 800 for the big editorial feel
                 fontFamily: "var(--next-font-syne), 'Cabinet Grotesk', system-ui, sans-serif",

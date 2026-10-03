@@ -102,6 +102,9 @@ const PAL = {
 interface Obs { x: number; type: "sm" | "lg" | "tree" }
 interface Flyer { x: number; y: number; f: number; t: number; big: boolean }
 interface Drift { x: number; y: number; s: number }
+interface Bullet { x: number; y: number; vx: number; vy: number; }
+interface Casing { x: number; y: number; vx: number; vy: number; rot: number; vrot: number; groundLife: number; }
+interface Particle { x: number; y: number; vx: number; vy: number; life: number; color: string; }
 
 // ── Component ──────────────────────────────────────────────────────────────
 
@@ -123,6 +126,12 @@ export function DinoRunner() {
     let obs: Obs[] = [];
     let bds: Flyer[] = [];
     let cls: Drift[] = [];
+    let bullets: Bullet[] = [];
+    let casings: Casing[] = [];
+    let particles: Particle[] = [];
+    let shootCD = 0;
+    let recoil = 0;
+    let muzzleFlash = 0;
     let oCD = 80, bCD = 60, cCD = 0;
     let init = false;
 
@@ -246,8 +255,6 @@ export function DinoRunner() {
       // Auto-jump — finely timed trigger distance
       if (!isJumping) {
         for (const o of obs) {
-          // Calculate distance from front of dino to obstacle
-          // Dino's body is centered with head forward (approx 75% of total sprite box)
           const dinoFront = dinoX + dinoTargetW * 0.78;
           const dist = o.x - dinoFront;
           const triggerDist = o.type === "tree" ? 22 : 16;
@@ -266,6 +273,116 @@ export function DinoRunner() {
         if (jumpY >= 0) { jumpY = 0; jumpVel = 0; isJumping = false; }
       }
 
+      const dy = g - dinoTargetH + jumpY + (isJumping ? 0 : dF ? -PX * 0.5 : PX * 0.2);
+
+      // Decay recoil and flash
+      if (recoil > 0) recoil = Math.max(0, Math.floor(recoil - dt));
+      if (muzzleFlash > 0) muzzleFlash -= dt;
+
+      // Auto-shoot at nearest bird
+      shootCD -= dt;
+      if (shootCD <= 0 && bds.length > 0) {
+        let nearestBird: Flyer | null = null;
+        let minDist = Infinity;
+        for (const b of bds) {
+          if (b.x > dinoX && b.x < W) {
+             const dist = b.x - dinoX;
+             if (dist < minDist) { minDist = dist; nearestBird = b; }
+          }
+        }
+
+        if (nearestBird && minDist < W * 0.75) {
+           shootCD = 12; // Rapid fire
+           recoil = 4; // Visual kickback
+           muzzleFlash = 3;
+           
+           const gunX = dinoX + dinoTargetW * 0.75;
+           const gunY = dy + dinoTargetH * 0.45;
+           
+           // Aim at bird
+           const birdCenterY = nearestBird.y + (nearestBird.big ? 4 : 2) * PX;
+           const birdCenterX = nearestBird.x + (nearestBird.big ? 4 : 2) * PX;
+           const angle = Math.atan2(birdCenterY - gunY, birdCenterX - gunX);
+           const speed = 25 * PX;
+           
+           bullets.push({
+             x: gunX, y: gunY,
+             vx: Math.cos(angle) * speed,
+             vy: Math.sin(angle) * speed
+           });
+
+           // Eject casing backward and downward
+           casings.push({
+             x: gunX - 2 * PX, y: gunY,
+             vx: -(2 + Math.random() * 2) * PX,
+             vy: -(3 + Math.random() * 2) * PX,
+             rot: 0,
+             vrot: (Math.random() - 0.5) * 0.8,
+             groundLife: 60
+           });
+        }
+      }
+
+      // Update Bullets & Collision
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        
+        let hit = false;
+        for (let j = bds.length - 1; j >= 0; j--) {
+           const bird = bds[j];
+           const bx = bird.x + (bird.big ? 4 : 2) * PX;
+           const by = bird.y + (bird.big ? 4 : 2) * PX;
+           const hitDist = Math.hypot(b.x - bx, b.y - by);
+           
+           if (hitDist < (bird.big ? 10 : 6) * PX) {
+              hit = true;
+              // Pixel splash
+              for(let k=0; k<14; k++) {
+                 particles.push({
+                   x: bx, y: by,
+                   vx: (Math.random() - 0.5) * 12 * PX,
+                   vy: (Math.random() - 0.5) * 12 * PX,
+                   life: 15 + Math.random() * 10,
+                   color: Math.random() > 0.5 ? PAL.bird : PAL.ptero
+                 });
+              }
+              bds.splice(j, 1);
+              break;
+           }
+        }
+
+        if (hit || b.x > W || b.y > H || b.y < 0) {
+          bullets.splice(i, 1);
+        }
+      }
+
+      // Update Casings
+      for (let i = casings.length - 1; i >= 0; i--) {
+        const c = casings[i];
+        if (c.y < g - PX) {
+          c.x += c.vx * dt;
+          c.y += c.vy * dt;
+          c.vy += GRAVITY * dt * 2.5; // fall to ground
+          c.rot += c.vrot * dt;
+        } else {
+          c.y = g - PX;
+          c.groundLife -= dt;
+        }
+        if (c.groundLife <= 0) casings.splice(i, 1);
+      }
+
+      // Update Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += GRAVITY * dt * 1.5;
+        p.life -= dt;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+
       // Obstacles
       oCD -= dt;
       if (oCD <= 0) {
@@ -276,25 +393,30 @@ export function DinoRunner() {
       for (const o of obs) o.x -= v * 1.5;
       if (obs.length && obs[0].x < -60) obs.shift();
 
-      // Birds & pterodactyls
+      // Birds (Enemy swoop)
       bCD -= dt;
       if (bCD <= 0) {
         bds.push({
           x: W + 30,
-          y: g - 60 - Math.random() * (H * 0.3),
+          y: g - 80 - Math.random() * (H * 0.3),
           f: 0, t: 0,
           big: Math.random() > 0.6,
         });
-        bCD = 80 + Math.random() * 100;
+        bCD = 60 + Math.random() * 60; // Spawn more frequently
       }
       for (const b of bds) {
-        b.x -= v * (b.big ? 0.9 : 1.2);
+        b.x -= v * (b.big ? 1.0 : 1.3);
+        // Swoop towards dino height
+        const dinoCenterY = dy + dinoTargetH * 0.5;
+        if (b.x < W) {
+            b.y += (dinoCenterY - b.y) * 0.01 * dt; 
+        }
         b.t += dt;
         if (b.t > (b.big ? 10 : 14)) { b.f ^= 1; b.t = 0; }
       }
       if (bds.length && bds[0].x < -60) bds.shift();
 
-      // Clouds — increased frequency & varied heights
+      // Clouds
       cCD -= dt;
       if (cCD <= 0) {
         cls.push({
@@ -324,24 +446,74 @@ export function DinoRunner() {
         ctx.fillRect(x + PX * 9, g + PX * 1.5, PX * 1.5, PX * 0.5);
       }
 
-      // ── Dino Graphic (Exact user artwork) ──
-      const legBob = isJumping ? 0 : dF ? -PX * 0.5 : PX * 0.2;
-      const dy = g - dinoTargetH + jumpY + legBob;
+      // Casings (render before dino so they fall behind)
+      ctx.fillStyle = "#ffb84d";
+      for (const c of casings) {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.rot);
+        ctx.globalAlpha = c.groundLife < 20 ? Math.max(0, c.groundLife / 20) : 1;
+        ctx.fillRect(-1.5 * PX, -PX, 3 * PX, 1.5 * PX);
+        ctx.restore();
+      }
 
+      // ── Dino Graphic (Apply Recoil) ──
       if (dinoLoaded && selectedDinoCanvas) {
         ctx.save();
         ctx.globalAlpha = 0.92;
-        // Pixel-perfect crisp rendering
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
           selectedDinoCanvas,
-          Math.round(dinoX),
+          Math.round(dinoX - recoil * PX),
           Math.round(dy),
           Math.round(dinoTargetW),
           Math.round(dinoTargetH)
         );
         ctx.restore();
       }
+
+      // Gun
+      const gunBaseX = dinoX - recoil * PX + dinoTargetW * 0.75;
+      const gunBaseY = dy + dinoTargetH * 0.45;
+      ctx.fillStyle = PAL.gear;
+      ctx.fillRect(gunBaseX, gunBaseY, 7 * PX, 2.5 * PX); // Barrel
+      ctx.fillRect(gunBaseX, gunBaseY + 2.5 * PX, 2.5 * PX, 3 * PX); // Grip
+
+      // Muzzle Flash
+      if (muzzleFlash > 0) {
+        const flashRadius = (muzzleFlash / 3) * 4 * PX;
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(gunBaseX + 8 * PX, gunBaseY + 1.25 * PX, flashRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffaa00";
+        ctx.beginPath();
+        ctx.arc(gunBaseX + 8 * PX, gunBaseY + 1.25 * PX, flashRadius * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Bullets
+      for (const b of bullets) {
+        // Trail
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y);
+        ctx.lineTo(b.x - b.vx * 0.2, b.y - b.vy * 0.2);
+        ctx.lineWidth = 2 * PX;
+        ctx.stroke();
+        
+        // Projectile
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(b.x - 2 * PX, b.y - PX, 4 * PX, 2 * PX);
+      }
+
+      // Particles (Splash)
+      for (const p of particles) {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life < 10 ? Math.max(0, p.life / 10) : 1;
+        ctx.fillRect(p.x, p.y, PX * 1.5, PX * 1.5);
+      }
+      ctx.globalAlpha = 1;
 
       // Obstacles
       for (const o of obs) {
@@ -354,7 +526,7 @@ export function DinoRunner() {
         }
       }
 
-      // Birds & pterodactyls
+      // Birds
       for (const b of bds) {
         if (b.big) stamp(PTERO[b.f], b.x, b.y, PAL.ptero);
         else stamp(BIRD[b.f], b.x, b.y, PAL.bird);
