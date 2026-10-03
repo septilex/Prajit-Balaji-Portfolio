@@ -201,6 +201,7 @@ export function GlowButton({
         wrapperClassName
       )}
       whileHover="hovered"
+      whileTap={{ scale: 0.95 }}
       initial="idle"
     >
       <motion.div

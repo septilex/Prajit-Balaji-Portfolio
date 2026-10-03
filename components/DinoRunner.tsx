@@ -31,6 +31,17 @@ const CACTUS_SM = px([
   "  #",
 ]);
 
+const CACTUS_MD = px([
+  "  #",
+  "# #",
+  "# #",
+  "# ##",
+  " ##",
+  "  #",
+  "  #",
+  "  #",
+]);
+
 const CACTUS_LG = px([
   "  #",
   "# # #",
@@ -57,25 +68,61 @@ const TREE = px([
   "   ##",
 ]);
 
-const BIRD = [
-  px(["#   #", " # #", "  #", " ###"]),
-  px([" ###", "  #", " # #", "#   #"]),
-];
-
-const PTERO = [
+// Spiky ball — menacing urchin/mine creature with protruding spikes
+const SPIKY_BALL = [
   px([
-    "#       #",
-    " #     #",
-    "  ## ##",
-    "  #####",
-    "   ###",
+    "    #   #    ",
+    "   ##   ##   ",
+    "  # ##### #  ",
+    " ## ##### ## ",
+    "#  #######  #",
+    "   #######   ",
+    "#  #######  #",
+    " ## ##### ## ",
+    "  # ##### #  ",
+    "   ##   ##   ",
+    "    #   #    ",
   ]),
   px([
-    "   ###",
-    "  #####",
-    "  ## ##",
-    " #     #",
-    "#       #",
+    "   #     #   ",
+    "    ## ##    ",
+    "  # ##### #  ",
+    " ## ##### ## ",
+    "   #######   ",
+    "#  #######  #",
+    "   #######   ",
+    " ## ##### ## ",
+    "  # ##### #  ",
+    "    ## ##    ",
+    "   #     #   ",
+  ]),
+];
+
+// Monster bird — aggressive with sharp beak, jagged wings, tail spikes
+const MONSTER_BIRD = [
+  px([
+    "  #              ",
+    " ##   ##         ",
+    " ### ####        ",
+    "  #######  ###   ",
+    "  ###########  ##",
+    "   ##########  # ",
+    "    ############ ",
+    "     ######  ##  ",
+    "      ####   #   ",
+    "       ##        ",
+  ]),
+  px([
+    "       ##        ",
+    "      ####   #   ",
+    "     ######  ##  ",
+    "    ############ ",
+    "   ##########  # ",
+    "  ###########  ##",
+    "  #######  ###   ",
+    " ### ####        ",
+    " ##   ##         ",
+    "  #              ",
   ]),
 ];
 
@@ -92,31 +139,139 @@ const PAL = {
   pebble: "rgba(58,50,43,0.6)",
   cactus: "rgba(58,50,43,0.75)",
   tree: "rgba(90,63,42,0.75)",
-  bird: "rgba(168,156,141,0.75)",
-  ptero: "rgba(200,170,140,0.65)",
+  spikyBall: "rgba(140, 30, 30, 0.95)",
+  spikyBallSpike: "rgba(200, 50, 20, 0.9)",
+  monsterBird: "rgba(50, 15, 60, 0.95)",
   cloud: "rgba(168,156,141,0.5)",
+};
+
+// ── Weapons — detailed pixel-art designs ──────────────────────────────────
+type WeaponType = "mp5" | "ak47" | "deagle";
+
+const WEAPON_ORDER: WeaponType[] = ["mp5", "ak47", "deagle"];
+
+/** Get the weapon for this page load, cycling on each refresh */
+function getWeaponForSession(): WeaponType {
+  if (typeof window === "undefined") return "mp5";
+  const key = "dinoWeaponIndex";
+  const stored = localStorage.getItem(key);
+  const idx = stored !== null ? parseInt(stored, 10) : 0;
+  const weaponIdx = idx % 3;
+  localStorage.setItem(key, String(idx + 1));
+  return WEAPON_ORDER[weaponIdx];
+}
+
+// ── Detailed pixel-art weapon sprites ─────────────────────────────────────
+
+// MP5 — compact SMG, clearly recognizable with stock, body, barrel, grip, magazine
+const MP5_SPRITE = px([
+  "                  ###    ",
+  "  ################   #   ",
+  "  ################    ###",
+  "  ##  ############   ###",
+  "  ##  ##  ############# ",
+  "      ##    #####       ",
+  "      ###   ##          ",
+  "       ##               ",
+]);
+
+// AK-47 — iconic long rifle with curved magazine, wooden stock, long barrel
+const AK47_SPRITE = px([
+  "                         ######  ",
+  "  ###########################  # ",
+  " #############################  #",
+  " ###  #######################   #",
+  " ##   ##   ################     ",
+  "       ##    ######             ",
+  "       ###   #####              ",
+  "       ####  ###                ",
+  "        ##                      ",
+]);
+
+// Desert Eagle — large boxy pistol, thick barrel, chunky grip
+const DEAGLE_SPRITE = px([
+  "        ########  ",
+  "  ################",
+  "  ################",
+  "  ##  ############",
+  "      ##  ####    ",
+  "      ##  ###     ",
+  "      ##  ###     ",
+  "      #####       ",
+  "       ###        ",
+]);
+
+const WEAPONS: Record<WeaponType, {
+  sprite: [number, number][];
+  muzzleX: number;
+  muzzleY: number;
+  cd: number;
+  recoilAmt: number;
+  flashSize: number;
+  bulletLength: number;
+  bulletWidth: number;
+  casingSize: number;
+  color: string;
+  trailColor: string;
+  glowColor: string;
+}> = {
+  mp5: {
+    sprite: MP5_SPRITE,
+    muzzleX: 25, muzzleY: 1.5, cd: 2, recoilAmt: 1.2, flashSize: 3,
+    bulletLength: 8, bulletWidth: 1, casingSize: 1,
+    color: "#ffee44", trailColor: "rgba(255,230,50,0.7)", glowColor: "rgba(255,200,30,0.5)"
+  },
+  ak47: {
+    sprite: AK47_SPRITE,
+    muzzleX: 33, muzzleY: 1.5, cd: 6, recoilAmt: 3.5, flashSize: 5,
+    bulletLength: 12, bulletWidth: 1.5, casingSize: 1.5,
+    color: "#ffcc22", trailColor: "rgba(255,200,30,0.7)", glowColor: "rgba(255,170,20,0.5)"
+  },
+  deagle: {
+    sprite: DEAGLE_SPRITE,
+    muzzleX: 18, muzzleY: 1.0, cd: 15, recoilAmt: 7, flashSize: 7,
+    bulletLength: 16, bulletWidth: 2, casingSize: 1.5,
+    color: "#ffbb11", trailColor: "rgba(255,180,40,0.8)", glowColor: "rgba(255,140,20,0.6)"
+  }
 };
 
 // ── Internal types ─────────────────────────────────────────────────────────
 
-interface Obs { x: number; type: "sm" | "lg" | "tree" }
-interface Flyer { x: number; y: number; f: number; t: number; big: boolean }
-interface Drift { x: number; y: number; s: number }
-interface Bullet { x: number; y: number; vx: number; vy: number; }
-interface Casing { x: number; y: number; vx: number; vy: number; rot: number; vrot: number; groundLife: number; }
-interface Particle { x: number; y: number; vx: number; vy: number; life: number; color: string; }
+interface Obs { x: number; type: "sm" | "md" | "lg" | "tree" }
+interface Flyer { 
+  x: number; y: number; f: number; t: number;
+  speed: number; age: number;
+  /** Pre-computed attack angle (radians) toward dino at spawn time */
+  attackAngle: number;
+  /** Velocity components computed from attackAngle */
+  vx: number; vy: number;
+  /** Which band this bird spawned in */
+  band: 'upper' | 'middle' | 'lower';
+  /** Creature type */
+  kind: 'spikyBall' | 'monsterBird';
+}
+interface Drift { x: number; y: number; s: number; opacity?: number; }
+interface Bullet { x: number; y: number; vx: number; vy: number; wpn: WeaponType; trail: { x: number; y: number }[]; }
+interface Casing { x: number; y: number; vx: number; vy: number; rot: number; vrot: number; groundLife: number; size: number; }
+interface Particle { x: number; y: number; vx: number; vy: number; life: number; color: string; size: number; }
 
 // ── Component ──────────────────────────────────────────────────────────────
 
 export function DinoRunner() {
   const cvs = useRef<HTMLCanvasElement>(null);
   const rid = useRef(0);
+  const currentWeapon = useRef<WeaponType>("mp5");
 
   useEffect(() => {
+    // Determine weapon on mount (client-side only)
+    currentWeapon.current = getWeaponForSession();
+
     const el = cvs.current;
     if (!el) return;
     const ctx = el.getContext("2d");
     if (!ctx) return;
+
+    const wpnType = currentWeapon.current;
 
     let W = 0, H = 0, PX = 2.5;
 
@@ -132,13 +287,13 @@ export function DinoRunner() {
     let shootCD = 0;
     let recoil = 0;
     let muzzleFlash = 0;
-    let oCD = 80, bCD = 60, cCD = 0;
+    let oCD = 80, bCD = 0, cCD = 0;
     let init = false;
 
     // Jump state scaled to medium-subtle size
     let jumpY = 0, jumpVel = 0, isJumping = false;
-    const GRAVITY = 0.42;
-    const JUMP_FORCE = -7.5;
+    const GRAVITY = 0.6;
+    const JUMP_FORCE = -9.0;
 
     // ── Load All 6 Dino Variants from Strip & Pick Random One ──
     const TOTAL_SKINS = 6;
@@ -192,6 +347,46 @@ export function DinoRunner() {
       }
     };
 
+    /** Spawn initial birds so they're visible on page load */
+    const spawnInitialBirds = () => {
+      const bands: ('upper' | 'middle' | 'lower')[] = ['upper', 'middle', 'lower'];
+      // Spawn 10 birds spread across the sky
+      for (let i = 0; i < 10; i++) {
+        const band = bands[i % 3];
+        let spawnX: number;
+        let spawnY: number;
+
+        // Spread birds across the viewport
+        spawnX = W * 0.15 + (i / 10) * (W * 0.8) + (Math.random() - 0.5) * W * 0.1;
+
+        switch (band) {
+          case 'upper':  spawnY = H * 0.12 + Math.random() * (H * 0.12); break;
+          case 'middle': spawnY = H * 0.30 + Math.random() * (H * 0.12); break;
+          case 'lower':  spawnY = H * 0.48 + Math.random() * (H * 0.12); break;
+        }
+
+        const speed = (2 + Math.random() * 3) * (PX / 2.5);
+        // Direct target dino
+        const dinoCX = W * 0.12 + (34 * PX * 1.15) * 0.5;
+        const dinoCY = H * 0.78 - (34 * PX) * 0.5;
+        const angle = Math.atan2(dinoCY - spawnY, dinoCX - spawnX);
+
+        bds.push({
+          x: spawnX,
+          y: spawnY!,
+          f: Math.random() > 0.5 ? 1 : 0,
+          t: Math.random() * 10,
+          speed,
+          age: 2, // start as if already alive so they can be targeted
+          attackAngle: angle,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          band,
+          kind: i % 2 === 0 ? 'spikyBall' : 'monsterBird',
+        });
+      }
+    };
+
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
       const r = el.getBoundingClientRect();
@@ -201,16 +396,39 @@ export function DinoRunner() {
       PX = W > 1200 ? 2.5 : W > 768 ? 2.0 : 1.6;
 
       if (!init) {
+        // Many clouds, especially at the top — visible on page load
         cls = [
-          { x: W * 0.05, y: H * 0.08, s: 0.9 },
-          { x: W * 0.18, y: H * 0.16, s: 0.7 },
-          { x: W * 0.32, y: H * 0.05, s: 1.1 },
-          { x: W * 0.48, y: H * 0.12, s: 0.8 },
-          { x: W * 0.62, y: H * 0.18, s: 0.65 },
-          { x: W * 0.75, y: H * 0.07, s: 1.0 },
-          { x: W * 0.88, y: H * 0.14, s: 0.85 },
-          { x: W * 0.98, y: H * 0.04, s: 0.75 },
+          // Top row — dense cloud coverage
+          { x: W * 0.02, y: H * 0.02, s: 1.0, opacity: 0.55 },
+          { x: W * 0.12, y: H * 0.06, s: 0.8, opacity: 0.5 },
+          { x: W * 0.22, y: H * 0.03, s: 1.2, opacity: 0.45 },
+          { x: W * 0.34, y: H * 0.07, s: 0.7, opacity: 0.6 },
+          { x: W * 0.46, y: H * 0.02, s: 1.1, opacity: 0.5 },
+          { x: W * 0.56, y: H * 0.05, s: 0.9, opacity: 0.55 },
+          { x: W * 0.68, y: H * 0.04, s: 1.0, opacity: 0.45 },
+          { x: W * 0.78, y: H * 0.06, s: 0.85, opacity: 0.5 },
+          { x: W * 0.90, y: H * 0.03, s: 1.1, opacity: 0.4 },
+          // Second row
+          { x: W * 0.05, y: H * 0.11, s: 0.9, opacity: 0.5 },
+          { x: W * 0.18, y: H * 0.14, s: 0.7, opacity: 0.6 },
+          { x: W * 0.32, y: H * 0.10, s: 1.1, opacity: 0.4 },
+          { x: W * 0.48, y: H * 0.13, s: 0.8, opacity: 0.55 },
+          { x: W * 0.62, y: H * 0.11, s: 0.65, opacity: 0.5 },
+          { x: W * 0.75, y: H * 0.15, s: 1.0, opacity: 0.4 },
+          { x: W * 0.88, y: H * 0.12, s: 0.85, opacity: 0.5 },
+          // Third row — mid-sky
+          { x: W * 0.08, y: H * 0.20, s: 0.6, opacity: 0.35 },
+          { x: W * 0.28, y: H * 0.22, s: 0.9, opacity: 0.4 },
+          { x: W * 0.52, y: H * 0.19, s: 0.7, opacity: 0.45 },
+          { x: W * 0.72, y: H * 0.23, s: 1.0, opacity: 0.35 },
+          { x: W * 0.92, y: H * 0.20, s: 0.55, opacity: 0.4 },
+          // Lower scattered
+          { x: W * 0.15, y: H * 0.28, s: 0.5, opacity: 0.3 },
+          { x: W * 0.42, y: H * 0.30, s: 1.2, opacity: 0.35 },
+          { x: W * 0.82, y: H * 0.27, s: 0.6, opacity: 0.4 },
         ];
+        // Spawn initial birds
+        spawnInitialBirds();
         init = true;
       }
     };
@@ -229,7 +447,7 @@ export function DinoRunner() {
     };
 
     const gy = () => H * 0.78;
-    const SPD = 1.5;
+    const SPD = 2.0;
     const DINO_X_FRAC = 0.12;
 
     let prev = 0;
@@ -241,7 +459,7 @@ export function DinoRunner() {
       const v = SPD * dt;
       const dinoX = W * DINO_X_FRAC;
       // Target rendered size matching existing scale
-      const dinoTargetH = 20 * PX;
+      const dinoTargetH = 34 * PX;
       const dinoTargetW = dinoTargetH * (dinoAspect || 1.15);
 
       // ── UPDATE ──
@@ -257,7 +475,7 @@ export function DinoRunner() {
         for (const o of obs) {
           const dinoFront = dinoX + dinoTargetW * 0.78;
           const dist = o.x - dinoFront;
-          const triggerDist = o.type === "tree" ? 22 : 16;
+          const triggerDist = o.type === "tree" ? 35 : 28;
           
           if (dist > 0 && dist < triggerDist) {
             isJumping = true;
@@ -276,49 +494,65 @@ export function DinoRunner() {
       const dy = g - dinoTargetH + jumpY + (isJumping ? 0 : dF ? -PX * 0.5 : PX * 0.2);
 
       // Decay recoil and flash
-      if (recoil > 0) recoil = Math.max(0, Math.floor(recoil - dt));
+      if (recoil > 0) recoil = Math.max(0, recoil - dt * 0.8);
       if (muzzleFlash > 0) muzzleFlash -= dt;
 
-      // Auto-shoot at nearest bird
+      // Auto-shoot at nearest bird — NO targeting delay, fire immediately
       shootCD -= dt;
-      if (shootCD <= 0 && bds.length > 0) {
-        let nearestBird: Flyer | null = null;
-        let minDist = Infinity;
-        for (const b of bds) {
-          if (b.x > dinoX && b.x < W) {
-             const dist = b.x - dinoX;
-             if (dist < minDist) { minDist = dist; nearestBird = b; }
-          }
-        }
+      let aimAngle = 0;
+      let nearestBird: Flyer | null = null;
+      let minDist = Infinity;
+      
+      for (const b of bds) {
+        // Target ALL creatures
+        const spriteW = b.kind === 'spikyBall' ? 13 * PX * 0.675 : 18 * PX * 0.675;
+        const spriteH = b.kind === 'spikyBall' ? 11 * PX * 0.675 : 10 * PX * 0.675;
+        const bcx = b.x + spriteW * 0.5;
+        const bcy = b.y + spriteH * 0.5;
+        const dist = Math.hypot(bcx - dinoX, bcy - dy);
+        if (dist < minDist) { minDist = dist; nearestBird = b; }
+      }
 
-        if (nearestBird && minDist < W * 0.75) {
-           shootCD = 12; // Rapid fire
-           recoil = 4; // Visual kickback
-           muzzleFlash = 3;
+      // Weapon scale factor — larger for visibility
+      const wpnScale = PX * 1.4;
+      const gunBaseX = dinoX - recoil * PX + dinoTargetW * 0.7;
+      const gunBaseY = dy + dinoTargetH * 0.40;
+
+      if (nearestBird) {
+         // Aim at the center of the creature sprite
+         const sprW = nearestBird.kind === 'spikyBall' ? 13 * PX * 0.675 : 18 * PX * 0.675;
+         const sprH = nearestBird.kind === 'spikyBall' ? 11 * PX * 0.675 : 10 * PX * 0.675;
+         const birdCenterX = nearestBird.x + sprW * 0.5;
+         const birdCenterY = nearestBird.y + sprH * 0.5;
+         aimAngle = Math.atan2(birdCenterY - gunBaseY, birdCenterX - gunBaseX);
+         
+         if (shootCD <= 0) {
+           const wpn = WEAPONS[wpnType];
+           shootCD = wpn.cd;
+           recoil = wpn.recoilAmt;
+           muzzleFlash = wpn.flashSize;
            
-           const gunX = dinoX + dinoTargetW * 0.75;
-           const gunY = dy + dinoTargetH * 0.45;
-           
-           // Aim at bird
-           const birdCenterY = nearestBird.y + (nearestBird.big ? 4 : 2) * PX;
-           const birdCenterX = nearestBird.x + (nearestBird.big ? 4 : 2) * PX;
-           const angle = Math.atan2(birdCenterY - gunY, birdCenterX - gunX);
-           const speed = 25 * PX;
+           const muzzleDist = wpn.muzzleX * wpnScale;
+           const bX = gunBaseX + Math.cos(aimAngle) * muzzleDist;
+           const bY = gunBaseY + Math.sin(aimAngle) * muzzleDist;
+           const speed = 40 * PX; // faster so dino doesn't miss before aliens arrive
            
            bullets.push({
-             x: gunX, y: gunY,
-             vx: Math.cos(angle) * speed,
-             vy: Math.sin(angle) * speed
+             x: bX, y: bY,
+             vx: Math.cos(aimAngle) * speed,
+             vy: Math.sin(aimAngle) * speed,
+             wpn: wpnType,
+             trail: [{ x: bX, y: bY }]
            });
 
-           // Eject casing backward and downward
            casings.push({
-             x: gunX - 2 * PX, y: gunY,
-             vx: -(2 + Math.random() * 2) * PX,
-             vy: -(3 + Math.random() * 2) * PX,
+             x: gunBaseX, y: gunBaseY,
+             vx: -(1 + Math.random() * 2) * PX,
+             vy: -(2 + Math.random() * 3) * PX,
              rot: 0,
              vrot: (Math.random() - 0.5) * 0.8,
-             groundLife: 60
+             groundLife: 60,
+             size: wpn.casingSize
            });
         }
       }
@@ -328,32 +562,54 @@ export function DinoRunner() {
         const b = bullets[i];
         b.x += b.vx * dt;
         b.y += b.vy * dt;
+
+        // Store trail points (keep last N for comet tail)
+        b.trail.push({ x: b.x, y: b.y });
+        if (b.trail.length > 14) b.trail.shift();
         
         let hit = false;
         for (let j = bds.length - 1; j >= 0; j--) {
            const bird = bds[j];
-           const bx = bird.x + (bird.big ? 4 : 2) * PX;
-           const by = bird.y + (bird.big ? 4 : 2) * PX;
+           const birdW = bird.kind === 'spikyBall' ? 13 * PX * 0.675 : 18 * PX * 0.675;
+           const birdH = bird.kind === 'spikyBall' ? 11 * PX * 0.675 : 10 * PX * 0.675;
+           const bx = bird.x + birdW * 0.5;
+           const by = bird.y + birdH * 0.5;
            const hitDist = Math.hypot(b.x - bx, b.y - by);
-           
-           if (hitDist < (bird.big ? 10 : 6) * PX) {
+           const hitRadius = bird.kind === 'spikyBall' ? 4.5 * PX : 5.25 * PX;
+           if (hitDist < hitRadius) {
               hit = true;
-              // Pixel splash
-              for(let k=0; k<14; k++) {
+              // Pixel-art impact — pixel burst with creature-colored fragments
+              const impactColor = bird.kind === 'spikyBall' ? PAL.spikyBall : PAL.monsterBird;
+              for (let k = 0; k < 16; k++) {
+                 const angle = (Math.PI * 2 * k) / 16;
+                 const spd = (3 + Math.random() * 5) * PX;
                  particles.push({
-                   x: bx, y: by,
-                   vx: (Math.random() - 0.5) * 12 * PX,
-                   vy: (Math.random() - 0.5) * 12 * PX,
-                   life: 15 + Math.random() * 10,
-                   color: Math.random() > 0.5 ? PAL.bird : PAL.ptero
+                   x: bx + (Math.random() - 0.5) * 8,
+                   y: by + (Math.random() - 0.5) * 8,
+                   vx: Math.cos(angle) * spd,
+                   vy: Math.sin(angle) * spd,
+                   life: 14 + Math.random() * 12,
+                   color: k % 4 === 0 ? "#ffcc00" : k % 4 === 1 ? "#ff6600" : k % 4 === 2 ? "#ffffff" : impactColor,
+                   size: 1.5 + Math.random() * 2
                  });
+              }
+              // A few larger pixel chunks
+              for (let k = 0; k < 5; k++) {
+                particles.push({
+                  x: bx, y: by,
+                  vx: (Math.random() - 0.5) * 10 * PX,
+                  vy: (Math.random() - 0.5) * 10 * PX - 3 * PX,
+                  life: 20 + Math.random() * 14,
+                  color: impactColor,
+                  size: 2.5 + Math.random() * 1.5
+                });
               }
               bds.splice(j, 1);
               break;
            }
         }
 
-        if (hit || b.x > W || b.y > H || b.y < 0) {
+        if (hit || b.x > W + 50 || b.y > H + 50 || b.y < -50 || b.x < -50) {
           bullets.splice(i, 1);
         }
       }
@@ -387,44 +643,100 @@ export function DinoRunner() {
       oCD -= dt;
       if (oCD <= 0) {
         const r = Math.random();
-        obs.push({ x: W + 20, type: r < 0.35 ? "sm" : r < 0.65 ? "lg" : "tree" });
-        oCD = 60 + Math.random() * 80;
+        obs.push({ x: W + 20, type: r < 0.25 ? "sm" : r < 0.5 ? "md" : r < 0.75 ? "lg" : "tree" });
+        oCD = 30 + Math.random() * 40;
       }
       for (const o of obs) o.x -= v * 1.5;
       if (obs.length && obs[0].x < -60) obs.shift();
 
-      // Birds (Enemy swoop)
-      bCD -= dt;
-      if (bCD <= 0) {
-        bds.push({
-          x: W + 30,
-          y: g - 80 - Math.random() * (H * 0.3),
-          f: 0, t: 0,
-          big: Math.random() > 0.6,
-        });
-        bCD = 60 + Math.random() * 60; // Spawn more frequently
-      }
-      for (const b of bds) {
-        b.x -= v * (b.big ? 1.0 : 1.3);
-        // Swoop towards dino height
-        const dinoCenterY = dy + dinoTargetH * 0.5;
-        if (b.x < W) {
-            b.y += (dinoCenterY - b.y) * 0.01 * dt; 
+      // ════════════════════════════════════════════════════════════════════
+      // BIRDS — Only birds as flying/shooting targets
+      // Birds spawn across the visible sky area.
+      // ════════════════════════════════════════════════════════════════════
+
+      const MAX_BIRDS = 12;
+      const dinoCenterX = dinoX + dinoTargetW * 0.5;
+      const dinoCenterY = dy + dinoTargetH * 0.5;
+
+      /** Spawn a bird in a specific band */
+      const spawnBird = (band: 'upper' | 'middle' | 'lower') => {
+        // X: distribute across 30%–85% of viewport width
+        const spawnX = W * 0.30 + Math.random() * (W * 0.55);
+
+        // Y: pick from the specified band
+        let spawnY: number;
+        switch (band) {
+          case 'upper':  spawnY = H * 0.10 + Math.random() * (H * 0.15); break;
+          case 'middle': spawnY = H * 0.30 + Math.random() * (H * 0.15); break;
+          case 'lower':  spawnY = H * 0.50 + Math.random() * (H * 0.12); break;
         }
-        b.t += dt;
-        if (b.t > (b.big ? 10 : 14)) { b.f ^= 1; b.t = 0; }
+
+        // Varied speeds: slower for farther birds, faster for closer ones
+        const speed = (3 + Math.random() * 4) * (PX / 2.5);
+
+        // Pre-compute attack angle toward the dino center
+        const attackAngle = Math.atan2(dinoCenterY - spawnY, dinoCenterX - spawnX);
+
+        // Remove variation so they directly target the dino
+        const finalAngle = attackAngle;
+
+        bds.push({
+          x: spawnX,
+          y: spawnY,
+          f: 0, t: 0,
+          speed,
+          age: 0,
+          attackAngle: finalAngle,
+          vx: Math.cos(finalAngle) * speed,
+          vy: Math.sin(finalAngle) * speed,
+          band,
+          kind: Math.random() > 0.5 ? 'spikyBall' : 'monsterBird',
+        });
+      };
+
+      bCD -= dt;
+      if (bCD <= 0 && bds.length < MAX_BIRDS) {
+        // Cycle through spawn bands to ensure variety
+        const bands: ('upper' | 'middle' | 'lower')[] = ['upper', 'middle', 'lower'];
+        const chosenBand = bands[Math.floor(Math.random() * bands.length)];
+        spawnBird(chosenBand);
+        // Staggered spawning: spawn another bird quickly sometimes
+        if (Math.random() > 0.5 && bds.length < MAX_BIRDS) {
+          const secondBand = bands[Math.floor(Math.random() * bands.length)];
+          spawnBird(secondBand);
+        }
+        bCD = 12 + Math.random() * 20;
       }
-      if (bds.length && bds[0].x < -60) bds.shift();
+
+      // Update bird positions — move along their pre-computed attack vector
+      for (let i = bds.length - 1; i >= 0; i--) {
+        const b = bds[i];
+        b.age += dt / 60;
+
+        // Move along attack trajectory
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+
+        // Wing flap animation
+        b.t += dt;
+        if (b.t > 12) { b.f ^= 1; b.t = 0; }
+
+        // Remove birds that have gone well past the dino or off-screen
+        if (b.x < -80 || b.y > H + 40 || b.x > W + 80 || b.y < -80) {
+          bds.splice(i, 1);
+        }
+      }
 
       // Clouds
       cCD -= dt;
       if (cCD <= 0) {
         cls.push({
           x: W + 60,
-          y: H * (0.03 + Math.random() * 0.2),
-          s: 0.6 + Math.random() * 0.6,
+          y: H * (0.02 + Math.random() * 0.30),
+          s: 0.4 + Math.random() * 1.2,
+          opacity: 0.3 + Math.random() * 0.4
         });
-        cCD = 75 + Math.random() * 85;
+        cCD = 3 + Math.random() * 8; // Spawn clouds very frequently
       }
       for (const c of cls) c.x -= v * (0.15 + (c.s - 0.6) * 0.1);
       cls = cls.filter(c => c.x > -100);
@@ -433,7 +745,11 @@ export function DinoRunner() {
       ctx.clearRect(0, 0, W, H);
 
       // Clouds
-      for (const c of cls) stamp(CLOUD, c.x, c.y, PAL.cloud, PX * c.s);
+      for (const c of cls) {
+         ctx.globalAlpha = c.opacity ?? 0.5;
+         stamp(CLOUD, c.x, c.y, PAL.cloud, PX * c.s);
+      }
+      ctx.globalAlpha = 1;
 
       // Ground
       ctx.fillStyle = PAL.ground;
@@ -453,7 +769,7 @@ export function DinoRunner() {
         ctx.translate(c.x, c.y);
         ctx.rotate(c.rot);
         ctx.globalAlpha = c.groundLife < 20 ? Math.max(0, c.groundLife / 20) : 1;
-        ctx.fillRect(-1.5 * PX, -PX, 3 * PX, 1.5 * PX);
+        ctx.fillRect(-1.5 * PX * c.size, -PX * c.size, 3 * PX * c.size, 1.5 * PX * c.size);
         ctx.restore();
       }
 
@@ -472,46 +788,137 @@ export function DinoRunner() {
         ctx.restore();
       }
 
-      // Gun
-      const gunBaseX = dinoX - recoil * PX + dinoTargetW * 0.75;
-      const gunBaseY = dy + dinoTargetH * 0.45;
-      ctx.fillStyle = PAL.gear;
-      ctx.fillRect(gunBaseX, gunBaseY, 7 * PX, 2.5 * PX); // Barrel
-      ctx.fillRect(gunBaseX, gunBaseY + 2.5 * PX, 2.5 * PX, 3 * PX); // Grip
+      // Gun — rendered at larger scale for visibility
+      const wpn = WEAPONS[wpnType];
+      ctx.save();
+      ctx.translate(gunBaseX, gunBaseY);
+      ctx.rotate(aimAngle);
+      stamp(wpn.sprite, -4 * wpnScale, -3 * wpnScale, PAL.gear, wpnScale);
 
-      // Muzzle Flash
+      // Muzzle Flash — bright multi-layered flash
       if (muzzleFlash > 0) {
-        const flashRadius = (muzzleFlash / 3) * 4 * PX;
+        const flashPct = muzzleFlash / wpn.flashSize;
+        const flashRadius = flashPct * wpn.flashSize * PX * 1.8;
+        // Outer glow
+        ctx.globalAlpha = flashPct * 0.6;
+        ctx.fillStyle = "#ffcc44";
+        ctx.beginPath();
+        ctx.arc(wpn.muzzleX * wpnScale, wpn.muzzleY * wpnScale, flashRadius * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        // Core white flash
+        ctx.globalAlpha = flashPct;
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        ctx.arc(gunBaseX + 8 * PX, gunBaseY + 1.25 * PX, flashRadius, 0, Math.PI * 2);
+        ctx.arc(wpn.muzzleX * wpnScale, wpn.muzzleY * wpnScale, flashRadius, 0, Math.PI * 2);
         ctx.fill();
+        // Inner hot core
         ctx.fillStyle = "#ffaa00";
         ctx.beginPath();
-        ctx.arc(gunBaseX + 8 * PX, gunBaseY + 1.25 * PX, flashRadius * 0.6, 0, Math.PI * 2);
+        ctx.arc(wpn.muzzleX * wpnScale, wpn.muzzleY * wpnScale, flashRadius * 0.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.globalAlpha = 1;
       }
+      ctx.restore();
 
-      // Bullets
+      // Bullets — THICK bright yellow/orange/white comet-style with intense glow
       for (const b of bullets) {
-        // Trail
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-        ctx.beginPath();
-        ctx.moveTo(b.x, b.y);
-        ctx.lineTo(b.x - b.vx * 0.2, b.y - b.vy * 0.2);
-        ctx.lineWidth = 2 * PX;
-        ctx.stroke();
+        const bWpn = WEAPONS[b.wpn];
         
-        // Projectile
+        // Draw glowing trail (comet tail) — THICK and bright
+        if (b.trail.length > 1) {
+          for (let ti = 0; ti < b.trail.length - 1; ti++) {
+            const tp = b.trail[ti];
+            const tn = b.trail[ti + 1];
+            const pct = (ti + 1) / b.trail.length;
+            const width = pct * bWpn.bulletWidth * PX * 0.5;
+            
+            // Wide outer glow — soft diffuse light
+            ctx.strokeStyle = bWpn.glowColor;
+            ctx.lineWidth = width + PX * 2;
+            ctx.globalAlpha = pct * 0.25;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(tp.x, tp.y);
+            ctx.lineTo(tn.x, tn.y);
+            ctx.stroke();
+
+            // Mid glow — orange
+            ctx.strokeStyle = bWpn.trailColor;
+            ctx.lineWidth = width + PX * 1;
+            ctx.globalAlpha = pct * 0.5;
+            ctx.beginPath();
+            ctx.moveTo(tp.x, tp.y);
+            ctx.lineTo(tn.x, tn.y);
+            ctx.stroke();
+            
+            // Inner trail — bright yellow-white core
+            ctx.strokeStyle = "#fff8cc";
+            ctx.lineWidth = width;
+            ctx.globalAlpha = pct * 0.7;
+            ctx.beginPath();
+            ctx.moveTo(tp.x, tp.y);
+            ctx.lineTo(tn.x, tn.y);
+            ctx.stroke();
+          }
+        }
+        ctx.globalAlpha = 1;
+        ctx.lineCap = 'butt';
+
+        // Large glow halo around projectile head
+        const glowR = bWpn.bulletLength * PX * 0.6;
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        
+        // Outer soft glow
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = bWpn.glowColor;
+        ctx.beginPath();
+        ctx.arc(0, 0, glowR * 1.2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Mid glow
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = bWpn.trailColor;
+        ctx.beginPath();
+        ctx.arc(0, 0, glowR, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Bright inner glow
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = "#ffeeaa";
+        ctx.beginPath();
+        ctx.arc(0, 0, glowR * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.globalAlpha = 1;
+        
+        // Projectile body (comet head) — thick and bright
+        ctx.rotate(Math.atan2(b.vy, b.vx));
+        // Colored body — thick
+        ctx.fillStyle = bWpn.color;
+        ctx.fillRect(
+          -bWpn.bulletLength * PX * 0.6,
+          -bWpn.bulletWidth * PX * 0.6,
+          bWpn.bulletLength * PX * 1.2,
+          bWpn.bulletWidth * PX * 1.2
+        );
+        // Bright white-hot core on top
         ctx.fillStyle = "#ffffff";
-        ctx.fillRect(b.x - 2 * PX, b.y - PX, 4 * PX, 2 * PX);
+        ctx.fillRect(
+          -bWpn.bulletLength * PX * 0.3,
+          -bWpn.bulletWidth * PX * 0.35,
+          bWpn.bulletLength * PX * 0.6,
+          bWpn.bulletWidth * PX * 0.7
+        );
+        ctx.restore();
       }
 
-      // Particles (Splash)
+      // Particles (Impact Splash)
       for (const p of particles) {
         ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.life < 10 ? Math.max(0, p.life / 10) : 1;
-        ctx.fillRect(p.x, p.y, PX * 1.5, PX * 1.5);
+        ctx.globalAlpha = p.life < 8 ? Math.max(0, p.life / 8) : 1;
+        const sz = PX * p.size;
+        ctx.fillRect(p.x - sz * 0.5, p.y - sz * 0.5, sz, sz);
       }
       ctx.globalAlpha = 1;
 
@@ -520,16 +927,31 @@ export function DinoRunner() {
         if (o.type === "tree") {
           stamp(TREE, o.x, g - 11 * PX, PAL.tree);
         } else {
-          const sp = o.type === "lg" ? CACTUS_LG : CACTUS_SM;
-          const rows = o.type === "lg" ? 9 : 7;
+          const sp = o.type === "lg" ? CACTUS_LG : o.type === "md" ? CACTUS_MD : CACTUS_SM;
+          const rows = o.type === "lg" ? 9 : o.type === "md" ? 8 : 7;
           stamp(sp, o.x, g - rows * PX, PAL.cactus);
         }
       }
 
-      // Birds
+      // Creatures — spiky balls and monster birds attacking the dino
       for (const b of bds) {
-        if (b.big) stamp(PTERO[b.f], b.x, b.y, PAL.ptero);
-        else stamp(BIRD[b.f], b.x, b.y, PAL.bird);
+        ctx.save();
+        ctx.globalAlpha = 1;
+        if (b.kind === 'spikyBall') {
+          // Spiky ball — rendered in menacing red with slightly larger scale
+          stamp(SPIKY_BALL[b.f], b.x, b.y, PAL.spikyBall, PX * 0.675);
+          // Draw brighter spike tips for extra menace
+          stamp(SPIKY_BALL[b.f], b.x, b.y, PAL.spikyBallSpike, PX * 0.5625);
+        } else {
+          // Monster bird — rendered in dark purple, larger aggressive shape
+          stamp(MONSTER_BIRD[b.f], b.x, b.y, PAL.monsterBird, PX * 0.675);
+          // Eye glow
+          const eyeX = b.x + 14 * PX * 0.675;
+          const eyeY = b.y + 4 * PX * 0.675;
+          ctx.fillStyle = '#ff3333';
+          ctx.fillRect(eyeX, eyeY, PX * 1.5, PX * 1.125);
+        }
+        ctx.restore();
       }
 
       rid.current = requestAnimationFrame(frame);

@@ -84,9 +84,9 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
     }
 
     // Slower, elegant pacing (decreasing speed more)
-    const exitDur = 0.55 + Math.random() * 0.2; // 550–750ms
-    const gapDur = 0.04 + Math.random() * 0.04; // 40–80ms empty slot
-    const entryDur = 0.55 + Math.random() * 0.2; // 550–750ms
+    const exitDur = 1.2 + Math.random() * 0.6; // 1.2s - 1.8s
+    const gapDur = 0.1 + Math.random() * 0.1; // 100-200ms empty slot
+    const entryDur = 1.2 + Math.random() * 0.6; // 1.2s - 1.8s
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -225,6 +225,13 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
     return () => {
       mountedRef.current = false;
       if (loopRef.current) clearTimeout(loopRef.current);
+      // Clean up GSAP timelines on unmount (fixes hot-reloading issues)
+      mainRefs.current.forEach((el) => {
+        if (el) {
+          gsap.killTweensOf(el);
+          gsap.set(el, { clearProps: "transform" });
+        }
+      });
     };
   }, [scheduleNext]);
 

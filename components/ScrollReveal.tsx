@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
-  initialTransform?: string; // e.g. "translateY(40px)" or "translateX(-40px)"
-  delay?: number; // delay in ms
-  duration?: number; // duration in ms
+  initialTransform?: string; // Kept for API compatibility, but we use framer-motion variants
+  delay?: number;
+  duration?: number;
   threshold?: number;
   triggerOnce?: boolean;
 }
@@ -15,56 +16,36 @@ interface ScrollRevealProps {
 export function ScrollReveal({
   children,
   className = "",
-  initialTransform = "translateY(40px)",
+  initialTransform, // Ignored in favor of premium 3D effect
   delay = 0,
-  duration = 400,
+  duration = 800, // Slightly longer, more cinematic
   threshold = 0.05,
   triggerOnce = true,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          if (triggerOnce && ref.current) {
-            observer.unobserve(ref.current);
-          }
-        } else if (!triggerOnce) {
-          setIsVisible(false);
-        }
-      },
-      { threshold }
-    );
-
-    const current = ref.current;
-    if (current) {
-      observer.observe(current);
-    }
-
-    return () => {
-      if (current) {
-        observer.unobserve(current);
-      }
-    };
-  }, [threshold, triggerOnce]);
-
-  const style: React.CSSProperties = {
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible ? "none" : initialTransform,
-    transitionProperty: "opacity, transform",
-    transitionDuration: `${duration}ms`,
-    transitionDelay: `${delay}ms`,
-    transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-    // Only promote to own layer during the transition, not permanently
-    willChange: isVisible ? "auto" : "opacity, transform",
-  };
+  const isInView = useInView(ref, { once: triggerOnce, margin: "-10% 0px" });
 
   return (
-    <div ref={ref} style={style} className={className}>
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, y: 60, rotateX: 15, scale: 0.95 }}
+      animate={
+        isInView
+          ? { opacity: 1, y: 0, rotateX: 0, scale: 1 }
+          : { opacity: 0, y: 60, rotateX: 15, scale: 0.95 }
+      }
+      transition={{
+        duration: duration / 1000,
+        delay: delay / 1000,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      style={{
+        transformStyle: "preserve-3d",
+        perspective: "1200px"
+      }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }

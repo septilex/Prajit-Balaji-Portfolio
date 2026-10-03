@@ -85,7 +85,8 @@ type TimelineNode = {
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <div className="rainbow-glow group relative rounded-[28px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 md:rounded-[40px]">
+    <TiltCard maxTilt={3} className="w-full">
+      <div className="rainbow-glow group relative rounded-[28px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 md:rounded-[40px]">
       <span aria-hidden="true" className="rainbow-halo"><span className="rainbow-conic" /></span>
       <span aria-hidden="true" className="rainbow-ring"><span className="rainbow-conic" /></span>
       {/* Hover shadow — pre-rendered on its own layer, faded via opacity (composited).
@@ -209,6 +210,7 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       </div>
     </div>
+    </TiltCard>
   );
 }
 
@@ -1253,8 +1255,8 @@ export default function Home() {
                     className="flex w-full py-2 transition-colors rounded-none border-0 border-b border-[#3a2a1c]/70 bg-transparent px-0 text-base text-[#f2ece1] placeholder:text-[#a89c8d]/55 focus:outline-none focus:border-[#ff8a3d] dark:text-[#f2ece1] dark:border-[#3a2a1c]/70 dark:placeholder:text-[#a89c8d]/55 light:text-black light:border-black/20 focus:ring-0 resize-none"
                   />
                 </div>
-
-                <GlowButton
+                <Magnetic strength={0.2} className="mt-4">
+                  <GlowButton
                   type="submit"
                   disabled={formState === "loading" || formState === "success"}
                   mode="rotate"
@@ -1281,7 +1283,8 @@ export default function Home() {
                       <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                     </>
                   )}
-                </GlowButton>
+                  </GlowButton>
+                </Magnetic>
               </form>
             </ScrollReveal>
 

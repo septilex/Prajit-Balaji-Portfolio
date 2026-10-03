@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { ScrollReveal } from "./ScrollReveal";
 
 export const About = () => {
   return (
@@ -43,13 +44,8 @@ export const About = () => {
           </motion.div>
 
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="relative flex w-full justify-end"
-            style={{ zIndex: 10 }}
+          <ScrollReveal
+            className="relative flex w-full justify-end z-10"
           >
             <div className="flex flex-col items-end text-right">
               {/* Arrow */}
@@ -89,7 +85,7 @@ export const About = () => {
                 <span>2024 &ndash; Present</span>
               </div>
             </div>
-          </motion.div>
+          </ScrollReveal>
         </div>
 
 
@@ -116,13 +112,8 @@ export const About = () => {
           </motion.div>
 
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="relative flex w-full justify-start"
-            style={{ zIndex: 10 }}
+          <ScrollReveal
+            className="relative flex w-full justify-start z-10"
           >
             <div className="flex flex-col items-start text-left">
               {/* Arrow */}
@@ -162,7 +153,7 @@ export const About = () => {
                 <span>2022 &ndash; 2024</span>
               </div>
             </div>
-          </motion.div>
+          </ScrollReveal>
         </div>
 
 
@@ -189,13 +180,8 @@ export const About = () => {
           </motion.div>
 
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="relative flex w-full justify-end"
-            style={{ zIndex: 10 }}
+          <ScrollReveal
+            className="relative flex w-full justify-end z-10"
           >
             <div className="flex flex-col items-end text-right">
               {/* Arrow */}
@@ -235,7 +221,7 @@ export const About = () => {
                 <span>May 2026 &ndash; Jul 2026</span>
               </div>
             </div>
-          </motion.div>
+          </ScrollReveal>
         </div>
 
 
@@ -262,13 +248,8 @@ export const About = () => {
           </motion.div>
 
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="relative flex w-full justify-start"
-            style={{ zIndex: 10 }}
+          <ScrollReveal
+            className="relative flex w-full justify-start z-10"
           >
             <div className="flex flex-col items-start text-left">
               {/* Arrow */}
@@ -308,7 +289,7 @@ export const About = () => {
                 <span>Jun 2026 &ndash; Jul 2026</span>
               </div>
             </div>
-          </motion.div>
+          </ScrollReveal>
         </div>
 
       </div>
