@@ -142,7 +142,7 @@ const PAL = {
   spikyBall: "rgba(140, 30, 30, 0.95)",
   spikyBallSpike: "rgba(200, 50, 20, 0.9)",
   monsterBird: "rgba(50, 15, 60, 0.95)",
-  cloud: "rgba(168,156,141,0.5)",
+  cloud: "rgba(145,135,120,0.7)",
 };
 
 // ── Weapons — detailed pixel-art designs ──────────────────────────────────
@@ -350,14 +350,17 @@ export function DinoRunner() {
     /** Spawn initial birds so they're visible on page load */
     const spawnInitialBirds = () => {
       const bands: ('upper' | 'middle' | 'lower')[] = ['upper', 'middle', 'lower'];
-      // Spawn 10 birds spread across the sky
-      for (let i = 0; i < 10; i++) {
+      const isDeagle = currentWeapon.current === 'deagle';
+      const numBirds = isDeagle ? 8 : 10; // Less initial birds in Deagle mode for scattering
+
+      // Spawn birds spread across the sky
+      for (let i = 0; i < numBirds; i++) {
         const band = bands[i % 3];
         let spawnX: number;
         let spawnY: number;
 
-        // Spread birds across the viewport
-        spawnX = W * 0.15 + (i / 10) * (W * 0.8) + (Math.random() - 0.5) * W * 0.1;
+        // Make sure all enemies start far away from the dino so they die at a distance
+        spawnX = W * 0.65 + (i / numBirds) * (W * 0.5) + (Math.random() - 0.5) * W * 0.1;
 
         switch (band) {
           case 'upper':  spawnY = H * 0.12 + Math.random() * (H * 0.12); break;
@@ -365,7 +368,8 @@ export function DinoRunner() {
           case 'lower':  spawnY = H * 0.48 + Math.random() * (H * 0.12); break;
         }
 
-        const speed = (2 + Math.random() * 3) * (PX / 2.5);
+        const speedMult = isDeagle ? 0.35 : 1.0;
+        const speed = (2 + Math.random() * 3) * (PX / 2.5) * speedMult;
         // Direct target dino
         const dinoCX = W * 0.12 + (34 * PX * 1.15) * 0.5;
         const dinoCY = H * 0.78 - (34 * PX) * 0.5;
@@ -396,39 +400,30 @@ export function DinoRunner() {
       PX = W > 1200 ? 2.5 : W > 768 ? 2.0 : 1.6;
 
       if (!init) {
-        // Many clouds, especially at the top — visible on page load
-        cls = [
-          // Top row — dense cloud coverage
-          { x: W * 0.02, y: H * 0.02, s: 1.0, opacity: 0.55 },
-          { x: W * 0.12, y: H * 0.06, s: 0.8, opacity: 0.5 },
-          { x: W * 0.22, y: H * 0.03, s: 1.2, opacity: 0.45 },
-          { x: W * 0.34, y: H * 0.07, s: 0.7, opacity: 0.6 },
-          { x: W * 0.46, y: H * 0.02, s: 1.1, opacity: 0.5 },
-          { x: W * 0.56, y: H * 0.05, s: 0.9, opacity: 0.55 },
-          { x: W * 0.68, y: H * 0.04, s: 1.0, opacity: 0.45 },
-          { x: W * 0.78, y: H * 0.06, s: 0.85, opacity: 0.5 },
-          { x: W * 0.90, y: H * 0.03, s: 1.1, opacity: 0.4 },
-          // Second row
-          { x: W * 0.05, y: H * 0.11, s: 0.9, opacity: 0.5 },
-          { x: W * 0.18, y: H * 0.14, s: 0.7, opacity: 0.6 },
-          { x: W * 0.32, y: H * 0.10, s: 1.1, opacity: 0.4 },
-          { x: W * 0.48, y: H * 0.13, s: 0.8, opacity: 0.55 },
-          { x: W * 0.62, y: H * 0.11, s: 0.65, opacity: 0.5 },
-          { x: W * 0.75, y: H * 0.15, s: 1.0, opacity: 0.4 },
-          { x: W * 0.88, y: H * 0.12, s: 0.85, opacity: 0.5 },
-          // Third row — mid-sky
-          { x: W * 0.08, y: H * 0.20, s: 0.6, opacity: 0.35 },
-          { x: W * 0.28, y: H * 0.22, s: 0.9, opacity: 0.4 },
-          { x: W * 0.52, y: H * 0.19, s: 0.7, opacity: 0.45 },
-          { x: W * 0.72, y: H * 0.23, s: 1.0, opacity: 0.35 },
-          { x: W * 0.92, y: H * 0.20, s: 0.55, opacity: 0.4 },
-          // Lower scattered
-          { x: W * 0.15, y: H * 0.28, s: 0.5, opacity: 0.3 },
-          { x: W * 0.42, y: H * 0.30, s: 1.2, opacity: 0.35 },
-          { x: W * 0.82, y: H * 0.27, s: 0.6, opacity: 0.4 },
-        ];
+        // Spread large clouds evenly across the entire screen and off-screen right
+        cls = [];
+        const numClouds = 12;
+        for (let i = 0; i < numClouds; i++) {
+           cls.push({
+             x: W * -0.1 + (i / numClouds) * (W * 1.6) + (Math.random() - 0.5) * W * 0.1,
+             y: H * (0.02 + Math.random() * 0.25),
+             s: 2.0 + Math.random() * 2.0,
+             opacity: 0.5 + Math.random() * 0.25
+           });
+        }
+        
         // Spawn initial birds
         spawnInitialBirds();
+        
+        // Spawn initial obstacles spread across the screen
+        const numObs = 6 + Math.floor(Math.random() * 3); // 6 to 8 obstacles
+        for (let i = 0; i < numObs; i++) {
+          const r = Math.random();
+          // Spread them across the viewport, starting a bit ahead of the dino
+          const obsX = W * 0.35 + (i / numObs) * (W * 0.65) + (Math.random() - 0.5) * W * 0.1;
+          obs.push({ x: obsX, type: r < 0.25 ? "sm" : r < 0.5 ? "md" : r < 0.75 ? "lg" : "tree" });
+        }
+
         init = true;
       }
     };
@@ -479,7 +474,9 @@ export function DinoRunner() {
           
           if (dist > 0 && dist < triggerDist) {
             isJumping = true;
-            jumpVel = JUMP_FORCE;
+            if (o.type === "sm") jumpVel = -9.0;
+            else if (o.type === "md") jumpVel = -10.5;
+            else jumpVel = -12.0; // lg and tree
             break;
           }
         }
@@ -504,6 +501,9 @@ export function DinoRunner() {
       let minDist = Infinity;
       
       for (const b of bds) {
+        // Kill Zone Restriction: Ignore enemies until they reach the letter "B" (W * 0.55)
+        if (b.x > W * 0.55) continue;
+
         // Target ALL creatures
         const spriteW = b.kind === 'spikyBall' ? 13 * PX * 0.675 : 18 * PX * 0.675;
         const spriteH = b.kind === 'spikyBall' ? 11 * PX * 0.675 : 10 * PX * 0.675;
@@ -535,7 +535,7 @@ export function DinoRunner() {
            const muzzleDist = wpn.muzzleX * wpnScale;
            const bX = gunBaseX + Math.cos(aimAngle) * muzzleDist;
            const bY = gunBaseY + Math.sin(aimAngle) * muzzleDist;
-           const speed = 40 * PX; // faster so dino doesn't miss before aliens arrive
+           const speed = 100 * PX; // extremely fast so the dino never misses and enemies die instantly at range
            
            bullets.push({
              x: bX, y: bY,
@@ -574,7 +574,16 @@ export function DinoRunner() {
            const birdH = bird.kind === 'spikyBall' ? 11 * PX * 0.675 : 10 * PX * 0.675;
            const bx = bird.x + birdW * 0.5;
            const by = bird.y + birdH * 0.5;
-           const hitDist = Math.hypot(b.x - bx, b.y - by);
+           
+           // Continuous collision detection: check line segment from prev pos to current pos
+           const prevX = b.x - b.vx * dt;
+           const prevY = b.y - b.vy * dt;
+           const l2 = (b.x - prevX) ** 2 + (b.y - prevY) ** 2;
+           let t = Math.max(0, Math.min(1, ((bx - prevX) * (b.x - prevX) + (by - prevY) * (b.y - prevY)) / (l2 || 1)));
+           const projX = prevX + t * (b.x - prevX);
+           const projY = prevY + t * (b.y - prevY);
+           
+           const hitDist = Math.hypot(projX - bx, projY - by);
            const hitRadius = bird.kind === 'spikyBall' ? 4.5 * PX : 5.25 * PX;
            if (hitDist < hitRadius) {
               hit = true;
@@ -660,8 +669,11 @@ export function DinoRunner() {
 
       /** Spawn a bird in a specific band */
       const spawnBird = (band: 'upper' | 'middle' | 'lower') => {
-        // X: distribute across 30%–85% of viewport width
-        const spawnX = W * 0.30 + Math.random() * (W * 0.55);
+        const isDeagle = wpnType === 'deagle';
+        
+        // X: distribute across right side of the screen 
+        // Spawn them far away for all modes so Dino has time to kill them from a distance
+        const spawnX = W * 0.70 + Math.random() * (W * 0.50);
 
         // Y: pick from the specified band
         let spawnY: number;
@@ -672,7 +684,8 @@ export function DinoRunner() {
         }
 
         // Varied speeds: slower for farther birds, faster for closer ones
-        const speed = (3 + Math.random() * 4) * (PX / 2.5);
+        const speedMult = isDeagle ? 0.35 : 1.0;
+        const speed = (3 + Math.random() * 4) * (PX / 2.5) * speedMult;
 
         // Pre-compute attack angle toward the dino center
         const attackAngle = Math.atan2(dinoCenterY - spawnY, dinoCenterX - spawnX);
@@ -701,11 +714,12 @@ export function DinoRunner() {
         const chosenBand = bands[Math.floor(Math.random() * bands.length)];
         spawnBird(chosenBand);
         // Staggered spawning: spawn another bird quickly sometimes
-        if (Math.random() > 0.5 && bds.length < MAX_BIRDS) {
+        // In Deagle mode, skip staggered spawning to keep them scattered
+        if (wpnType !== 'deagle' && Math.random() > 0.5 && bds.length < MAX_BIRDS) {
           const secondBand = bands[Math.floor(Math.random() * bands.length)];
           spawnBird(secondBand);
         }
-        bCD = 12 + Math.random() * 20;
+        bCD = wpnType === 'deagle' ? 22 + Math.random() * 10 : 12 + Math.random() * 20;
       }
 
       // Update bird positions — move along their pre-computed attack vector
@@ -732,11 +746,11 @@ export function DinoRunner() {
       if (cCD <= 0) {
         cls.push({
           x: W + 60,
-          y: H * (0.02 + Math.random() * 0.30),
-          s: 0.4 + Math.random() * 1.2,
-          opacity: 0.3 + Math.random() * 0.4
+          y: H * (0.02 + Math.random() * 0.25),
+          s: 2.0 + Math.random() * 2.0,
+          opacity: 0.5 + Math.random() * 0.25
         });
-        cCD = 3 + Math.random() * 8; // Spawn clouds very frequently
+        cCD = 40 + Math.random() * 60; // Spawn clouds much less frequently
       }
       for (const c of cls) c.x -= v * (0.15 + (c.s - 0.6) * 0.1);
       cls = cls.filter(c => c.x > -100);
