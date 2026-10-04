@@ -513,10 +513,9 @@ export function DinoRunner() {
         if (dist < minDist) { minDist = dist; nearestBird = b; }
       }
 
-      // Weapon scale factor — larger for visibility
-      const wpnScale = PX * 1.4;
-      const gunBaseX = dinoX - recoil * PX + dinoTargetW * 0.7;
-      const gunBaseY = dy + dinoTargetH * 0.40;
+      const wpnScale = PX * 0.7;
+      const gunBaseX = dinoX - recoil * PX + dinoTargetW * 0.6;
+      const gunBaseY = dy + dinoTargetH * 0.60;
 
       if (nearestBird) {
          // Aim at the center of the creature sprite
@@ -787,18 +786,38 @@ export function DinoRunner() {
         ctx.restore();
       }
 
-      // ── Dino Graphic (Apply Recoil) ──
+      // ── Dino Graphic (Split rendering for static body + wiggling legs) ──
       if (dinoLoaded && selectedDinoCanvas) {
         ctx.save();
         ctx.globalAlpha = 0.92;
         ctx.imageSmoothingEnabled = false;
+
+        const splitRatio = 0.65; // Upper 65% is body, lower 35% is legs
+        const splitH_canvas = selectedDinoCanvas.height * splitRatio;
+        const splitH_dest = dinoTargetH * splitRatio;
+
+        // Draw top half (body, head, arms) - STATIC
         ctx.drawImage(
           selectedDinoCanvas,
-          Math.round(dinoX - recoil * PX),
-          Math.round(dy),
-          Math.round(dinoTargetW),
-          Math.round(dinoTargetH)
+          0, 0, selectedDinoCanvas.width, splitH_canvas,
+          Math.round(dinoX - recoil * PX), Math.round(dy), Math.round(dinoTargetW), Math.round(splitH_dest)
         );
+
+        // Draw bottom half (legs) - WIGGLING
+        const legWiggle = isJumping ? 0 : (dF ? 0.25 : -0.25); // Radians for leg swing
+        const legPivotX = Math.round(dinoX - recoil * PX) + dinoTargetW * 0.5;
+        const legPivotY = Math.round(dy) + splitH_dest;
+        
+        ctx.save();
+        ctx.translate(legPivotX, legPivotY);
+        ctx.rotate(legWiggle);
+        ctx.drawImage(
+          selectedDinoCanvas,
+          0, splitH_canvas, selectedDinoCanvas.width, selectedDinoCanvas.height - splitH_canvas,
+          -dinoTargetW * 0.5, 0, Math.round(dinoTargetW), Math.round(dinoTargetH - splitH_dest)
+        );
+        ctx.restore();
+
         ctx.restore();
       }
 
@@ -812,7 +831,7 @@ export function DinoRunner() {
       // Muzzle Flash — bright multi-layered flash
       if (muzzleFlash > 0) {
         const flashPct = muzzleFlash / wpn.flashSize;
-        const flashRadius = flashPct * wpn.flashSize * PX * 1.8;
+        const flashRadius = flashPct * wpn.flashSize * PX * 0.9;
         // Outer glow
         ctx.globalAlpha = flashPct * 0.6;
         ctx.fillStyle = "#ffcc44";
