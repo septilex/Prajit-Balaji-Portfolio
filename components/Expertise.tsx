@@ -119,7 +119,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#ff8a3d" stopOpacity="0.4" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px">
+           <motion.g animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
              {[0, 60, 120, 180, 240, 300].map((angle, i) => (
                <g key={`petal-${i}`} transform={`rotate(${angle} 50 50)`}>
                  {/* Bold interlocking ribbon/knot */}
@@ -128,7 +128,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              ))}
              <motion.circle cx="50" cy="50" r="4.5" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.3, 1] : 1 }} transition={{ duration: 2, repeat: Infinity }} />
            </motion.g>
-           <motion.circle cx="50" cy="50" r="42" strokeDasharray="3 6" strokeWidth="1.5" strokeOpacity="0.2" animate={{ rotate: -360 }} transition={{ duration: 60, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px" />
+           <motion.circle cx="50" cy="50" r="42" strokeDasharray="3 6" strokeWidth="1.5" strokeOpacity="0.2" animate={{ rotate: -360 }} transition={{ duration: 60, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }} />
         </svg>
       );
     case "LLMs":
@@ -223,7 +223,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
            <circle cx="50" cy="50" r="20" fill="url(#globeGrad)" strokeWidth="1.5" strokeOpacity="0.9" />
            <motion.circle cx="50" cy="50" r="5" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.3, 1] : 1 }} transition={{ duration: 1.5, repeat: Infinity }} />
 
-           <motion.g animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px">
+           <motion.g animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
              {/* Bold directional loop */}
              <circle cx="50" cy="50" r="38" strokeDasharray="12 8" strokeWidth="1.5" strokeOpacity="0.5" />
              <path d="M 50 12 L 53 7 L 50 2 Z" fill="#3a2a1c" stroke="none" transform="translate(-1, 0)" />
@@ -328,7 +328,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              {/* 2. Process */}
              <g transform="translate(35, 40)">
                <rect x="0" y="0" width="20" height="20" rx="4" fill="#fcfaf7" strokeWidth="1.5" />
-               <motion.circle cx="10" cy="10" r="4" strokeWidth="1.5" strokeDasharray="2 2" animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} transformOrigin="10px 10px" />
+               <motion.circle cx="10" cy="10" r="4" strokeWidth="1.5" strokeDasharray="2 2" animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "10px 10px" }} />
                <text x="10" y="30" fontSize="4.5" fill="#3a2a1c" stroke="none" fontFamily="monospace" fontWeight="bold" textAnchor="middle">PROCESS</text>
              </g>
 
@@ -367,7 +367,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#ff8a3d" stopOpacity="0" />
              </radialGradient>
            </defs>
-           <motion.g animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px">
+           <motion.g animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
              {[0, 60, 120].map((angle, i) => (
                <motion.ellipse 
                  key={i} 
@@ -414,7 +414,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <circle cx="50" cy="50" r="38" fill="url(#nextGrad)" stroke="#3a2a1c" strokeWidth="1.5" />
              <circle cx="50" cy="50" r="45" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.2" />
              
-             <motion.g animate={{ rotateY: isActive ? 15 : 0 }} transition={{ duration: 0.5, ease: "easeOut" }} transformOrigin="50px 50px">
+             <motion.g animate={{ rotateY: isActive ? 15 : 0 }} transition={{ duration: 0.5, ease: "easeOut" }} style={{ transformOrigin: "50px 50px" }}>
                {/* The Next.js N */}
                <path d="M 35 70 L 35 30 L 65 70 L 65 30" stroke="#fcfaf7" strokeWidth="6" strokeLinejoin="miter" strokeMiterlimit="10" />
                {/* Accent highlight */}
@@ -422,7 +422,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              </motion.g>
 
              {/* Orbital ring */}
-             <motion.circle cx="50" cy="50" r="45" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="30 150" strokeOpacity="0.8" animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px" />
+             <motion.circle cx="50" cy="50" r="45" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="30 150" strokeOpacity="0.8" animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }} />
            </motion.g>
         </svg>
       );
@@ -470,7 +470,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <ellipse cx="50" cy="55" rx="35" ry="10" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.3" transform="rotate(-15 50 55)" />
              <ellipse cx="50" cy="55" rx="35" ry="10" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.3" transform="rotate(45 50 55)" />
 
-             <motion.g animate={{ rotateY: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} transformOrigin="50px 55px">
+             <motion.g animate={{ rotateY: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 55px" }}>
                {/* Solid 3D Tetrahedron */}
                <path d="M 50 15 L 80 75 L 20 75 Z" fill="url(#threeGrad)" stroke="#3a2a1c" strokeWidth="1.5" strokeLinejoin="round" />
                <path d="M 50 15 L 50 85 L 80 75" fill="#fcfaf7" fillOpacity="0.1" stroke="#3a2a1c" strokeWidth="1.5" strokeLinejoin="round" />
@@ -577,7 +577,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <motion.circle cx="50" cy="50" r="32" fill="url(#fastGrad)" stroke="#ff8a3d" strokeWidth="1.5" />
              
              {/* Orbiting particles */}
-             <motion.g animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px">
+             <motion.g animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
                 <circle cx="18" cy="50" r="3" fill="#ff8a3d" stroke="none" />
                 <circle cx="82" cy="50" r="2" fill="#ff8a3d" stroke="none" />
              </motion.g>
@@ -626,43 +626,17 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
       );
     case "PostgreSQL":
       return (
-        <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
-           <motion.g animate={{ y: [-1, 1, -1] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
-             
-             {/* Subdued wireframe background to match aesthetic */}
-             <circle cx="50" cy="50" r="40" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.2" fill="none" />
-             
-             <motion.g animate={{ scale: isActive ? 1.05 : 1 }} transition={{ duration: 0.3 }}>
-               
-               {/* 1. ORANGE SILHOUETTE (Thickest stroke, draws the outer glow) */}
-               <g stroke="#ff8a3d" strokeWidth="7" strokeLinejoin="round" fill="#ff8a3d">
-                 <path d="M 40 30 C 20 0, -10 20, 5 55 C 15 75, 35 75, 40 60 Z" />
-                 <path d="M 60 30 C 80 0, 110 20, 95 55 C 85 75, 65 75, 60 60 Z" />
-                 <path d="M 40 65 C 25 72, 10 75, 15 65 C 20 68, 30 65, 40 60 Z" />
-                 <path d="M 60 65 C 75 72, 90 75, 85 65 C 80 68, 70 65, 60 60 Z" />
-                 <path d="M 36 25 C 36 8, 64 8, 64 25 C 64 45, 68 55, 56 70 C 56 85, 56 92, 50 92 C 44 92, 44 85, 44 70 C 32 55, 36 45, 36 25 Z" />
-               </g>
-
-               {/* 2. EARS (Black stroke, White fill) */}
-               <path d="M 40 30 C 20 0, -10 20, 5 55 C 15 75, 35 75, 40 60 Z" stroke="#1a1612" strokeWidth="3" strokeLinejoin="round" fill="#fcfaf7" />
-               <path d="M 60 30 C 80 0, 110 20, 95 55 C 85 75, 65 75, 60 60 Z" stroke="#1a1612" strokeWidth="3" strokeLinejoin="round" fill="#fcfaf7" />
-
-               {/* 3. TUSKS (Black stroke, White fill) */}
-               <path d="M 40 65 C 25 72, 10 75, 15 65 C 20 68, 30 65, 40 60 Z" stroke="#1a1612" strokeWidth="3" strokeLinejoin="round" fill="#fcfaf7" />
-               <path d="M 60 65 C 75 72, 90 75, 85 65 C 80 68, 70 65, 60 60 Z" stroke="#1a1612" strokeWidth="3" strokeLinejoin="round" fill="#fcfaf7" />
-
-               {/* 4. HEAD (Black stroke, White fill) - Overlaps ears and tusks */}
-               <path d="M 36 25 C 36 8, 64 8, 64 25 C 64 45, 68 55, 56 70 C 56 85, 56 92, 50 92 C 44 92, 44 85, 44 70 C 32 55, 36 45, 36 25 Z" stroke="#1a1612" strokeWidth="3" strokeLinejoin="round" fill="#fcfaf7" />
-
-               {/* 5. EYES & RECESSES (Black recesses, White pupils) */}
-               <path d="M 40 36 C 34 36, 34 44, 38 50 C 40 55, 42 55, 42 50 C 42 44, 44 36, 40 36 Z" fill="#1a1612" stroke="none" />
-               <path d="M 60 36 C 66 36, 66 44, 62 50 C 60 55, 58 55, 58 50 C 58 44, 56 36, 60 36 Z" fill="#1a1612" stroke="none" />
-               <circle cx="37" cy="40" r="2" fill="#fcfaf7" stroke="none" />
-               <circle cx="63" cy="40" r="2" fill="#fcfaf7" stroke="none" />
-
-             </motion.g>
-           </motion.g>
-        </svg>
+        <motion.div 
+          animate={{ y: [-1, 1, -1] }} 
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="w-full h-full flex items-center justify-center opacity-90"
+        >
+          <img 
+            src="/logos/postgresql.png" 
+            alt="PostgreSQL" 
+            className="w-2/3 h-2/3 object-contain"
+          />
+        </motion.div>
       );
     case "REST APIs":
       return (
@@ -752,19 +726,19 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" strokeWidth="0.35" fill="none">
            <circle cx="50" cy="50" r="12" fill={isActive ? "#ff8a3d" : "none"} fillOpacity="0.1" strokeWidth="0.5" />
-           <motion.g animate={{ rotateZ: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px">
+           <motion.g animate={{ rotateZ: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
              <ellipse cx="50" cy="50" rx="42" ry="16" transform="rotate(25 50 50)" />
              <ellipse cx="50" cy="50" rx="42" ry="16" strokeDasharray="2 4" transform="rotate(-35 50 50)" strokeOpacity="0.6" />
              <circle cx="12" cy="34" r="2.5" fill="#ff8a3d" stroke="none" transform="rotate(25 50 50)" />
              <circle cx="86" cy="67" r="1.5" fill="#ff8a3d" stroke="none" transform="rotate(-35 50 50)" />
            </motion.g>
-           <motion.circle cx="50" cy="50" r="14" stroke="#ff8a3d" strokeWidth="0.2" strokeDasharray="1 3" animate={{ rotateZ: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px" />
+           <motion.circle cx="50" cy="50" r="14" stroke="#ff8a3d" strokeWidth="0.2" strokeDasharray="1 3" animate={{ rotateZ: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }} />
         </svg>
       );
     case "Three.js":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" strokeWidth="0.35" fill="none" strokeLinejoin="round">
-           <motion.g animate={{ rotateY: isActive ? [0, 360] : [0, 180] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px">
+           <motion.g animate={{ rotateY: isActive ? [0, 360] : [0, 180] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
              {/* Abstract wireframe geometry */}
              <path d="M 50 15 L 85 75 L 15 75 Z" strokeWidth="0.6" />
              <path d="M 50 15 L 50 85 L 85 75" strokeOpacity="0.6" fill={isActive ? "#ff8a3d" : "none"} fillOpacity="0.08" />
@@ -782,7 +756,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" strokeWidth="0.35" fill="none">
            <circle cx="50" cy="50" r="20" strokeDasharray="1 3" strokeOpacity="0.8" />
            <circle cx="50" cy="50" r="35" strokeOpacity="0.25" />
-           <motion.g animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} transformOrigin="50px 50px">
+           <motion.g animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
              <circle cx="50" cy="15" r="3.5" fill="#ff8a3d" stroke="none" />
              <circle cx="85" cy="50" r="2" stroke="#ff8a3d" />
              <circle cx="15" cy="50" r="2.5" fill="#ff8a3d" stroke="none" fillOpacity="0.5" />
@@ -966,10 +940,50 @@ function CreativeSkillCell({
          className="w-full h-full p-8 md:p-10 flex flex-col justify-between z-10 bg-transparent overflow-hidden relative border border-[#3a2a1c]/15 group/ccell"
        >
          
-         {/* Background Subtle Abstract Icon */}
-         <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-[40%] h-[85%] pointer-events-none flex items-center justify-center">
-           <AbstractTechIcon skill={skill} isActive={isActive} />
-         </div>
+         {/* Live Animated Background & Logo */}
+         <motion.div 
+           animate={{
+             y: [-3, 3, -3],
+           }}
+           transition={{
+             duration: 6 + (index % 3),
+             repeat: Infinity,
+             ease: "easeInOut"
+           }}
+           className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-[40%] h-[85%] pointer-events-none flex items-center justify-center group-hover/ccell:scale-105 transition-transform duration-500 ease-out"
+         >
+           {/* Pulsing Visual Effect Core (Optimized) */}
+           <motion.div
+             animate={{
+               scale: [0.9, 1.1, 0.9],
+               opacity: [0.05, 0.15, 0.05]
+             }}
+             transition={{
+               duration: 8 + (index % 4),
+               repeat: Infinity,
+               ease: "linear"
+             }}
+             className="absolute w-28 h-28 bg-[#ff8a3d] blur-2xl rounded-full"
+           />
+           
+           {/* Additional floating ring effect (Optimized) */}
+           <motion.div
+             animate={{
+               rotate: [0, -360],
+             }}
+             transition={{
+               duration: 20 + (index % 5),
+               repeat: Infinity,
+               ease: "linear"
+             }}
+             className="absolute w-24 h-24 border border-[#ff8a3d]/10 rounded-full border-dashed"
+           />
+
+           <div className="relative z-10 w-full h-full">
+             {/* Use the original isActive state so heavy internal animations only play on hover, keeping base effects light */}
+             <AbstractTechIcon skill={skill} isActive={isActive} />
+           </div>
+         </motion.div>
 
          {/* Corner precision markers */}
          <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-[#3a2a1c]/20 m-4" />
@@ -1137,7 +1151,7 @@ function ExpertiseRow({ category, index }: { category: ExpertiseCategoryData, in
 
 export function Expertise() {
   return (
-    <section className="relative w-full bg-[#f2ece1] px-6 md:px-12 py-24 md:py-32 overflow-hidden selection:bg-[#ff8a3d]/30">
+    <section id="stack" className="relative w-full bg-[#f2ece1] px-6 md:px-12 py-24 md:py-32 overflow-hidden selection:bg-[#ff8a3d]/30">
       <div className="max-w-7xl mx-auto w-full">
         
         {/* Title */}

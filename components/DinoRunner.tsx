@@ -792,7 +792,7 @@ export function DinoRunner() {
         ctx.globalAlpha = 0.92;
         ctx.imageSmoothingEnabled = false;
 
-        const splitRatio = 0.65; // Upper 65% is body, lower 35% is legs
+        const splitRatio = 0.85; // Upper 85% is body, lower 15% is legs
         const splitH_canvas = selectedDinoCanvas.height * splitRatio;
         const splitH_dest = dinoTargetH * splitRatio;
 

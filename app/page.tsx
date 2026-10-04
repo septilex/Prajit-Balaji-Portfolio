@@ -1204,7 +1204,7 @@ export default function Home() {
           <WordReveal
             text="Let's build the"
             accentText="future."
-            className="font-display max-w-6xl text-[clamp(1.25rem,4vw,5rem)] font-semibold leading-[0.9] tracking-tight"
+            className="font-display max-w-6xl text-[clamp(1.25rem,4vw,5rem)] font-black leading-[0.9] tracking-[-0.03em]"
           />
 
           <div className="mt-24 grid grid-cols-1 gap-16 md:grid-cols-12">
