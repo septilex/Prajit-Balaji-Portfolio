@@ -545,7 +545,7 @@ export default function Home() {
       desc: "Aiming to enter large-scale engineering environments as a Java-focused developer while strengthening backend systems, scalability, and software engineering foundations through real-world experience.",
       side: "left",
       logoSrc: "/logos/amazon.svg",
-      logoClass: "scale-[1.6]",
+      logoClass: "scale-100",
     },
     {
       year: "2032",
@@ -553,7 +553,7 @@ export default function Home() {
       desc: "Working toward contributing to intelligent systems, machine learning infrastructure, and large-scale data-driven technologies while expanding expertise in AI research, analytics, and generative systems.",
       side: "right",
       logoSrc: "/logos/google.svg",
-      logoClass: "scale-[1.6]",
+      logoClass: "scale-[1.2]",
     },
     {
       year: "2037",
