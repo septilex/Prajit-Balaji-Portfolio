@@ -39,6 +39,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { BottomTicker } from "@/components/BottomTicker";
 import { DinoRunner } from "@/components/DinoRunner";
 import { HireMeModal } from "@/components/HireMeModal";
+import GithubContributions from "@/components/GithubContributions";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -1168,16 +1169,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Section 6: GitHub Graph */}
+      <section id="github" className="relative overflow-hidden w-full max-w-[1600px] mx-auto px-6 md:px-12 py-16">
+        <ScrollReveal initialTransform="translateY(60px)">
+          <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
+            <span>06</span>
+            <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
+            <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Open Source</span>
+          </div>
+          
+          <div className="mb-12">
+            <WordReveal
+              text="Consistency is"
+              accentText="Magnetic."
+              className="font-display max-w-5xl text-[clamp(1.5rem,3.5vw,4rem)] font-black leading-[0.9] tracking-[-0.03em] text-[#1a1612]"
+            />
+          </div>
+          
+          <GithubContributions username="septilex" />
+        </ScrollReveal>
+      </section>
 
 
 
-      {/* Section 6: Credentials */}
+
+      {/* Section 7: Credentials */}
       <Credentials />
 
-      {/* Section 7: Journey */}
+      {/* Section 8: Journey */}
       <section id="journey" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
-          <span>07</span>
+          <span>08</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
           <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Journey</span>
         </div>
@@ -1192,11 +1214,11 @@ export default function Home() {
         <JourneyTimeline timeline={timeline} />
       </section>
 
-      {/* Section 8: Contact */}
+      {/* Section 9: Contact */}
       <section id="contact" className="relative overflow-hidden">
         <div className="mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
-            <span>08</span>
+            <span>09</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
             <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Let&apos;s Talk</span>
           </div>

@@ -96,7 +96,7 @@ export function Credentials() {
 
       <div className="mx-auto max-w-[1600px] px-6 md:px-12 relative z-10 w-full">
         <div className="mb-6 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#8c7d6e] font-researcher">
-          <span>06</span>
+          <span>07</span>
           <span className="h-px w-12 bg-[#ff8a3d]/40"></span>
           <span className="text-[#ff8a3d] font-black text-[13px] md:text-[15px] tracking-[0.4em]">Credentials</span>
         </div>
