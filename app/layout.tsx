@@ -68,8 +68,6 @@ export default function RootLayout({
       className={cn("light", inter.variable, spaceGrotesk.variable, instrumentSerif.variable, montserrat.variable, researcher.variable, GeistSans.variable, GeistMono.variable, syne.variable, "font-sans", geist.variable)}
       suppressHydrationWarning
     >
-      <head>
-      </head>
       <body className="antialiased min-h-screen">
           <CustomCursor />
           <CursorGlow />

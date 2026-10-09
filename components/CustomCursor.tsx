@@ -49,8 +49,13 @@ export function CustomCursor() {
       const interactive = !!target.closest(
         "a, button, [role='button'], input, textarea, select, label"
       );
+      const isGithubGraph = !!target.closest("[data-cursor='github-graph']");
+
       ring.classList.toggle("cursor-ring--active", interactive);
       dot.classList.toggle("cursor-dot--active", interactive);
+      
+      ring.classList.toggle("cursor-ring--green", isGithubGraph);
+      dot.classList.toggle("cursor-dot--green", isGithubGraph);
 
       if (rafId === null) {
         rafId = requestAnimationFrame(updateCursor);

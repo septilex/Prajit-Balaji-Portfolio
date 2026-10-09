@@ -88,7 +88,7 @@ const LENS = {
   rimLineWidth: 0.003,
   vignette: 0,
   vignetteSize: 0.3,
-  samples: 16,
+  samples: 12,
 };
 
 const FOCUS = {
@@ -161,7 +161,7 @@ uniform int uSamples;
 varying vec2 vUv;
 
 #define PI 3.14159265359
-#define MAX_SAMPLES 64
+#define MAX_SAMPLES 16
 
 float sdRoundBox(vec2 p, vec2 b, float r) {
   vec2 q = abs(p) - b + r;
@@ -212,15 +212,21 @@ vec4 discLens(vec2 center, float aspectCorrect, out float outA) {
   float alphaCol = 0.0;
   vec3 caW = vec3(0.0);
   float aW = 0.0;
+  float invSigmaSq = 6.9252; // Precalculated 1.0 / (0.38 * 0.38)
   for (int i = 0; i < MAX_SAMPLES; i++) {
     if (i >= N) break;
     float t = float(i) / float(N - 1);
     vec2 sUV = baseUV + dispDir * (t - 0.5);
     vec4 s = texture2D(uTex, sUV);
+    
+    float t0 = t;
+    float t5 = t - 0.5;
+    float t1 = t - 1.0;
+
     vec3 w = vec3(
-      exp(-pow((t - 0.00) / 0.38, 2.0)),
-      exp(-pow((t - 0.50) / 0.38, 2.0)),
-      exp(-pow((t - 1.00) / 0.38, 2.0))
+      exp(-invSigmaSq * t0 * t0),
+      exp(-invSigmaSq * t5 * t5),
+      exp(-invSigmaSq * t1 * t1)
     );
     col += s.rgb * w;
     alphaCol += s.a * w.g;
@@ -261,12 +267,12 @@ vec4 discLens(vec2 center, float aspectCorrect, out float outA) {
   float dC = shapeND * 0.5;
   float tR = clamp(uRingRadius, 0.1, 0.49);
   float rW = max(uRingWidth, 0.003);
-  float ring = exp(-pow((dC - tR) / rW, 2.0));
+  float ring = exp(-((dC - tR) * (dC - tR)) / (rW * rW));
   ring *= uBlueRing * (uGlow / 17.0) * 1.8;
   if (uShimmer > 0.5) ring *= sin(angle * uShimmerFreq + uTime * uShimmerSpeed) * uShimmerDepth + (1.0 - uShimmerDepth);
-  float ringAura = exp(-pow((dC - tR) / (rW * 6.0), 2.0)) * 0.28 * uBlueRing * (uGlow / 17.0);
+  float ringAura = exp(-((dC - tR) * (dC - tR)) / ((rW * 6.0) * (rW * 6.0))) * 0.28 * uBlueRing * (uGlow / 17.0);
   col += uBlueColor * (ring + ringAura);
-  col += vec3(exp(-pow((dC - uRimLinePos) / max(uRimLineWidth, 0.0001), 2.0)) * uRimLine);
+  col += vec3(exp(-((dC - uRimLinePos) * (dC - uRimLinePos)) / max(uRimLineWidth * uRimLineWidth, 0.00000001)) * uRimLine);
 
   outA = smoothstep(1.0, 0.93, maskND);
   return vec4(col, alphaCol);

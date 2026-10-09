@@ -119,7 +119,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#ff8a3d" stopOpacity="0.4" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
+           <g style={{ animation: "spin-slow 40s linear infinite", transformOrigin: "50px 50px" }}>
              {[0, 60, 120, 180, 240, 300].map((angle, i) => (
                <g key={`petal-${i}`} transform={`rotate(${angle} 50 50)`}>
                  {/* Bold interlocking ribbon/knot */}
@@ -127,8 +127,8 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                </g>
              ))}
              <motion.circle cx="50" cy="50" r="4.5" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.3, 1] : 1 }} transition={{ duration: 2, repeat: Infinity }} />
-           </motion.g>
-           <motion.circle cx="50" cy="50" r="42" strokeDasharray="3 6" strokeWidth="1.5" strokeOpacity="0.2" animate={{ rotate: -360 }} transition={{ duration: 60, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }} />
+           </g>
+           <circle cx="50" cy="50" r="42" strokeDasharray="3 6" strokeWidth="1.5" strokeOpacity="0.2" style={{ animation: "spin-slow-reverse 60s linear infinite", transformOrigin: "50px 50px" }} />
         </svg>
       );
     case "LLMs":
@@ -141,7 +141,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              </linearGradient>
            </defs>
            
-           <motion.g animate={{ y: [-2, 2, -2] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-2 6s ease-in-out infinite" }}>
              {/* Center pillar flowing through layers */}
              <line x1="50" y1="10" x2="50" y2="90" stroke="#ff8a3d" strokeWidth="2" strokeDasharray="4 4" strokeOpacity="0.8" />
              
@@ -159,13 +159,13 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              
              {/* Flow lines */}
              <path d="M 20 20 L 20 74 M 80 20 L 80 74" stroke="#3a2a1c" strokeWidth="1.5" strokeOpacity="0.4" />
-           </motion.g>
+           </g>
         </svg>
       );
     case "RAG":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
-           <motion.g animate={{ x: [-1, 1, -1] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-x-1 8s ease-in-out infinite" }}>
              
              {/* 1. Documents (Left) */}
              <g transform="translate(5, 30)">
@@ -206,7 +206,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <text x="8" y="52" fontSize="5" fill="#3a2a1c" stroke="none" fontFamily="monospace" fontWeight="bold" textAnchor="middle">OUTPUT</text>
              </g>
 
-           </motion.g>
+           </g>
         </svg>
       );
     case "AI Agents":
@@ -223,7 +223,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
            <circle cx="50" cy="50" r="20" fill="url(#globeGrad)" strokeWidth="1.5" strokeOpacity="0.9" />
            <motion.circle cx="50" cy="50" r="5" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.3, 1] : 1 }} transition={{ duration: 1.5, repeat: Infinity }} />
 
-           <motion.g animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
+           <g style={{ animation: "spin-slow 25s linear infinite", transformOrigin: "50px 50px" }}>
              {/* Bold directional loop */}
              <circle cx="50" cy="50" r="38" strokeDasharray="12 8" strokeWidth="1.5" strokeOpacity="0.5" />
              <path d="M 50 12 L 53 7 L 50 2 Z" fill="#3a2a1c" stroke="none" transform="translate(-1, 0)" />
@@ -239,7 +239,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                  <motion.circle cx="0" cy="0" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }} />
                </g>
              ))}
-           </motion.g>
+           </g>
            
            {/* Static Bold Labels */}
            {[ 
@@ -261,7 +261,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
     case "Prompt Engineering":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
-           <motion.g animate={{ x: [-1, 1, -1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-x-1 4s ease-in-out infinite" }}>
              
              {/* Large Stacked Input Cards */}
              {[
@@ -297,13 +297,13 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <line x1="2" y1="36" x2="12" y2="36" stroke="#3a2a1c" strokeOpacity="0.5" strokeWidth="1.5" />
              </g>
 
-           </motion.g>
+           </g>
         </svg>
       );
     case "AI Workflows":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
-           <motion.g animate={{ y: [-1, 1, -1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-1 4s ease-in-out infinite" }}>
              
              {/* Thick Automation Paths */}
              <path d="M 22 50 L 35 50" strokeWidth="1.5" />
@@ -354,7 +354,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <text x="9" y="27" fontSize="4.5" fill="#3a2a1c" stroke="none" fontFamily="monospace" fontWeight="bold" textAnchor="middle">MEMORY</text>
              </g>
 
-           </motion.g>
+           </g>
         </svg>
       );
     // --- Frontend Engineering ---
@@ -367,7 +367,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#ff8a3d" stopOpacity="0" />
              </radialGradient>
            </defs>
-           <motion.g animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
+           <g style={{ animation: "spin-slow 30s linear infinite", transformOrigin: "50px 50px" }}>
              {[0, 60, 120].map((angle, i) => (
                <motion.ellipse 
                  key={i} 
@@ -394,7 +394,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <motion.circle cx="85" cy="50" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity }} />
              <motion.circle cx="67.5" cy="19.7" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity, delay: 0.6 }} />
              <motion.circle cx="32.5" cy="80.3" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity, delay: 1.2 }} />
-           </motion.g>
+           </g>
            
            <circle cx="50" cy="50" r="8" fill="url(#reactCore)" stroke="none" />
            <circle cx="50" cy="50" r="5" fill="#fcfaf7" stroke="#3a2a1c" strokeWidth="1.5" />
@@ -410,7 +410,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#1a1612" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ y: [-1, 1, -1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-1 4s ease-in-out infinite" }}>
              <circle cx="50" cy="50" r="38" fill="url(#nextGrad)" stroke="#3a2a1c" strokeWidth="1.5" />
              <circle cx="50" cy="50" r="45" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.2" />
              
@@ -423,13 +423,13 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
 
              {/* Orbital ring */}
              <motion.circle cx="50" cy="50" r="45" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="30 150" strokeOpacity="0.8" animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }} />
-           </motion.g>
+           </g>
         </svg>
       );
     case "TypeScript":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
-           <motion.g animate={{ y: [-2, 2, -2] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-2 5s ease-in-out infinite" }}>
              
              {/* 3D Layered Panels */}
              {[
@@ -452,7 +452,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              {/* Connection dots */}
              <circle cx="30" cy="20" r="1.5" fill="#ff8a3d" stroke="none" />
              <circle cx="75" cy="65" r="1.5" fill="#ff8a3d" stroke="none" />
-           </motion.g>
+           </g>
         </svg>
       );
     case "Three.js / R3F":
@@ -464,7 +464,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#1a1612" stopOpacity="0.9" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ y: [-1.5, 1.5, -1.5] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-1.5 6s ease-in-out infinite" }}>
              
              {/* Orbital wires */}
              <ellipse cx="50" cy="55" rx="35" ry="10" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.3" transform="rotate(-15 50 55)" />
@@ -485,7 +485,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <motion.circle cx="85" cy="45" r="3" fill="#ff8a3d" stroke="none" animate={{ y: [-10, 10, -10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
              <motion.circle cx="20" cy="35" r="2" fill="#ff8a3d" stroke="none" animate={{ y: [8, -8, 8] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} />
 
-           </motion.g>
+           </g>
         </svg>
       );
     case "Tailwind CSS":
@@ -497,7 +497,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#fcfaf7" stopOpacity="0.9" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ y: [-2, 2, -2] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-2 5s ease-in-out infinite" }}>
              
              <motion.g animate={{ scale: isActive ? 1.05 : 1, rotate: isActive ? 5 : 0 }} transition={{ duration: 0.4, type: "spring" }}>
                {/* Tailwind Waves */}
@@ -512,7 +512,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <path d="M 75 35 L 85 25" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="2 2" />
              <path d="M 25 75 L 15 85" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="2 2" />
 
-           </motion.g>
+           </g>
         </svg>
       );
     // --- Backend & Infrastructure ---
@@ -525,7 +525,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#1a1612" stopOpacity="0.9" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ y: [-1.5, 1.5, -1.5] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-1.5 5s ease-in-out infinite" }}>
              {/* Abstract Node Hexagons */}
              <path d="M 50 20 L 75 35 L 75 65 L 50 80 L 25 65 L 25 35 Z" strokeDasharray="3 4" strokeWidth="1.5" strokeOpacity="0.4" />
              <path d="M 50 30 L 65 40 L 65 60 L 50 70 L 35 60 L 35 40 Z" fill="url(#nodeGrad)" stroke="#3a2a1c" strokeWidth="1.5" />
@@ -536,13 +536,13 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <motion.circle cx="75" cy="65" r="3" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
              
              <text x="50" y="55" fontSize="12" fill="#fcfaf7" stroke="none" fontFamily="sans-serif" fontWeight="900" textAnchor="middle">JS</text>
-           </motion.g>
+           </g>
         </svg>
       );
     case "Express.js":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
-           <motion.g animate={{ x: [-1, 1, -1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-x-1 4s ease-in-out infinite" }}>
              {/* Routing paths */}
              <path d="M 10 50 L 30 50 C 40 50, 45 35, 55 35 L 90 35" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.5" />
              <path d="M 10 50 L 30 50 C 40 50, 45 65, 55 65 L 90 65" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.5" />
@@ -559,7 +559,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <circle cx="90" cy="35" r="3" fill="#ff8a3d" stroke="none" />
              <circle cx="90" cy="50" r="3" fill="#ff8a3d" stroke="none" />
              <circle cx="90" cy="65" r="3" fill="#ff8a3d" stroke="none" />
-           </motion.g>
+           </g>
         </svg>
       );
     case "FastAPI":
@@ -571,16 +571,16 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#3a2a1c" stopOpacity="0.8" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ y: [-1.5, 1.5, -1.5] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-1.5 4s ease-in-out infinite" }}>
              {/* Outer dimensional rings */}
              <circle cx="50" cy="50" r="40" strokeWidth="1.5" strokeOpacity="0.2" strokeDasharray="2 4" />
              <motion.circle cx="50" cy="50" r="32" fill="url(#fastGrad)" stroke="#ff8a3d" strokeWidth="1.5" />
              
              {/* Orbiting particles */}
-             <motion.g animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
+             <g style={{ animation: "spin-slow 15s linear infinite", transformOrigin: "50px 50px" }}>
                 <circle cx="18" cy="50" r="3" fill="#ff8a3d" stroke="none" />
                 <circle cx="82" cy="50" r="2" fill="#ff8a3d" stroke="none" />
-             </motion.g>
+             </g>
 
              {/* Lightning Bolt */}
              <motion.path 
@@ -592,7 +592,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                animate={{ scale: isActive ? 1.05 : 1 }}
                transition={{ duration: 0.3 }}
              />
-           </motion.g>
+           </g>
         </svg>
       );
     case "MongoDB":
@@ -604,7 +604,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#1a1612" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ y: [-2, 2, -2] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-2 6s ease-in-out infinite" }}>
              {/* Network nodes */}
              <path d="M 20 40 L 50 15 L 80 40 L 80 70 L 50 90 L 20 70 Z" strokeWidth="1.5" strokeDasharray="3 4" strokeOpacity="0.3" />
              
@@ -621,7 +621,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              {/* Orbiting data points */}
              <motion.circle cx="20" cy="40" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity }} />
              <motion.circle cx="80" cy="70" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
-           </motion.g>
+           </g>
         </svg>
       );
     case "PostgreSQL":
@@ -641,7 +641,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
     case "REST APIs":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
-           <motion.g animate={{ y: [-1, 1, -1] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-1 6s ease-in-out infinite" }}>
              
              {/* Left Methods */}
              {[
@@ -670,7 +670,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <line x1="5" y1="45" x2="25" y2="45" stroke="#fcfaf7" strokeWidth="1.5" strokeOpacity="0.3" />
              </motion.g>
 
-           </motion.g>
+           </g>
         </svg>
       );
     // --- UI/UX & Creative Engineering ---
@@ -685,7 +685,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
               <circle cx="37.5" cy="77.5" r="12.5" />
               <rect x="25" y="65" width="25" height="12.5" />
            </motion.g>
-           <motion.circle cx="37.5" cy="27.5" r="1.5" fill="#ff8a3d" stroke="none" animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
+           <circle cx="37.5" cy="27.5" r="1.5" fill="#ff8a3d" stroke="none" className="anim-pulse-op-fast" />
            <circle cx="62.5" cy="52.5" r="1.5" fill="#ff8a3d" stroke="none" />
            {/* Subtle alignment lines */}
            <path d="M 25 10 L 25 90 M 75 10 L 75 90 M 10 40 L 90 40" strokeOpacity="0.1" strokeDasharray="1 3" />
@@ -700,7 +700,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <stop offset="100%" stopColor="#1a1612" />
              </linearGradient>
            </defs>
-           <motion.g animate={{ y: [-1, 1, -1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+           <g style={{ animation: "float-y-1 4s ease-in-out infinite" }}>
              
              {/* Motion trails */}
              <path d="M 10 30 C 20 10, 40 10, 50 30" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="3 4" strokeOpacity="0.6" />
@@ -719,20 +719,20 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              {/* Pulsing nodes */}
              <motion.circle cx="30" cy="20" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity }} />
              <motion.circle cx="50" cy="80" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
-           </motion.g>
+           </g>
         </svg>
       );
     case "GSAP":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" strokeWidth="0.35" fill="none">
            <circle cx="50" cy="50" r="12" fill={isActive ? "#ff8a3d" : "none"} fillOpacity="0.1" strokeWidth="0.5" />
-           <motion.g animate={{ rotateZ: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
+           <g style={{ animation: "spin-slow 25s linear infinite", transformOrigin: "50px 50px" }}>
              <ellipse cx="50" cy="50" rx="42" ry="16" transform="rotate(25 50 50)" />
              <ellipse cx="50" cy="50" rx="42" ry="16" strokeDasharray="2 4" transform="rotate(-35 50 50)" strokeOpacity="0.6" />
              <circle cx="12" cy="34" r="2.5" fill="#ff8a3d" stroke="none" transform="rotate(25 50 50)" />
              <circle cx="86" cy="67" r="1.5" fill="#ff8a3d" stroke="none" transform="rotate(-35 50 50)" />
-           </motion.g>
-           <motion.circle cx="50" cy="50" r="14" stroke="#ff8a3d" strokeWidth="0.2" strokeDasharray="1 3" animate={{ rotateZ: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }} />
+           </g>
+           <circle cx="50" cy="50" r="14" stroke="#ff8a3d" strokeWidth="0.2" strokeDasharray="1 3" style={{ animation: "spin-slow-reverse 15s linear infinite", transformOrigin: "50px 50px" }} />
         </svg>
       );
     case "Three.js":
@@ -756,12 +756,12 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" strokeWidth="0.35" fill="none">
            <circle cx="50" cy="50" r="20" strokeDasharray="1 3" strokeOpacity="0.8" />
            <circle cx="50" cy="50" r="35" strokeOpacity="0.25" />
-           <motion.g animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
+           <g style={{ animation: "spin-slow-reverse 30s linear infinite", transformOrigin: "50px 50px" }}>
              <circle cx="50" cy="15" r="3.5" fill="#ff8a3d" stroke="none" />
              <circle cx="85" cy="50" r="2" stroke="#ff8a3d" />
              <circle cx="15" cy="50" r="2.5" fill="#ff8a3d" stroke="none" fillOpacity="0.5" />
              <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" strokeOpacity="0.2" />
-           </motion.g>
+           </g>
            <motion.circle cx="50" cy="50" r="7" fill={isActive ? "#ff8a3d" : "transparent"} stroke="#ff8a3d" transition={{ duration: 0.8, ease: "easeOut" }} />
            <path d="M 50 5 L 50 10 M 50 90 L 50 95 M 5 50 L 10 50 M 90 50 L 95 50" strokeOpacity="0.3" />
         </svg>
@@ -941,41 +941,19 @@ function CreativeSkillCell({
        >
          
          {/* Live Animated Background & Logo */}
-         <motion.div 
-           animate={{
-             y: [-3, 3, -3],
-           }}
-           transition={{
-             duration: 6 + (index % 3),
-             repeat: Infinity,
-             ease: "easeInOut"
-           }}
+         <div 
+           style={{ animation: `float-y-3 ${6 + (index % 3)}s ease-in-out infinite` }}
            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-[40%] h-[85%] pointer-events-none flex items-center justify-center group-hover/ccell:scale-105 transition-transform duration-500 ease-out"
          >
            {/* Pulsing Visual Effect Core (Optimized) */}
-           <motion.div
-             animate={{
-               scale: [0.9, 1.1, 0.9],
-               opacity: [0.05, 0.15, 0.05]
-             }}
-             transition={{
-               duration: 8 + (index % 4),
-               repeat: Infinity,
-               ease: "linear"
-             }}
+           <div
+             style={{ animation: `pulse-scale ${8 + (index % 4)}s linear infinite` }}
              className="absolute w-28 h-28 bg-[#ff8a3d] blur-2xl rounded-full"
            />
            
            {/* Additional floating ring effect (Optimized) */}
-           <motion.div
-             animate={{
-               rotate: [0, -360],
-             }}
-             transition={{
-               duration: 20 + (index % 5),
-               repeat: Infinity,
-               ease: "linear"
-             }}
+           <div
+             style={{ animation: `spin-slow-reverse ${20 + (index % 5)}s linear infinite` }}
              className="absolute w-24 h-24 border border-[#ff8a3d]/10 rounded-full border-dashed"
            />
 
@@ -983,7 +961,7 @@ function CreativeSkillCell({
              {/* Use the original isActive state so heavy internal animations only play on hover, keeping base effects light */}
              <AbstractTechIcon skill={skill} isActive={isActive} />
            </div>
-         </motion.div>
+         </div>
 
          {/* Corner precision markers */}
          <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-[#3a2a1c]/20 m-4" />
@@ -1149,9 +1127,79 @@ function ExpertiseRow({ category, index }: { category: ExpertiseCategoryData, in
 
 // ─── Main Export ─────────────────────────────────────────────────────────────
 
+const expertiseStyles = `
+  @keyframes spin-slow { to { transform: rotate(360deg); } }
+  @keyframes spin-slow-reverse { to { transform: rotate(-360deg); } }
+  @keyframes float-y-3 {
+    0%, 100% { transform: translateY(-3px); }
+    50% { transform: translateY(3px); }
+  }
+  @keyframes float-y-2 {
+    0%, 100% { transform: translateY(-2px); }
+    50% { transform: translateY(2px); }
+  }
+  @keyframes float-y-1.5 {
+    0%, 100% { transform: translateY(-1.5px); }
+    50% { transform: translateY(1.5px); }
+  }
+  @keyframes float-y-1 {
+    0%, 100% { transform: translateY(-1px); }
+    50% { transform: translateY(1px); }
+  }
+  @keyframes float-x-1 {
+    0%, 100% { transform: translateX(-1px); }
+    50% { transform: translateX(1px); }
+  }
+  @keyframes pulse-scale {
+    0%, 100% { transform: scale(0.9); opacity: 0.05; }
+    50% { transform: scale(1.1); opacity: 0.15; }
+  }
+  @keyframes pulse-opacity-fast {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+  
+  .anim-pulse-op-fast {
+    animation: pulse-opacity-fast 3s ease-in-out infinite;
+  }
+  
+  /* Pause ALL animations when the section is out of view */
+  .expertise-paused *, .expertise-paused {
+    animation-play-state: paused !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .expertise-paused *, .expertise-paused {
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+`;
+
 export function Expertise() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    
+    // Fallback if IntersectionObserver is not available
+    if (typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.classList.remove('expertise-paused');
+      } else {
+        el.classList.add('expertise-paused');
+      }
+    }, { rootMargin: "200px" });
+    
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="stack" className="relative w-full bg-[#f2ece1] px-6 md:px-12 py-24 md:py-32 overflow-hidden selection:bg-[#ff8a3d]/30">
+    <section id="stack" ref={sectionRef} className="relative w-full bg-[#f2ece1] px-6 md:px-12 py-24 md:py-32 overflow-hidden selection:bg-[#ff8a3d]/30">
+      <style>{expertiseStyles}</style>
       <div className="max-w-7xl mx-auto w-full">
         
         {/* Title */}

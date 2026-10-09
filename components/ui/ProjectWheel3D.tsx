@@ -108,7 +108,6 @@ function CurvedProjectCard({
             transparent 70%
           )`,
           boxShadow: "0 0 70px rgba(255,138,61,0.05), 0 30px 90px rgba(0,0,0,0.10)",
-          filter: "blur(3px)",
         }}
       />
 
@@ -575,7 +574,21 @@ export function ProjectWheel3D({
     // Velocity threshold below which we stop applying momentum
     const VEL_EPSILON = 0.01;
 
+    let isVisible = true;
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+    });
+    if (cylinderRef.current?.parentElement) {
+      observer.observe(cylinderRef.current.parentElement);
+    }
+
     const tick = (time: number) => {
+      if (!isVisible) {
+        lastTime.current = 0; // Prevent delta jump on return
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      
       if (!lastTime.current) lastTime.current = time;
       const rawDt = (time - lastTime.current) / 1000;
       const dt = Math.min(rawDt, 0.05); // cap at 50ms to prevent jumps
@@ -612,12 +625,38 @@ export function ProjectWheel3D({
           translateZ(-${radius}px)
           rotateY(${rotationRef.current}deg)
         `;
+        
+        // GPU Culling: Hide cards facing away from the camera to avoid compositing 140+ facets
+        const children = cylinderRef.current.children;
+        const total = children.length;
+        if (total > 0) {
+          const step = 360 / total;
+          for (let i = 0; i < total; i++) {
+            const card = children[i] as HTMLElement;
+            const cardAngle = i * step;
+            let absAngle = (rotationRef.current + cardAngle) % 360;
+            if (absAngle < 0) absAngle += 360;
+            if (absAngle > 180) absAngle -= 360;
+            
+            // Visible only if within 100 degrees of the front (camera is 0)
+            const cardVisible = Math.abs(absAngle) < 100;
+            const visStr = cardVisible ? "visible" : "hidden";
+            
+            // Only update DOM if changed to prevent style recalculation thrashing
+            if (card.style.visibility !== visStr) {
+              card.style.visibility = visStr;
+            }
+          }
+        }
       }
 
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      observer.disconnect();
+    };
   }, [autoRotate, autoSpeed, focusedIndex, radius]);
 
   /* ── Pointer handlers with velocity tracking ───────────────────────────── */
@@ -751,8 +790,7 @@ export function ProjectWheel3D({
                   transform: isFocused 
                     ? `rotateY(${cardAngle}deg) translateZ(${radius + 120}px) scale(1.1)`
                     : `rotateY(${cardAngle}deg) translateZ(${radius}px) scale(1)`,
-                  filter: focusedIndex !== null && !isFocused ? "blur(8px)" : "blur(0px)",
-                  opacity: focusedIndex !== null && !isFocused ? 0.4 : 1,
+                  opacity: focusedIndex !== null && !isFocused ? 0.25 : 1,
                 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 style={{

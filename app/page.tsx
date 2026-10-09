@@ -404,18 +404,56 @@ export default function Home() {
 
 
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
+    if (formState === "loading") return;
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    
     setFormState("loading");
-    setTimeout(() => {
-      setFormState("success");
-      setName("");
-      setEmail("");
-      setMessage("");
-      // Reset after 3 seconds
-      setTimeout(() => setFormState("idle"), 3000);
-    }, 1800);
+    
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
+          name: name,
+          email: email,
+          message: message,
+        }),
+      });
+
+      const result = await response.json();
+      if (response.status === 200 && result.success) {
+        setFormState("success");
+        setName("");
+        setEmail("");
+        setMessage("");
+        
+        // Reset button state after 3 seconds
+        setTimeout(() => {
+          setFormState("idle");
+        }, 3000);
+      } else {
+        console.error("Web3Forms error:", result);
+        setFormState("idle");
+        alert(result.message || "Something went wrong. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Submission failed:", error);
+      setFormState("idle");
+      alert("Network error. Please check your connection and try again.");
+    }
   };
 
   if (!mounted) {
@@ -586,7 +624,7 @@ export default function Home() {
       {/* Floating quick-access dock — GitHub / LinkedIn / Gmail / Instagram, always on screen */}
       <style dangerouslySetInnerHTML={{ __html: `
         .glass-icon-btn, .glass-pill-btn, .glass-corner-btn {
-          color: #bd6a2b;
+          color: #ff6a00;
           background: linear-gradient(180deg, rgba(40,40,40,0.85) 0%, rgba(15,15,15,0.95) 100%);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
@@ -597,8 +635,8 @@ export default function Home() {
             0 6px 0px rgba(10,10,10,0.95),
             0 6px 4px rgba(255,255,255,0.15),
             0 14px 20px rgba(0,0,0,0.5),
-            0 0 15px rgba(255,255,255,0.15);
-          text-shadow: 0 0 4px rgba(255,255,255,0.2);
+            0 0 15px rgba(255,106,0,0.15);
+          text-shadow: 0 0 8px rgba(255,106,0,0.35);
           transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s, text-shadow 0.25s, background 0.3s;
         }
         .glass-icon-btn, .glass-pill-btn { border: 1px solid rgba(0,0,0,0.8); border-top: 1px solid rgba(255,255,255,0.25); }
@@ -607,7 +645,7 @@ export default function Home() {
         .glass-pill-btn { margin-bottom: 0px; }
         
         .glass-icon-btn svg, .glass-pill-btn svg, .glass-corner-btn svg {
-          filter: drop-shadow(0 0 4px rgba(255,255,255,0.2));
+          filter: drop-shadow(0 0 6px rgba(255,106,0,0.35));
           transition: filter 0.25s;
         }
         .glass-icon-btn:hover, .glass-pill-btn:hover, .glass-corner-btn:hover {
@@ -633,9 +671,9 @@ export default function Home() {
             inset 0 1px 1px rgba(255,255,255,0.15),
             inset 0 -1px 4px rgba(0,0,0,0.9),
             0 0px 0px rgba(10,10,10,0.95),
-            0 0px 0px rgba(255,138,61,0.15),
+            0 0px 0px rgba(255,106,0,0.2),
             0 4px 10px rgba(0,0,0,0.4),
-            0 0 20px rgba(255,138,61,0.4);
+            0 0 20px rgba(255,106,0,0.45);
         }
         .glass-icon-btn::before, .glass-pill-btn::before {
           content: '';
@@ -659,7 +697,7 @@ export default function Home() {
           pointer-events: none;
         }
         .glass-icon-btn:hover svg, .glass-pill-btn:hover svg {
-          filter: drop-shadow(0 0 12px rgba(255,138,61,1));
+          filter: drop-shadow(0 0 12px rgba(255,138,0,1));
         }
         .glass-icon-btn:active, .glass-pill-btn:active {
           transform: translateY(6px);
@@ -667,9 +705,9 @@ export default function Home() {
             inset 0 1px 1px rgba(255,255,255,0.15),
             inset 0 -1px 4px rgba(0,0,0,0.9),
             0 0px 0px rgba(10,10,10,0.95),
-            0 0px 0px rgba(255,138,61,0.15),
+            0 0px 0px rgba(255,106,0,0.2),
             0 4px 10px rgba(0,0,0,0.4),
-            0 0 20px rgba(255,138,61,0.4);
+            0 0 20px rgba(255,106,0,0.45);
         }
         .glass-icon-btn::before, .glass-pill-btn::before {
           content: '';
@@ -731,8 +769,8 @@ export default function Home() {
               className="glass-icon-btn group relative z-10 flex h-14 w-14 items-center justify-center rounded-full"
             >
               <span className="relative z-10 scale-110">{item.icon}</span>
-              {/* Hover label — orange bg with black text */}
-              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-4 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a3d] bg-[#ff8a3d] px-4 py-2.5 font-researcher text-[11px] font-black uppercase tracking-[0.3em] text-[#1a1612] opacity-0 shadow-[0_8px_24px_rgba(255,138,61,0.3)] transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block">
+              {/* Hover label — bright orange bg with black text */}
+              <span className="pointer-events-none absolute right-full top-1/2 z-20 mr-4 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-full border border-[#ff8a00] bg-gradient-to-r from-[#ff6a00] to-[#ff8a00] px-4 py-2.5 font-researcher text-[11px] font-black uppercase tracking-[0.3em] text-[#1a1612] opacity-0 shadow-[0_8px_24px_rgba(255,106,0,0.35)] transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block">
                 {item.label}
               </span>
             </a>
@@ -1171,7 +1209,7 @@ export default function Home() {
 
       {/* Section 6: GitHub Graph */}
       <section id="github" className="relative overflow-hidden w-full max-w-[1600px] mx-auto px-6 md:px-12 py-16">
-        <ScrollReveal initialTransform="translateY(60px)">
+        <ScrollReveal initialTransform="translateY(60px)" triggerOnce={false}>
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
             <span>06</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
@@ -1235,7 +1273,7 @@ export default function Home() {
               <form onSubmit={handleFormSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-[#a89c8d]/70 font-semibold font-researcher">
+                    <label className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-[#8c7f70] dark:text-[#a89c8d]/90 font-bold font-researcher">
                       Name
                     </label>
                     <input
@@ -1249,7 +1287,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-[#a89c8d]/70 font-semibold font-researcher">
+                    <label className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-[#8c7f70] dark:text-[#a89c8d]/90 font-bold font-researcher">
                       Email
                     </label>
                     <input
@@ -1264,7 +1302,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div>
-                  <label className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-[#a89c8d]/70 font-semibold font-researcher">
+                  <label className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-[#8c7f70] dark:text-[#a89c8d]/90 font-bold font-researcher">
                     Tell me about it
                   </label>
                   <textarea
