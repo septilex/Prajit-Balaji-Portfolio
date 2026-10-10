@@ -10,8 +10,6 @@ export default function GithubContributions({ username = 'septilex' }: { usernam
   const [loading, setLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [year, setYear] = useState<"2026" | "2025">("2026");
-  
-  const [isInView, setIsInView] = useState(true);
 
   useEffect(() => {
     let ignore = false;
@@ -51,12 +49,10 @@ export default function GithubContributions({ username = 'septilex' }: { usernam
       initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: false, margin: "-20% 0px" }}
-      onViewportEnter={() => setIsInView(true)}
-      onViewportLeave={() => setIsInView(false)}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-7xl mx-auto py-12 relative"
     >
-      <GithubGraph3D data={data.days} totalContributions={data.total} year={year} onYearChange={(y) => setYear(y as "2026" | "2025")} isFetching={isFetching} isInView={isInView} />
+      <GithubGraph3D data={data.days} totalContributions={data.total} year={year} onYearChange={(y) => setYear(y as "2026" | "2025")} isFetching={isFetching} />
     </motion.div>
   );
 }

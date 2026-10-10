@@ -292,59 +292,186 @@ export function DinoRunner() {
 
     // Jump state scaled to medium-subtle size
     let jumpY = 0, jumpVel = 0, isJumping = false;
+    let petJumpY = 0, petJumpVel = 0, petIsJumping = false;
     const GRAVITY = 0.6;
     const JUMP_FORCE = -9.0;
 
-    // ── Load All 6 Dino Variants from Strip & Pick Random One ──
-    const TOTAL_SKINS = 6;
+    const DINO_FILES = [
+      "/01_astronaut_dino.png",
+      "/02_viking_dino.png",
+      "/03_ninja_dino.png",
+      "/04_soldier_dino.png",
+      "/05_wizard_dino.png",
+      "/06_king_dino.png",
+      "/07_samurai_dino.png",
+      "/08_cowboy_dino.png",
+      "/09_cyberpunk_dino.png",
+      "/10_explorer_dino.png"
+    ];
+    
+    // ── Load Single Dino Variant & Pick from List ──
+    const DINO_TOTAL_SKINS = DINO_FILES.length;
+    const PET_TOTAL_SKINS = 6;
     let selectedDinoCanvas: HTMLCanvasElement | null = null;
     let dinoLoaded = false;
     let dinoAspect = 1.0;
 
-    const stripImg = new Image();
-    stripImg.src = "/dino-skins-strip.png";
-    stripImg.onload = () => {
-      const sw = stripImg.naturalWidth || 1024;
-      const sh = stripImg.naturalHeight || 145;
-      const frameW = sw / TOTAL_SKINS;
-      dinoAspect = frameW / sh;
+    // Cycle sequentially using localStorage to ensure all pets are used equally
+    const storedIdx = localStorage.getItem("dinoSkinIndex");
+    let nextIdx = storedIdx ? parseInt(storedIdx, 10) : 0;
+    let chosenDinoIdx = nextIdx % DINO_TOTAL_SKINS;
+    localStorage.setItem("dinoSkinIndex", String(nextIdx + 1));
 
-      // Extract each skin onto its own clean transparent offscreen canvas
-      const skinCanvases: HTMLCanvasElement[] = [];
+    // ── Pet Companion System ──
+    const petCanvases: HTMLCanvasElement[] = [];
+    let petsLoaded = false;
+    let petAspect = 1.0;
 
-      for (let s = 0; s < TOTAL_SKINS; s++) {
-        const offCanvas = document.createElement("canvas");
-        offCanvas.width = frameW;
-        offCanvas.height = sh;
-        const offCtx = offCanvas.getContext("2d");
-        if (!offCtx) continue;
+    const singleImg = new Image();
+    singleImg.src = DINO_FILES[chosenDinoIdx];
+    singleImg.onload = () => {
+      const sw = singleImg.naturalWidth;
+      const sh = singleImg.naturalHeight;
+      const offCanvas = document.createElement("canvas");
+      offCanvas.width = sw;
+      offCanvas.height = sh;
+      const offCtx = offCanvas.getContext("2d");
+      if (!offCtx) return;
 
-        // Draw this specific dino frame
-        offCtx.drawImage(
-          stripImg,
-          s * frameW, 0, frameW, sh,
-          0, 0, frameW, sh
-        );
+      offCtx.drawImage(singleImg, 0, 0);
 
-        // Remove background beige/white cleanly
-        const imgData = offCtx.getImageData(0, 0, frameW, sh);
-        const data = imgData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i], g = data[i + 1], b = data[i + 2];
-          if (r > 215 && g > 210 && b > 200) {
-            data[i + 3] = 0; // Transparent background
+      const imgData = offCtx.getImageData(0, 0, sw, sh);
+      const data = imgData.data;
+
+      let minX = sw, minY = sh, maxX = 0, maxY = 0;
+
+      for (let y = 0; y < sh; y++) {
+        for (let x = 0; x < sw; x++) {
+          const idx = y * sw + x;
+          const i = idx * 4;
+          if (data[i+3] > 0) { 
+            const distToWhite = Math.abs(data[i] - 255) + Math.abs(data[i+1] - 255) + Math.abs(data[i+2] - 255);
+            if (distToWhite < 40) {
+              data[i] = 0;
+              data[i+1] = 0;
+              data[i+2] = 0;
+              data[i+3] = 255;
+            }
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
           }
         }
-        offCtx.putImageData(imgData, 0, 0);
-        skinCanvases.push(offCanvas);
+      }
+      offCtx.putImageData(imgData, 0, 0);
+
+      if (maxX >= minX && maxY >= minY) {
+         const cropW = maxX - minX + 1;
+         const cropH = maxY - minY + 1;
+         const croppedCanvas = document.createElement("canvas");
+         croppedCanvas.width = cropW;
+         croppedCanvas.height = cropH;
+         const croppedCtx = croppedCanvas.getContext("2d");
+         if (croppedCtx) {
+           croppedCtx.drawImage(offCanvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+           selectedDinoCanvas = croppedCanvas;
+         } else {
+           selectedDinoCanvas = offCanvas;
+         }
+      } else {
+         selectedDinoCanvas = offCanvas;
       }
 
-      if (skinCanvases.length > 0) {
-        // Randomly pick one skin on page load
-        const chosenIdx = Math.floor(Math.random() * skinCanvases.length);
-        selectedDinoCanvas = skinCanvases[chosenIdx];
-        dinoLoaded = true;
+      dinoAspect = selectedDinoCanvas.width / selectedDinoCanvas.height;
+      dinoLoaded = true;
+    };
+
+    const petStripImg = new Image();
+    petStripImg.src = "/pets-strip.png";
+    petStripImg.onload = () => {
+      const sw = petStripImg.naturalWidth || 600;
+      const sh = petStripImg.naturalHeight || 100;
+      
+      const offCanvas = document.createElement("canvas");
+      offCanvas.width = sw;
+      offCanvas.height = sh;
+      const offCtx = offCanvas.getContext("2d");
+      if (!offCtx) return;
+      
+      offCtx.drawImage(petStripImg, 0, 0);
+      const imgData = offCtx.getImageData(0, 0, sw, sh);
+      const data = imgData.data;
+      const bgR = data[0], bgG = data[1], bgB = data[2];
+
+      const colHits = new Array(sw).fill(false);
+      for (let x = 0; x < sw; x++) {
+        for (let y = 0; y < sh; y++) {
+          const i = (y * sw + x) * 4;
+          const dist = Math.abs(data[i] - bgR) + Math.abs(data[i+1] - bgG) + Math.abs(data[i+2] - bgB);
+          if (dist > 30) {
+            colHits[x] = true;
+            break;
+          }
+        }
       }
+
+      const segments: {startX: number, endX: number}[] = [];
+      let inSeg = false;
+      let segStart = 0;
+      let gapCount = 0;
+
+      for (let x = 0; x < sw; x++) {
+        if (colHits[x]) {
+          if (!inSeg) { inSeg = true; segStart = x; }
+          gapCount = 0;
+        } else if (inSeg) {
+          gapCount++;
+          if (gapCount > 3) {
+            segments.push({startX: segStart, endX: x - gapCount});
+            inSeg = false;
+          }
+        }
+      }
+      if (inSeg) segments.push({startX: segStart, endX: sw - 1});
+
+      const validSegments = segments.filter(seg => (seg.endX - seg.startX) > sw * 0.02);
+
+      for (const seg of validSegments) {
+        let minY = sh, maxY = 0;
+        for (let x = seg.startX; x <= seg.endX; x++) {
+          for (let y = 0; y < sh; y++) {
+            const i = (y * sw + x) * 4;
+            const dist = Math.abs(data[i] - bgR) + Math.abs(data[i+1] - bgG) + Math.abs(data[i+2] - bgB);
+            if (dist > 30) {
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+        }
+
+        if (maxY >= minY) {
+           const cropW = seg.endX - seg.startX + 1;
+           const cropH = maxY - minY + 1;
+           const fCanvas = document.createElement("canvas");
+           fCanvas.width = cropW;
+           fCanvas.height = cropH;
+           const fCtx = fCanvas.getContext("2d");
+           if (fCtx) {
+             fCtx.drawImage(petStripImg, seg.startX, minY, cropW, cropH, 0, 0, cropW, cropH);
+             
+             const fData = fCtx.getImageData(0, 0, cropW, cropH);
+             const fd = fData.data;
+             for (let i = 0; i < fd.length; i += 4) {
+               const dist = Math.abs(fd[i] - bgR) + Math.abs(fd[i+1] - bgG) + Math.abs(fd[i+2] - bgB);
+               if (dist < 40) fd[i+3] = 0;
+             }
+             fCtx.putImageData(fData, 0, 0);
+             petCanvases.push(fCanvas);
+           }
+        }
+      }
+      petsLoaded = true;
     };
 
     /** Spawn initial birds so they're visible on page load */
@@ -465,6 +592,30 @@ export function DinoRunner() {
       dT += dt;
       if (dT > 6.5) { dF ^= 1; dT = 0; }
 
+      // ── 8-Phase Dynamic Run Cycle ──
+      // Style Config based on chosenDinoIdx matching the reference specifications
+      const runStyles = [
+        { bounce: 0.8, swing: 0.35, speed: 0.015, lean: 0 },       // 0
+        { bounce: 1.5, swing: 0.50, speed: 0.012, lean: 0.05 },    // 1
+        { bounce: 0.6, swing: 0.45, speed: 0.020, lean: 0.1 },     // 2
+        { bounce: 0.4, swing: 0.30, speed: 0.013, lean: 0.05 },    // 3
+        { bounce: 0.2, swing: 0.25, speed: 0.010, lean: 0 },       // 4
+        { bounce: 1.0, swing: 0.40, speed: 0.012, lean: 0.02 },    // 5
+        { bounce: 0.8, swing: 0.35, speed: 0.015, lean: 0 },       // 6
+        { bounce: 0.8, swing: 0.35, speed: 0.015, lean: 0 },       // 7
+        { bounce: 0.8, swing: 0.35, speed: 0.015, lean: 0 },       // 8
+        { bounce: 0.8, swing: 0.35, speed: 0.015, lean: 0 }        // 9
+      ];
+      const rStyle = runStyles[chosenDinoIdx % runStyles.length] || runStyles[0];
+
+      // Smooth phase using absolute time (t is in milliseconds)
+      const runPhase = isJumping ? 0 : (t * rStyle.speed) % (Math.PI * 2);
+      
+      const nearLegRot = Math.sin(runPhase) * rStyle.swing;
+      const farLegRot = Math.sin(runPhase + Math.PI) * rStyle.swing; // Exactly opposite phase
+      const bodyBounce = 0; // Completely disable procedural bounce animation
+      const bodyLean = 0; // Completely disable procedural lean animation
+
       // Auto-jump — finely timed trigger distance
       if (!isJumping) {
         for (const o of obs) {
@@ -488,7 +639,41 @@ export function DinoRunner() {
         if (jumpY >= 0) { jumpY = 0; jumpVel = 0; isJumping = false; }
       }
 
-      const dy = g - dinoTargetH + jumpY + (isJumping ? 0 : dF ? -PX * 0.5 : PX * 0.2);
+      // Compute pet dimensions and position for jump detection
+      let computedPetAspect = 1.0;
+      const computedPetIdx = petCanvases.length > 0 ? (chosenDinoIdx % petCanvases.length) : 0;
+      if (petsLoaded && petCanvases[computedPetIdx]) {
+         computedPetAspect = petCanvases[computedPetIdx].width / petCanvases[computedPetIdx].height;
+      }
+      const petTargetH = dinoTargetH * 0.60;
+      const petTargetW = petTargetH * computedPetAspect;
+      const petX = dinoX - recoil * PX - petTargetW - (PX * 10);
+
+      // Independent Pet Jump Logic
+      if (!petIsJumping) {
+        for (const o of obs) {
+          const petFront = petX + petTargetW * 0.8;
+          const dist = o.x - petFront;
+          const triggerDist = o.type === "tree" ? 30 : 25; // Pet triggers slightly closer due to smaller size
+          
+          if (dist > 0 && dist < triggerDist) {
+            petIsJumping = true;
+            // Pet needs slightly less force to clear the same obstacle since it is smaller, but still enough
+            if (o.type === "sm") petJumpVel = -8.5;
+            else if (o.type === "md") petJumpVel = -10.0;
+            else petJumpVel = -11.5;
+            break;
+          }
+        }
+      }
+
+      if (petIsJumping) {
+        petJumpY += petJumpVel * dt;
+        petJumpVel += GRAVITY * dt;
+        if (petJumpY >= 0) { petJumpY = 0; petJumpVel = 0; petIsJumping = false; }
+      }
+
+      const dy = g - dinoTargetH + jumpY + bodyBounce;
 
       // Decay recoil and flash
       if (recoil > 0) recoil = Math.max(0, recoil - dt * 0.8);
@@ -786,37 +971,60 @@ export function DinoRunner() {
         ctx.restore();
       }
 
-      // ── Dino Graphic (Split rendering for static body + wiggling legs) ──
+      // ── Dino Graphic (Static frame with procedural body physics) ──
       if (dinoLoaded && selectedDinoCanvas) {
         ctx.save();
         ctx.globalAlpha = 0.92;
         ctx.imageSmoothingEnabled = false;
 
-        const splitRatio = 0.85; // Upper 85% is body, lower 15% is legs
-        const splitH_canvas = selectedDinoCanvas.height * splitRatio;
-        const splitH_dest = dinoTargetH * splitRatio;
+        const dinoPivotX = Math.round(dinoX - recoil * PX) + dinoTargetW * 0.5;
+        const dinoPivotY = Math.round(dy) + dinoTargetH;
 
-        // Draw top half (body, head, arms) - STATIC
+        // Apply global character lean
+        ctx.translate(dinoPivotX, dinoPivotY);
+        ctx.rotate(bodyLean);
+
+        // Draw the fully intact sprite
         ctx.drawImage(
           selectedDinoCanvas,
-          0, 0, selectedDinoCanvas.width, splitH_canvas,
-          Math.round(dinoX - recoil * PX), Math.round(dy), Math.round(dinoTargetW), Math.round(splitH_dest)
+          0, 0, selectedDinoCanvas.width, selectedDinoCanvas.height,
+          -dinoTargetW * 0.5, -dinoTargetH, Math.round(dinoTargetW), Math.round(dinoTargetH)
         );
 
-        // Draw bottom half (legs) - WIGGLING
-        const legWiggle = isJumping ? 0 : (dF ? 0.25 : -0.25); // Radians for leg swing
-        const legPivotX = Math.round(dinoX - recoil * PX) + dinoTargetW * 0.5;
-        const legPivotY = Math.round(dy) + splitH_dest;
+        ctx.restore();
+      }
+
+      // ── Pet Companion Graphic (Trailing slightly behind) ──
+      // Always safely fallback if there are fewer pets than expected by modulo
+      const petIdx = petCanvases.length > 0 ? (chosenDinoIdx % petCanvases.length) : 0;
+      if (petsLoaded && petCanvases[petIdx]) {
+        const petCanvas = petCanvases[petIdx];
+        
+        // Use the newly cropped canvas to determine true aspect ratio
+        const petAspect = petCanvas.width / petCanvas.height;
+        
+        // 60% of the dino's height
+        const petTargetH = dinoTargetH * 0.60;
+        const petTargetW = petTargetH * petAspect;
+        
+        // Positioned slightly behind the dino and slightly offset
+        const petX = Math.round(dinoX - recoil * PX) - petTargetW - (PX * 10);
+        
+        // Add a gentle bounce based on the dino's frame toggle
+        const petBounce = petIsJumping ? 0 : (dF ? -PX * 1.0 : 0);
+        // Use independent petJumpY instead of following the main dino's dy
+        const petY = g - petTargetH + petJumpY + petBounce;
         
         ctx.save();
-        ctx.translate(legPivotX, legPivotY);
-        ctx.rotate(legWiggle);
+        ctx.globalAlpha = 0.92;
+        ctx.imageSmoothingEnabled = false;
+
+        // Draw the entire pet sprite at once without splitting
         ctx.drawImage(
-          selectedDinoCanvas,
-          0, splitH_canvas, selectedDinoCanvas.width, selectedDinoCanvas.height - splitH_canvas,
-          -dinoTargetW * 0.5, 0, Math.round(dinoTargetW), Math.round(dinoTargetH - splitH_dest)
+          petCanvas,
+          0, 0, petCanvas.width, petCanvas.height,
+          petX, petY, Math.round(petTargetW), Math.round(petTargetH)
         );
-        ctx.restore();
 
         ctx.restore();
       }

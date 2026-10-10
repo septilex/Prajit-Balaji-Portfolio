@@ -148,8 +148,27 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
   const entranceProgressIndex = useRef<number>(0);
 
   // Pre-allocate typed arrays for physics and color states
-  const { currentX, currentY, activePositionsX, activePositionsY, currentZ, currentScale, hoverAmt, activeLevels, emissiveArray, currentColorArray } = useMemo(() => {
+  // Pre-allocate typed arrays for physics and color states
+  const { currentX, currentY, activePositionsX, activePositionsY, currentZ, currentScale, hoverAmt, activeLevels, emissiveArray, currentColorArray, delays, startZ, startX, startY, currentRotX, currentRotY, currentRotZ, startRotX, startRotY, startRotZ, springs } = useMemo(() => {
     hasInitialized.current = false;
+    const delays = new Float32Array(count);
+    const startZ = new Float32Array(count);
+    const startX = new Float32Array(count);
+    const startY = new Float32Array(count);
+    const startRotX = new Float32Array(count);
+    const startRotY = new Float32Array(count);
+    const startRotZ = new Float32Array(count);
+    const springs = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      delays[i] = Math.random() * 800; // random delay up to 800ms
+      startZ[i] = 15 + Math.random() * 20; // Z from 15 to 35
+      startX[i] = cubes[i].position[0] + (Math.random() - 0.5) * 20; // slightly scattered X
+      startY[i] = cubes[i].position[1] + (Math.random() - 0.5) * 20; // slightly scattered Y
+      startRotX[i] = (Math.random() - 0.5) * Math.PI * 2;
+      startRotY[i] = (Math.random() - 0.5) * Math.PI * 2;
+      startRotZ[i] = (Math.random() - 0.5) * Math.PI * 2;
+      springs[i] = 1.0 + Math.random() * 5.0; // random spring stiffness from 1.0 to 6.0
+    }
     return {
       currentX: new Float32Array(count),
       currentY: new Float32Array(count),
@@ -161,13 +180,25 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
       activeLevels: new Int32Array(count).fill(0),
       emissiveArray: new Float32Array(count * 3).fill(0),
       currentColorArray: new Float32Array(count * 3).fill(0),
+      currentRotX: new Float32Array(count),
+      currentRotY: new Float32Array(count),
+      currentRotZ: new Float32Array(count),
+      delays,
+      startZ,
+      startX,
+      startY,
+      startRotX,
+      startRotY,
+      startRotZ,
+      springs
     };
-  }, [count]);
+  }, [count, cubes]);
 
   const tempMatrix = useMemo(() => new THREE.Matrix4(), []);
   const tempPosition = useMemo(() => new THREE.Vector3(), []);
   const tempScale = useMemo(() => new THREE.Vector3(), []);
   const tempRotation = useMemo(() => new THREE.Quaternion(), []);
+  const tempEuler = useMemo(() => new THREE.Euler(), []);
 
   // Initialize initial state immediately on first mount
   React.useLayoutEffect(() => {
@@ -175,8 +206,12 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
     hasInitialized.current = true;
     const baseC = THEME_COLORS[0];
     for (let i = 0; i < count; i++) {
-      currentX[i] = cubes[i].position[0];
-      currentY[i] = cubes[i].position[1];
+      currentX[i] = startX[i];
+      currentY[i] = startY[i];
+      currentZ[i] = startZ[i];
+      currentRotX[i] = startRotX[i];
+      currentRotY[i] = startRotY[i];
+      currentRotZ[i] = startRotZ[i];
       activePositionsX[i] = cubes[i].position[0];
       activePositionsY[i] = cubes[i].position[1];
       
@@ -184,7 +219,9 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
       currentColorArray[i * 3 + 1] = baseC.g;
       currentColorArray[i * 3 + 2] = baseC.b;
 
-      tempPosition.set(currentX[i], currentY[i], 0.1);
+      tempPosition.set(currentX[i], currentY[i], currentZ[i]);
+      tempEuler.set(currentRotX[i], currentRotY[i], currentRotZ[i]);
+      tempRotation.setFromEuler(tempEuler);
       tempScale.setScalar(1);
       tempMatrix.compose(tempPosition, tempRotation, tempScale);
       meshRef.current.setMatrixAt(i, tempMatrix);
@@ -203,14 +240,34 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
 
   // Staggered entrance and year switching via shared timeline
   React.useEffect(() => {
-    if (!isInView || hasPlayedEntrance.current) {
+    if (!isInView) {
+      hasPlayedEntrance.current = false;
+      // Reset visual state instantly while offscreen so it staggers up again next time
+      const baseC = THEME_COLORS[0];
+      for (let i = 0; i < count; i++) {
+        activeLevels[i] = 0;
+        currentX[i] = startX[i];
+        currentY[i] = startY[i];
+        currentZ[i] = startZ[i];
+        currentRotX[i] = startRotX[i];
+        currentRotY[i] = startRotY[i];
+        currentRotZ[i] = startRotZ[i];
+        currentColorArray[i * 3] = baseC.r;
+        currentColorArray[i * 3 + 1] = baseC.g;
+        currentColorArray[i * 3 + 2] = baseC.b;
+        emissiveArray[i * 3] = 0;
+        emissiveArray[i * 3 + 1] = 0;
+        emissiveArray[i * 3 + 2] = 0;
+      }
       return;
     }
+    
+    if (hasPlayedEntrance.current) return;
 
     hasPlayedEntrance.current = true;
     entranceStartTime.current = performance.now();
     entranceProgressIndex.current = 0;
-  }, [cubes, activeLevels, isInView]);
+  }, [cubes, activeLevels, isInView, count, currentZ, currentColorArray, emissiveArray]);
 
   useFrame((state, delta) => {
     if (!meshRef.current || count === 0 || !isInView) return;
@@ -221,14 +278,15 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
     // Process shared entrance timeline
     if (entranceStartTime.current !== null) {
       const elapsed = now - entranceStartTime.current;
-      while (entranceProgressIndex.current < count && elapsed > entranceProgressIndex.current * 2.5) {
-        const idx = entranceProgressIndex.current;
-        activeLevels[idx] = cubes[idx].level;
-        activePositionsX[idx] = cubes[idx].position[0];
-        activePositionsY[idx] = cubes[idx].position[1];
-        entranceProgressIndex.current++;
+      let allDone = true;
+      for (let i = 0; i < count; i++) {
+        if (elapsed > delays[i]) {
+          activeLevels[i] = cubes[i].level;
+        } else {
+          allDone = false;
+        }
       }
-      if (entranceProgressIndex.current >= count) {
+      if (allDone) {
         entranceStartTime.current = null;
       }
     }
@@ -245,8 +303,9 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
       const targetHover = isHovered ? 1 : 0;
       
       let hoverChanged = false;
+      const hoverLerpAmt = 1 - Math.exp(-12 * delta); // Hover is fast
       if (hoverAmt[i] !== targetHover) {
-        hoverAmt[i] = THREE.MathUtils.lerp(hoverAmt[i], targetHover, delta * speed);
+        hoverAmt[i] = THREE.MathUtils.lerp(hoverAmt[i], targetHover, hoverLerpAmt);
         if (Math.abs(hoverAmt[i] - targetHover) < 0.01) hoverAmt[i] = targetHover;
         hoverChanged = true;
       }
@@ -266,25 +325,29 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
         finalZ += wave * (1 - amt);
       }
 
+      const lerpAmt = 1 - Math.exp(-springs[i] * delta); // Smooth frame-rate independent spring based on random spring stiffness
       const scaleChanged = Math.abs(currentScale[i] - targetScale) > 0.001;
       const zChanged = Math.abs(currentZ[i] - finalZ) > 0.001 || amt < 1;
       const xChanged = Math.abs(currentX[i] - activePositionsX[i]) > 0.001;
       const yChanged = Math.abs(currentY[i] - activePositionsY[i]) > 0.001;
+      const rotChanged = Math.abs(currentRotX[i]) > 0.001 || Math.abs(currentRotY[i]) > 0.001 || Math.abs(currentRotZ[i]) > 0.001;
 
-      if (scaleChanged || zChanged || hoverChanged || xChanged || yChanged) {
-        currentScale[i] = THREE.MathUtils.lerp(currentScale[i], targetScale, delta * speed);
-        currentZ[i] = THREE.MathUtils.lerp(currentZ[i], finalZ, delta * speed);
-        currentX[i] = THREE.MathUtils.lerp(currentX[i], activePositionsX[i], delta * speed);
-        currentY[i] = THREE.MathUtils.lerp(currentY[i], activePositionsY[i], delta * speed);
+      if (scaleChanged || zChanged || hoverChanged || xChanged || yChanged || rotChanged) {
+        currentScale[i] = THREE.MathUtils.lerp(currentScale[i], targetScale, lerpAmt);
+        currentZ[i] = THREE.MathUtils.lerp(currentZ[i], finalZ, lerpAmt);
+        currentX[i] = THREE.MathUtils.lerp(currentX[i], activePositionsX[i], lerpAmt);
+        currentY[i] = THREE.MathUtils.lerp(currentY[i], activePositionsY[i], lerpAmt);
+        currentRotX[i] = THREE.MathUtils.lerp(currentRotX[i], 0, lerpAmt);
+        currentRotY[i] = THREE.MathUtils.lerp(currentRotY[i], 0, lerpAmt);
+        currentRotZ[i] = THREE.MathUtils.lerp(currentRotZ[i], 0, lerpAmt);
 
-        // Direct write to matrix buffer (Scale and Position translation)
-        const idx = i * 16;
-        mArray[idx + 0] = currentScale[i];
-        mArray[idx + 5] = currentScale[i];
-        mArray[idx + 10] = currentScale[i];
-        mArray[idx + 12] = currentX[i];
-        mArray[idx + 13] = currentY[i];
-        mArray[idx + 14] = currentZ[i];
+        tempPosition.set(currentX[i], currentY[i], currentZ[i]);
+        tempEuler.set(currentRotX[i], currentRotY[i], currentRotZ[i]);
+        tempRotation.setFromEuler(tempEuler);
+        tempScale.setScalar(currentScale[i]);
+        tempMatrix.compose(tempPosition, tempRotation, tempScale);
+        
+        tempMatrix.toArray(mArray, i * 16);
         
         needsMatrixUpdate = true;
       }
@@ -314,13 +377,14 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
                     Math.abs(emissiveArray[rIdx+2] - emissiveTargetB);
 
       if (cDiff > 0.005 || eDiff > 0.005) {
-        currentColorArray[rIdx] = THREE.MathUtils.lerp(currentColorArray[rIdx], hoverR, delta * speed);
-        currentColorArray[rIdx + 1] = THREE.MathUtils.lerp(currentColorArray[rIdx + 1], hoverG, delta * speed);
-        currentColorArray[rIdx + 2] = THREE.MathUtils.lerp(currentColorArray[rIdx + 2], hoverB, delta * speed);
+        const cLerpAmt = 1 - Math.exp(-6 * delta);
+        currentColorArray[rIdx] = THREE.MathUtils.lerp(currentColorArray[rIdx], hoverR, cLerpAmt);
+        currentColorArray[rIdx + 1] = THREE.MathUtils.lerp(currentColorArray[rIdx + 1], hoverG, cLerpAmt);
+        currentColorArray[rIdx + 2] = THREE.MathUtils.lerp(currentColorArray[rIdx + 2], hoverB, cLerpAmt);
 
-        emissiveArray[rIdx] = THREE.MathUtils.lerp(emissiveArray[rIdx], emissiveTargetR, delta * speed);
-        emissiveArray[rIdx + 1] = THREE.MathUtils.lerp(emissiveArray[rIdx + 1], emissiveTargetG, delta * speed);
-        emissiveArray[rIdx + 2] = THREE.MathUtils.lerp(emissiveArray[rIdx + 2], emissiveTargetB, delta * speed);
+        emissiveArray[rIdx] = THREE.MathUtils.lerp(emissiveArray[rIdx], emissiveTargetR, cLerpAmt);
+        emissiveArray[rIdx + 1] = THREE.MathUtils.lerp(emissiveArray[rIdx + 1], emissiveTargetG, cLerpAmt);
+        emissiveArray[rIdx + 2] = THREE.MathUtils.lerp(emissiveArray[rIdx + 2], emissiveTargetB, cLerpAmt);
         
         if (cArray) {
           cArray[rIdx] = currentColorArray[rIdx];
