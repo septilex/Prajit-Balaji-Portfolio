@@ -625,64 +625,58 @@ export default function Home() {
       <style dangerouslySetInnerHTML={{ __html: `
         .glass-icon-btn, .glass-pill-btn, .glass-corner-btn {
           color: #ff6a00;
-          background: linear-gradient(180deg, rgba(40,40,40,0.85) 0%, rgba(15,15,15,0.95) 100%);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-top: 1px solid rgba(255,255,255,0.25);
+          background: linear-gradient(180deg, rgba(32, 28, 24, 0.85) 0%, rgba(15, 13, 11, 0.95) 100%);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-top: 1px solid rgba(255, 255, 255, 0.25);
           box-shadow: 
-            inset 0 1px 1px rgba(255,255,255,0.25),
-            inset 0 -2px 6px rgba(0,0,0,0.8),
-            0 6px 0px rgba(10,10,10,0.95),
-            0 6px 4px rgba(255,255,255,0.15),
-            0 14px 20px rgba(0,0,0,0.5),
-            0 0 15px rgba(255,106,0,0.15);
-          text-shadow: 0 0 8px rgba(255,106,0,0.35);
-          transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s, text-shadow 0.25s, background 0.3s;
+            inset 0 1px 1px rgba(255, 255, 255, 0.22),
+            inset 0 -1px 3px rgba(0, 0, 0, 0.4),
+            0 8px 24px -4px rgba(0, 0, 0, 0.35),
+            0 0 12px rgba(255, 106, 0, 0.12);
+          text-shadow: 0 0 8px rgba(255, 106, 0, 0.35);
+          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s, text-shadow 0.2s, background 0.25s, border-color 0.25s;
+          cursor: pointer;
         }
-        .glass-icon-btn, .glass-pill-btn { border: 1px solid rgba(0,0,0,0.8); border-top: 1px solid rgba(255,255,255,0.25); }
-        .glass-corner-btn { border-left: 1px solid rgba(0,0,0,0.8); }
-        .glass-icon-btn { margin-bottom: 6px; }
+        .glass-icon-btn { margin-bottom: 0px; }
         .glass-pill-btn { margin-bottom: 0px; }
+        .glass-corner-btn { border-left: 1px solid rgba(255, 255, 255, 0.1); }
         
         .glass-icon-btn svg, .glass-pill-btn svg, .glass-corner-btn svg {
-          filter: drop-shadow(0 0 6px rgba(255,106,0,0.35));
-          transition: filter 0.25s;
+          filter: drop-shadow(0 0 6px rgba(255, 106, 0, 0.35));
+          transition: filter 0.25s, color 0.25s;
         }
         .glass-icon-btn:hover, .glass-pill-btn:hover, .glass-corner-btn:hover {
           color: #ffffff;
-          background: linear-gradient(180deg, rgba(50,50,50,0.9) 0%, rgba(20,20,20,0.98) 100%);
-          border-top: 1px solid rgba(255,255,255,0.5);
+          background: linear-gradient(180deg, rgba(48, 42, 36, 0.9) 0%, rgba(20, 18, 16, 0.98) 100%);
+          border-color: rgba(255, 138, 61, 0.35);
+          border-top: 1px solid rgba(255, 255, 255, 0.45);
           box-shadow: 
-            inset 0 1px 2px rgba(255,255,255,0.6),
-            inset 0 -2px 6px rgba(0,0,0,0.8),
-            0 6px 0px rgba(10,10,10,0.95),
-            0 6px 6px rgba(255,255,255,0.4),
-            0 16px 25px rgba(255,255,255,0.2),
-            0 0 40px rgba(255,255,255,0.8),
-            0 0 80px rgba(255,255,255,0.4);
-          text-shadow: 0 0 12px rgba(255,255,255,1), 0 0 24px rgba(255,255,255,0.9), 0 0 35px rgba(255,255,255,0.6);
+            inset 0 1px 2px rgba(255, 255, 255, 0.4),
+            inset 0 -1px 3px rgba(0, 0, 0, 0.4),
+            0 12px 28px -4px rgba(255, 106, 0, 0.25),
+            0 0 25px rgba(255, 106, 0, 0.35);
+          text-shadow: 0 0 12px rgba(255, 255, 255, 1), 0 0 24px rgba(255, 106, 0, 0.6);
         }
         .glass-icon-btn:hover svg, .glass-pill-btn:hover svg, .glass-corner-btn:hover svg {
-          filter: drop-shadow(0 0 16px rgba(255,255,255,1)) drop-shadow(0 0 24px rgba(255,255,255,0.8));
+          filter: drop-shadow(0 0 10px rgba(255, 138, 61, 0.8));
         }
         .glass-icon-btn:active, .glass-pill-btn:active, .glass-corner-btn:active {
-          transform: translateY(6px);
+          transform: scale(0.95);
           box-shadow: 
-            inset 0 1px 1px rgba(255,255,255,0.15),
-            inset 0 -1px 4px rgba(0,0,0,0.9),
-            0 0px 0px rgba(10,10,10,0.95),
-            0 0px 0px rgba(255,106,0,0.2),
-            0 4px 10px rgba(0,0,0,0.4),
-            0 0 20px rgba(255,106,0,0.45);
+            inset 0 1px 1px rgba(255, 255, 255, 0.15),
+            inset 0 -1px 3px rgba(0, 0, 0, 0.6),
+            0 4px 12px rgba(0, 0, 0, 0.35);
         }
         .glass-icon-btn::before, .glass-pill-btn::before {
           content: '';
           position: absolute;
           top: 0;
-          left: 10%;
-          right: 10%;
+          left: 12%;
+          right: 12%;
           height: 35%;
-          background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
           border-radius: 50px 50px 0 0;
           pointer-events: none;
         }
@@ -693,31 +687,7 @@ export default function Home() {
           left: 0;
           right: 0;
           height: 35%;
-          background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
-          pointer-events: none;
-        }
-        .glass-icon-btn:hover svg, .glass-pill-btn:hover svg {
-          filter: drop-shadow(0 0 12px rgba(255,138,0,1));
-        }
-        .glass-icon-btn:active, .glass-pill-btn:active {
-          transform: translateY(6px);
-          box-shadow: 
-            inset 0 1px 1px rgba(255,255,255,0.15),
-            inset 0 -1px 4px rgba(0,0,0,0.9),
-            0 0px 0px rgba(10,10,10,0.95),
-            0 0px 0px rgba(255,106,0,0.2),
-            0 4px 10px rgba(0,0,0,0.4),
-            0 0 20px rgba(255,106,0,0.45);
-        }
-        .glass-icon-btn::before, .glass-pill-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 10%;
-          right: 10%;
-          height: 35%;
-          background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
-          border-radius: 50px 50px 0 0;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
           pointer-events: none;
         }
       `}} />

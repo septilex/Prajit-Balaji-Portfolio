@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch and helper scripts
+argon.mjs
+bridge.mjs
+*.py
+scratch/

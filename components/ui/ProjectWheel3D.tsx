@@ -298,11 +298,11 @@ function CurvedProjectCard({
                   left: `${-i * segW}px`,
                 }}
               >
-                <h3 className="font-researcher text-[14px] md:text-[18px] font-black uppercase tracking-[0.25em] text-black transition-colors group-hover:text-[#ff8a3d] drop-shadow-[0_0_10px_rgba(255,138,61,0.3)]">
+                <h3 className="font-researcher text-[14px] md:text-[18px] font-black uppercase tracking-[0.25em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors group-hover:text-[#ff8a3d] drop-shadow-[0_0_10px_rgba(255,138,61,0.3)]">
                   {item.title}
                 </h3>
                 {item.cat && (
-                  <p className="mt-1.5 font-syne text-[10px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-black/40">
+                  <p className="mt-1.5 font-syne text-[10px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-[#ff8a3d]/80">
                     {item.cat}
                   </p>
                 )}
@@ -354,28 +354,52 @@ function CurvedProjectCard({
 
       {/* ── Flat Title & Buttons (Fades in when focused) ── */}
       <motion.div
-        className="absolute top-[20%] right-full mr-8 md:mr-12 w-[220px] md:w-[280px] flex flex-col items-end text-right"
+        className="absolute z-40 flex flex-col pointer-events-auto md:top-[12%] md:right-full md:mr-8 md:w-[280px] md:items-end md:text-right max-md:top-[calc(100%+24px)] max-md:left-1/2 max-md:-translate-x-1/2 max-md:w-[280px] max-md:items-center max-md:text-center"
         initial={false}
         animate={{ opacity: isFocused ? 1 : 0, x: isFocused ? 0 : 20 }}
         transition={{ duration: 0.5, delay: isFocused ? 0.2 : 0, ease: [0.16, 1, 0.3, 1] }}
-        style={{ transform: `translateZ(${GLASS_DEPTH}px)`, pointerEvents: isFocused ? "auto" : "none" }}
+        style={{
+          transform: `translateZ(${GLASS_DEPTH + 30}px)`,
+          pointerEvents: isFocused ? "auto" : "none",
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        onPointerUp={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-researcher text-[16px] md:text-[22px] font-black uppercase tracking-[0.25em] text-black drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] leading-tight">
+        <h3 className="font-researcher text-[18px] md:text-[24px] font-black uppercase tracking-[0.25em] text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] drop-shadow-[0_0_15px_rgba(255,138,61,0.35)] leading-tight">
           {item.title}
         </h3>
         {item.cat && (
-          <p className="mt-2 font-syne text-[10px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-black/40">
+          <p className="mt-2 font-syne text-[11px] md:text-[13px] font-bold uppercase tracking-[0.15em] text-[#ff8a3d]">
             {item.cat}
           </p>
         )}
-        <div className="mt-6 flex flex-col gap-3 items-end">
+        <div
+          className="mt-5 flex flex-col max-md:flex-row gap-3 items-end max-md:items-center max-md:justify-center"
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
           {item.link && (
             <Magnetic strength={0.3}>
               <a
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="glass-btn-black relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-researcher text-[9px] md:text-[10px] uppercase tracking-widest"
+                className="glass-btn-black relative z-50 inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-researcher text-[9px] md:text-[10px] uppercase tracking-widest cursor-pointer select-auto"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onPointerUp={(e) => {
+                  e.stopPropagation();
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (item.link) {
+                    window.open(item.link, "_blank", "noopener,noreferrer");
+                    e.preventDefault();
+                  }
+                }}
               >
                 Vercel / Live
               </a>
@@ -387,7 +411,20 @@ function CurvedProjectCard({
                 href={item.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="glass-btn-white relative inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-researcher text-[9px] md:text-[10px] uppercase tracking-widest"
+                className="glass-btn-white relative z-50 inline-flex items-center gap-2 rounded-full px-6 py-2.5 font-researcher text-[9px] md:text-[10px] uppercase tracking-widest cursor-pointer select-auto"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onPointerUp={(e) => {
+                  e.stopPropagation();
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (item.github) {
+                    window.open(item.github, "_blank", "noopener,noreferrer");
+                    e.preventDefault();
+                  }
+                }}
               >
                 GitHub
               </a>
@@ -406,6 +443,7 @@ function CurvedProjectCard({
 
 const glassStyles = `
   .glass-btn-black {
+    cursor: pointer;
     color: #bd6a2b;
     background: linear-gradient(180deg, rgba(40,40,40,0.85) 0%, rgba(15,15,15,0.95) 100%);
     backdrop-filter: blur(12px);
@@ -448,6 +486,7 @@ const glassStyles = `
   }
 
   .glass-btn-white {
+    cursor: pointer;
     color: #000000;
     background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(220,220,220,0.4) 100%);
     backdrop-filter: blur(12px);
@@ -742,7 +781,7 @@ export function ProjectWheel3D({
         className="relative mx-auto select-none py-10"
         style={{
           width: "100%",
-          height: `${cardHeight + 200}px`,
+          height: `${cardHeight + (isMobile ? 260 : 200)}px`,
           perspective: `${perspective}px`,
           perspectiveOrigin: "50% 50%",
           cursor: isDragging.current ? "grabbing" : "grab",
@@ -762,7 +801,7 @@ export function ProjectWheel3D({
         {/* Rotating cylinder — transform driven by rAF via ref, not React state */}
         <div
           ref={cylinderRef}
-          className="absolute left-1/2 top-1/2"
+          className="absolute left-1/2 top-1/2 z-10"
           style={{
             width: 0,
             height: 0,
@@ -800,6 +839,8 @@ export function ProjectWheel3D({
                   top: `${-cardHeight / 2}px`,
                   transformStyle: "preserve-3d",
                   backfaceVisibility: "hidden" as any,
+                  zIndex: isFocused ? 50 : 1,
+                  pointerEvents: focusedIndex !== null && !isFocused ? "none" : "auto",
                 }}
                 onPointerDown={(e) => {
                   if (isFocused) {
