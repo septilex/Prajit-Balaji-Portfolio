@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, type TargetAndTransition, type Transition } from "framer-motion";
+import { useAnimationBudget } from "@/lib/useAnimationBudget";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -105,9 +106,52 @@ function getTechSubtitle(skill: string) {
 }
 
 
+// ─── Icon animation lifecycle ─────────────────────────────────────────────────
+// The icons' looping framer-motion animations — many on SVG geometry attributes
+// (cx / cy / r), which force style recalculation and layout on every frame —
+// only run while the section is on screen, the tab is visible and motion is
+// allowed. Otherwise every looping value rests at its first keyframe.
+
+type LoopKeyframes = Record<string, number | number[]>;
+
+/** `true` while the Expertise section is animating (see useAnimationBudget). */
+const IconMotionContext = React.createContext(false);
+
+function restPose(keyframes: LoopKeyframes): Record<string, number> {
+  const rest: Record<string, number> = {};
+  for (const key in keyframes) {
+    const value = keyframes[key];
+    rest[key] = Array.isArray(value) ? value[0] : value;
+  }
+  return rest;
+}
+
+/**
+ * `animate` + `transition` props for a looping icon animation. Loops while the
+ * section is animating and `enabled` (e.g. while hovered). When a hover ends it
+ * eases back to rest once instead of repeating a no-op loop forever; while the
+ * section is paused it snaps to rest immediately.
+ */
+function useIconLoop() {
+  const running = React.useContext(IconMotionContext);
+  return (
+    keyframes: LoopKeyframes,
+    transition: Transition,
+    { enabled = true, rest }: { enabled?: boolean; rest?: Record<string, number> } = {}
+  ): { animate: TargetAndTransition; transition: Transition } => {
+    if (running && enabled) return { animate: keyframes as TargetAndTransition, transition };
+    return {
+      animate: (rest ?? restPose(keyframes)) as TargetAndTransition,
+      transition: running ? ({ ...transition, repeat: 0, delay: 0 } as Transition) : { duration: 0 },
+    };
+  };
+}
+
+
 // ─── Abstract Tech Icons ──────────────────────────────────────────────────────
 
 function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolean }) {
+  const loop = useIconLoop();
   switch (skill) {
     // --- AI & Intelligent Systems ---
     case "OpenAI":
@@ -126,7 +170,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                  <path d="M 43 50 L 43 20 A 15 15 0 0 1 70 20 L 70 35 A 10 10 0 0 0 49 35 L 49 50 Z" fill="url(#openaiGrad)" stroke="#3a2a1c" strokeWidth="1.5" strokeOpacity="0.9" strokeLinejoin="round" />
                </g>
              ))}
-             <motion.circle cx="50" cy="50" r="4.5" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.3, 1] : 1 }} transition={{ duration: 2, repeat: Infinity }} />
+             <motion.circle cx="50" cy="50" r="4.5" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.3, 1] }, { duration: 2, repeat: Infinity }, { enabled: isActive })} />
            </g>
            <circle cx="50" cy="50" r="42" strokeDasharray="3 6" strokeWidth="1.5" strokeOpacity="0.2" style={{ animation: "spin-slow-reverse 60s linear infinite", transformOrigin: "50px 50px" }} />
         </svg>
@@ -146,8 +190,8 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <line x1="50" y1="10" x2="50" y2="90" stroke="#ff8a3d" strokeWidth="2" strokeDasharray="4 4" strokeOpacity="0.8" />
              
              {/* Flowing tokens down the central pillar */}
-             <motion.circle cx="50" cy="10" r="2" fill="#ff8a3d" stroke="none" animate={{ cy: [10, 90], opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }} />
-             <motion.circle cx="50" cy="10" r="2" fill="#ff8a3d" stroke="none" animate={{ cy: [10, 90], opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: 1.5 }} />
+             <motion.circle cx="50" cy="10" r="2" fill="#ff8a3d" stroke="none" {...loop({ cy: [10, 90], opacity: [0, 1, 0] }, { duration: 3, repeat: Infinity, ease: "linear" })} />
+             <motion.circle cx="50" cy="10" r="2" fill="#ff8a3d" stroke="none" {...loop({ cy: [10, 90], opacity: [0, 1, 0] }, { duration: 3, repeat: Infinity, ease: "linear", delay: 1.5 })} />
 
              {/* Stack of large Transformer layers */}
              {[0, 1, 2, 3].map((layer, i) => (
@@ -178,7 +222,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              </g>
 
              <path d="M 33 26 L 43 26" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="3 3" />
-             <motion.circle cx="33" cy="26" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cx: [33, 43], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }} />
+             <motion.circle cx="33" cy="26" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cx: [33, 43], opacity: [0, 1, 0] }, { duration: 1.5, repeat: Infinity, ease: "linear" })} />
 
              {/* 2. Vector Search (Center) */}
              <g transform="translate(55, 26)">
@@ -187,7 +231,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                  {[-6, 0, 6].map((x) => 
                    [-6, 0, 6].map((y) => (
                      <motion.circle key={`${x}-${y}`} cx={x} cy={y} r={x===0&&y===0 ? 2.5 : 1.5} fill={x===0 ? "#ff8a3d" : "#3a2a1c"} fillOpacity={x===0 ? 1 : 0.4} stroke="none" 
-                       animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2 + Math.random()*2, repeat: Infinity, delay: Math.random() }} />
+                       {...loop({ scale: [1, 1.3, 1] }, { duration: 2 + Math.random()*2, repeat: Infinity, delay: Math.random() })} />
                    ))
                  )}
                </motion.g>
@@ -195,7 +239,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              </g>
 
              <path d="M 67 26 L 77 26" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="3 3" />
-             <motion.circle cx="67" cy="26" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cx: [67, 77], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.75 }} />
+             <motion.circle cx="67" cy="26" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cx: [67, 77], opacity: [0, 1, 0] }, { duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.75 })} />
 
              {/* 3. Response (Right) */}
              <g transform="translate(80, 20)">
@@ -221,7 +265,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
            
            {/* Center Core */}
            <circle cx="50" cy="50" r="20" fill="url(#globeGrad)" strokeWidth="1.5" strokeOpacity="0.9" />
-           <motion.circle cx="50" cy="50" r="5" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.3, 1] : 1 }} transition={{ duration: 1.5, repeat: Infinity }} />
+           <motion.circle cx="50" cy="50" r="5" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.3, 1] }, { duration: 1.5, repeat: Infinity }, { enabled: isActive })} />
 
            <g style={{ animation: "spin-slow 25s linear infinite", transformOrigin: "50px 50px" }}>
              {/* Bold directional loop */}
@@ -236,7 +280,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              {[0, 72, 144, 216, 288].map((angle, i) => (
                <g key={i} transform={`rotate(${angle} 50 50) translate(50, 12)`}>
                  <circle cx="0" cy="0" r="7" fill="#fcfaf7" strokeWidth="1.5" />
-                 <motion.circle cx="0" cy="0" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }} />
+                 <motion.circle cx="0" cy="0" r="2.5" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity, delay: i * 0.4 })} />
                </g>
              ))}
            </g>
@@ -282,10 +326,10 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <path d="M 45 42 C 65 42, 60 50, 75 50" stroke="#ff8a3d" strokeWidth="2" strokeOpacity="0.6" fill="none" />
                <path d="M 45 59 C 65 59, 60 50, 75 50" stroke="#ff8a3d" strokeWidth="2" strokeOpacity="0.8" fill="none" />
                <path d="M 45 76 C 65 76, 60 50, 75 50" stroke="#ff8a3d" strokeWidth="2" strokeOpacity="0.4" fill="none" />
-               <motion.circle cx="75" cy="50" r="4" fill="#ff8a3d" stroke="none" animate={{ r: [4, 5, 4] }} transition={{ duration: 1.5, repeat: Infinity }} />
+               <motion.circle cx="75" cy="50" r="4" fill="#ff8a3d" stroke="none" {...loop({ r: [4, 5, 4] }, { duration: 1.5, repeat: Infinity })} />
                {/* Animated Pulses flowing into center */}
-               <motion.circle cx="45" cy="25" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cx: [45, 75], cy: [25, 50], opacity: [0, 1, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} />
-               <motion.circle cx="45" cy="76" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cx: [45, 75], cy: [76, 50], opacity: [0, 1, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 1 }} />
+               <motion.circle cx="45" cy="25" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cx: [45, 75], cy: [25, 50], opacity: [0, 1, 0] }, { duration: 2, repeat: Infinity, ease: "linear" })} />
+               <motion.circle cx="45" cy="76" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cx: [45, 75], cy: [76, 50], opacity: [0, 1, 0] }, { duration: 2, repeat: Infinity, ease: "linear", delay: 1 })} />
              </g>
 
              {/* Right Optimized Output Block */}
@@ -314,21 +358,21 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <path d="M 45 60 L 45 75 L 65 75 M 65 67 L 65 60" strokeWidth="1.5" strokeDasharray="4 4" />
 
              {/* Animated Pulses */}
-             <motion.circle cx="22" cy="50" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cx: [22, 35], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }} />
-             <motion.circle cx="55" cy="50" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cx: [55, 70], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.75 }} />
-             <motion.circle cx="45" cy="60" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cy: [60, 75], opacity: [0, 1, 0] }} transition={{ duration: 1, repeat: Infinity, ease: "linear", delay: 1 }} />
+             <motion.circle cx="22" cy="50" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cx: [22, 35], opacity: [0, 1, 0] }, { duration: 1.5, repeat: Infinity, ease: "linear" })} />
+             <motion.circle cx="55" cy="50" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cx: [55, 70], opacity: [0, 1, 0] }, { duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.75 })} />
+             <motion.circle cx="45" cy="60" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cy: [60, 75], opacity: [0, 1, 0] }, { duration: 1, repeat: Infinity, ease: "linear", delay: 1 })} />
 
              {/* 1. Trigger */}
              <g transform="translate(5, 40)">
                <rect x="0" y="0" width="17" height="20" rx="2" fill="#fcfaf7" strokeWidth="1.5" />
-               <motion.circle cx="8.5" cy="10" r="3" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 1, repeat: Infinity }} />
+               <motion.circle cx="8.5" cy="10" r="3" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 1, repeat: Infinity }, { enabled: isActive })} />
                <text x="8.5" y="30" fontSize="4.5" fill="#3a2a1c" stroke="none" fontFamily="monospace" fontWeight="bold" textAnchor="middle">TRIGGER</text>
              </g>
 
              {/* 2. Process */}
              <g transform="translate(35, 40)">
                <rect x="0" y="0" width="20" height="20" rx="4" fill="#fcfaf7" strokeWidth="1.5" />
-               <motion.circle cx="10" cy="10" r="4" strokeWidth="1.5" strokeDasharray="2 2" animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "10px 10px" }} />
+               <motion.circle cx="10" cy="10" r="4" strokeWidth="1.5" strokeDasharray="2 2" {...loop({ rotate: [0, 360] }, { duration: 10, repeat: Infinity, ease: "linear" })} style={{ transformOrigin: "10px 10px" }} />
                <text x="10" y="30" fontSize="4.5" fill="#3a2a1c" stroke="none" fontFamily="monospace" fontWeight="bold" textAnchor="middle">PROCESS</text>
              </g>
 
@@ -391,14 +435,14 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                />
              ))}
              {/* Orbiting nodes */}
-             <motion.circle cx="85" cy="50" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity }} />
-             <motion.circle cx="67.5" cy="19.7" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity, delay: 0.6 }} />
-             <motion.circle cx="32.5" cy="80.3" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity, delay: 1.2 }} />
+             <motion.circle cx="85" cy="50" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity }, { enabled: isActive })} />
+             <motion.circle cx="67.5" cy="19.7" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity, delay: 0.6 }, { enabled: isActive })} />
+             <motion.circle cx="32.5" cy="80.3" r="3" fill="#ff8a3d" stroke="none" transform="rotate(0 50 50)" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity, delay: 1.2 }, { enabled: isActive })} />
            </g>
            
            <circle cx="50" cy="50" r="8" fill="url(#reactCore)" stroke="none" />
            <circle cx="50" cy="50" r="5" fill="#fcfaf7" stroke="#3a2a1c" strokeWidth="1.5" />
-           <motion.circle cx="50" cy="50" r="3" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.2, 1] : 1 }} transition={{ duration: 1.5, repeat: Infinity }} />
+           <motion.circle cx="50" cy="50" r="3" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.2, 1] }, { duration: 1.5, repeat: Infinity }, { enabled: isActive })} />
         </svg>
       );
     case "Next.js":
@@ -422,7 +466,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              </motion.g>
 
              {/* Orbital ring */}
-             <motion.circle cx="50" cy="50" r="45" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="30 150" strokeOpacity="0.8" animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }} />
+             <motion.circle cx="50" cy="50" r="45" stroke="#ff8a3d" strokeWidth="1.5" strokeDasharray="30 150" strokeOpacity="0.8" {...loop({ rotate: [0, 360] }, { duration: 8, repeat: Infinity, ease: "linear" })} style={{ transformOrigin: "50px 50px" }} />
            </g>
         </svg>
       );
@@ -470,7 +514,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <ellipse cx="50" cy="55" rx="35" ry="10" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.3" transform="rotate(-15 50 55)" />
              <ellipse cx="50" cy="55" rx="35" ry="10" strokeDasharray="2 4" strokeWidth="1.5" strokeOpacity="0.3" transform="rotate(45 50 55)" />
 
-             <motion.g animate={{ rotateY: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 55px" }}>
+             <motion.g {...loop({ rotateY: [0, 360] }, { duration: 20, repeat: Infinity, ease: "linear" })} style={{ transformOrigin: "50px 55px" }}>
                {/* Solid 3D Tetrahedron */}
                <path d="M 50 15 L 80 75 L 20 75 Z" fill="url(#threeGrad)" stroke="#3a2a1c" strokeWidth="1.5" strokeLinejoin="round" />
                <path d="M 50 15 L 50 85 L 80 75" fill="#fcfaf7" fillOpacity="0.1" stroke="#3a2a1c" strokeWidth="1.5" strokeLinejoin="round" />
@@ -482,8 +526,8 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <circle cx="50" cy="85" r="2.5" fill="#ff8a3d" stroke="none" />
              </motion.g>
 
-             <motion.circle cx="85" cy="45" r="3" fill="#ff8a3d" stroke="none" animate={{ y: [-10, 10, -10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
-             <motion.circle cx="20" cy="35" r="2" fill="#ff8a3d" stroke="none" animate={{ y: [8, -8, 8] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} />
+             <motion.circle cx="85" cy="45" r="3" fill="#ff8a3d" stroke="none" {...loop({ y: [-10, 10, -10] }, { duration: 4, repeat: Infinity, ease: "easeInOut" })} />
+             <motion.circle cx="20" cy="35" r="2" fill="#ff8a3d" stroke="none" {...loop({ y: [8, -8, 8] }, { duration: 5, repeat: Infinity, ease: "easeInOut" })} />
 
            </g>
         </svg>
@@ -532,8 +576,8 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <path d="M 50 30 L 50 50 L 35 60 M 50 50 L 65 60" stroke="#fcfaf7" strokeWidth="1.5" strokeOpacity="0.4" />
              
              {/* Surrounding Nodes */}
-             <motion.circle cx="25" cy="35" r="3" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity }} />
-             <motion.circle cx="75" cy="65" r="3" fill="#ff8a3d" stroke="none" animate={{ scale: isActive ? [1, 1.5, 1] : 1 }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
+             <motion.circle cx="25" cy="35" r="3" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity }, { enabled: isActive })} />
+             <motion.circle cx="75" cy="65" r="3" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity, delay: 1 }, { enabled: isActive })} />
              
              <text x="50" y="55" fontSize="12" fill="#fcfaf7" stroke="none" fontFamily="sans-serif" fontWeight="900" textAnchor="middle">JS</text>
            </g>
@@ -549,7 +593,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <path d="M 10 50 L 90 50" strokeWidth="1.5" />
              
              {/* Traveling nodes */}
-             <motion.circle cx="10" cy="50" r="2" fill="#ff8a3d" stroke="none" animate={{ cx: [10, 90], opacity: [0, 1, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} />
+             <motion.circle cx="10" cy="50" r="2" fill="#ff8a3d" stroke="none" {...loop({ cx: [10, 90], opacity: [0, 1, 0] }, { duration: 2, repeat: Infinity, ease: "linear" })} />
              
              {/* Center bold EX mark */}
              <rect x="35" y="35" width="30" height="30" rx="4" fill="#fcfaf7" stroke="#3a2a1c" strokeWidth="2" />
@@ -619,16 +663,15 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              </motion.g>
 
              {/* Orbiting data points */}
-             <motion.circle cx="20" cy="40" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity }} />
-             <motion.circle cx="80" cy="70" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
+             <motion.circle cx="20" cy="40" r="2.5" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity })} />
+             <motion.circle cx="80" cy="70" r="2.5" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity, delay: 1 })} />
            </g>
         </svg>
       );
     case "PostgreSQL":
       return (
         <motion.div 
-          animate={{ y: [-1, 1, -1] }} 
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          {...loop({ y: [-1, 1, -1] }, { duration: 5, repeat: Infinity, ease: "easeInOut" })}
           className="w-full h-full flex items-center justify-center opacity-90"
         >
           <img 
@@ -655,7 +698,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                  <text x="15" y="10" fontSize="5" fill="#3a2a1c" stroke="none" fontFamily="monospace" fontWeight="bold" textAnchor="middle">{method.label}</text>
                  <path d="M 30 7 L 45 7" strokeWidth="1.5" strokeDasharray="2 2" strokeOpacity="0.5" />
                  {/* Traveling pulses */}
-                 <motion.circle cx="30" cy="7" r="1.5" fill="#ff8a3d" stroke="none" animate={{ cx: [30, 45], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }} />
+                 <motion.circle cx="30" cy="7" r="1.5" fill="#ff8a3d" stroke="none" {...loop({ cx: [30, 45], opacity: [0, 1, 0] }, { duration: 1.5, repeat: Infinity, delay: i * 0.3 })} />
                </g>
              ))}
 
@@ -677,7 +720,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
     case "Figma":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" strokeWidth="0.4" fill="none">
-           <motion.g animate={{ x: isActive ? 3 : 0, y: isActive ? -2 : 0 }} transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}>
+           <motion.g {...loop({ x: [0, 3], y: [0, -2] }, { duration: 2.5, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }, { enabled: isActive })}>
               <rect x="25" y="15" width="25" height="25" rx="12.5" fill={isActive ? "#ff8a3d" : "none"} fillOpacity="0.1" />
               <rect x="50" y="15" width="25" height="25" rx="12.5" />
               <rect x="25" y="40" width="25" height="25" rx="12.5" />
@@ -717,8 +760,8 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              </motion.g>
 
              {/* Pulsing nodes */}
-             <motion.circle cx="30" cy="20" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity }} />
-             <motion.circle cx="50" cy="80" r="2.5" fill="#ff8a3d" stroke="none" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
+             <motion.circle cx="30" cy="20" r="2.5" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity })} />
+             <motion.circle cx="50" cy="80" r="2.5" fill="#ff8a3d" stroke="none" {...loop({ scale: [1, 1.5, 1] }, { duration: 2, repeat: Infinity, delay: 1 })} />
            </g>
         </svg>
       );
@@ -738,7 +781,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
     case "Three.js":
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" strokeWidth="0.35" fill="none" strokeLinejoin="round">
-           <motion.g animate={{ rotateY: isActive ? [0, 360] : [0, 180] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} style={{ transformOrigin: "50px 50px" }}>
+           <motion.g {...loop({ rotateY: isActive ? [0, 360] : [0, 180] }, { duration: 20, repeat: Infinity, ease: "linear" })} style={{ transformOrigin: "50px 50px" }}>
              {/* Abstract wireframe geometry */}
              <path d="M 50 15 L 85 75 L 15 75 Z" strokeWidth="0.6" />
              <path d="M 50 15 L 50 85 L 85 75" strokeOpacity="0.6" fill={isActive ? "#ff8a3d" : "none"} fillOpacity="0.08" />
@@ -774,7 +817,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <rect x="5" y="5" width="90" height="90" rx="5" />
              </clipPath>
            </defs>
-           <motion.g clipPath="url(#shaderMask)" animate={{ x: isActive ? [-4, 4, -4] : 0, y: isActive ? [3, -3, 3] : 0 }} transition={{ duration: 7, ease: "easeInOut", repeat: Infinity }}>
+           <motion.g clipPath="url(#shaderMask)" {...loop({ x: [-4, 4, -4], y: [3, -3, 3] }, { duration: 7, ease: "easeInOut", repeat: Infinity }, { enabled: isActive, rest: { x: 0, y: 0 } })}>
              {/* Wavy Deformed Grid */}
              {[...Array(12)].map((_, i) => (
                <path key={`h-${i}`} d={`M 0 ${10 + i * 8} Q 25 ${5 + i * 8 + (i%2?6:-6)} 50 ${10 + i * 8} T 100 ${10 + i * 8}`} strokeOpacity={0.15 + (i/25)} />
@@ -783,7 +826,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
                <path key={`v-${i}`} d={`M ${10 + i * 8} 0 Q ${5 + i * 8 + (i%2?6:-6)} 25 ${10 + i * 8} 50 T ${10 + i * 8} 100`} strokeOpacity={0.15 + ((12-i)/25)} />
              ))}
            </motion.g>
-           <motion.circle cx="25" cy="25" r="2" fill="#ff8a3d" stroke="none" animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
+           <motion.circle cx="25" cy="25" r="2" fill="#ff8a3d" stroke="none" {...loop({ opacity: [0.2, 1, 0.2] }, { duration: 4, repeat: Infinity, ease: "easeInOut" })} />
            <motion.circle cx="75" cy="75" r="2.5" fill="#ff8a3d" stroke="none" fillOpacity="0.6" />
         </svg>
       );
@@ -1032,10 +1075,10 @@ function ExpertiseRow({ category, index }: { category: ExpertiseCategoryData, in
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-10%" }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="flex flex-col border-t border-[#3a2a1c]/15 group relative py-16 md:py-24"
+        className="flex flex-col border-t border-[#3a2a1c]/15 group relative py-10 md:py-16 lg:py-24"
       >
         {/* Top Header Row for Premium Section */}
-        <div className="flex flex-col md:flex-row w-full mb-16 md:mb-24">
+        <div className="flex flex-col md:flex-row w-full mb-10 md:mb-16 lg:mb-24">
           <div className="w-full md:w-[30%] flex flex-col justify-start md:pr-12 relative z-10 mb-8 md:mb-0">
              <div className="flex items-center gap-3">
                <span className="font-mono text-[13px] text-[#ff8a3d] font-bold">{paddedIndex}</span>
@@ -1048,7 +1091,7 @@ function ExpertiseRow({ category, index }: { category: ExpertiseCategoryData, in
           </div>
           
           <div className="w-full md:w-[70%] md:pl-12 md:border-l border-[#3a2a1c]/15 relative z-10 flex flex-col justify-center">
-            <h3 className="font-syne font-bold text-3xl md:text-5xl text-[#1a1612] mb-4 tracking-tight">
+            <h3 className="font-syne font-bold text-2xl sm:text-3xl md:text-5xl text-[#1a1612] mb-4 tracking-tight">
               {category.title}
             </h3>
             <p className="font-sans text-base md:text-lg text-[#3a2a1c]/70 max-w-3xl leading-relaxed">
@@ -1058,7 +1101,7 @@ function ExpertiseRow({ category, index }: { category: ExpertiseCategoryData, in
         </div>
 
         {/* Spacious Full-width Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 w-full z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full z-10">
            {category.skills.map((skill, idx) => (
              <CreativeSkillCell 
                key={skill} 
@@ -1167,38 +1210,23 @@ const expertiseStyles = `
   .expertise-paused *, .expertise-paused {
     animation-play-state: paused !important;
   }
-  @media (prefers-reduced-motion: reduce) {
-    .expertise-paused *, .expertise-paused {
-      animation: none !important;
-      transform: none !important;
-    }
-  }
+  /* Reduced motion is handled by the same paused state (applied by the
+     animation budget): animations freeze at their first keyframe. Using
+     animation/transform: none here would override SVG transform attributes
+     and the animated elements' keyframed opacity, breaking the icon artwork. */
 `;
 
 export function Expertise() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    
-    // Fallback if IntersectionObserver is not available
-    if (typeof IntersectionObserver === 'undefined') return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        el.classList.remove('expertise-paused');
-      } else {
-        el.classList.add('expertise-paused');
-      }
-    }, { rootMargin: "200px" });
-    
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  // Section-wide animation budget: pauses the cells' CSS animations (via the
+  // .expertise-paused class) and the icons' framer-motion loops (via context)
+  // when the section is off screen (+200 px), the tab is hidden, or the user
+  // prefers reduced motion.
+  const { shouldAnimate } = useAnimationBudget(sectionRef, { rootMargin: "200px" });
 
   return (
-    <section id="stack" ref={sectionRef} className="relative w-full bg-[#f2ece1] px-6 md:px-12 py-24 md:py-32 overflow-hidden selection:bg-[#ff8a3d]/30">
+    <section id="stack" ref={sectionRef} className={`relative w-full bg-[#f2ece1] px-4 sm:px-6 md:px-12 py-16 md:py-24 lg:py-32 overflow-hidden selection:bg-[#ff8a3d]/30${shouldAnimate ? "" : " expertise-paused"}`}>
       <style>{expertiseStyles}</style>
       <div className="max-w-7xl mx-auto w-full">
         
@@ -1211,7 +1239,7 @@ export function Expertise() {
           className="flex items-center gap-4 mb-12"
         >
            <span className="font-researcher text-[#ff8a3d] text-lg font-bold tracking-[0.2em]">04</span>
-           <h2 className="font-syne font-black text-3xl md:text-5xl text-[#1a1612] uppercase tracking-tighter">
+           <h2 className="font-syne font-black text-2xl sm:text-3xl md:text-5xl text-[#1a1612] uppercase tracking-tighter">
              <span className="text-[0.7em]"><span className="text-[1.25em]">M</span>Y</span> <span className="text-[#ff8a3d]"><span className="text-[1.25em]">E</span>XPERTISE</span>
            </h2>
         </motion.div>
@@ -1228,8 +1256,8 @@ export function Expertise() {
           <div className="hidden md:block text-center flex-1">Applied Expertise & Production Stack</div>
           <div className="flex items-center gap-3">
             <motion.div 
-              animate={{ opacity: [1, 0.3, 1] }} 
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              animate={shouldAnimate ? { opacity: [1, 0.3, 1] } : { opacity: 1 }} 
+              transition={shouldAnimate ? { duration: 2, repeat: Infinity, ease: "linear" } : { duration: 0 }}
               className="w-1.5 h-1.5 bg-[#ff8a3d]" 
             /> 
             <span className="text-[#1a1612] font-bold">VERIFIED STACK</span>
@@ -1238,9 +1266,11 @@ export function Expertise() {
 
         {/* Stacked Rows */}
         <div className="flex flex-col">
-          {EXPERTISE_DATA.map((cat, i) => (
-            <ExpertiseRow key={cat.title} category={cat} index={i} />
-          ))}
+          <IconMotionContext.Provider value={shouldAnimate}>
+            {EXPERTISE_DATA.map((cat, i) => (
+              <ExpertiseRow key={cat.title} category={cat} index={i} />
+            ))}
+          </IconMotionContext.Provider>
           {/* Final closing border */}
           <div className="border-t border-[#3a2a1c]/15 w-full" />
         </div>

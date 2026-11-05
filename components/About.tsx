@@ -36,7 +36,7 @@ export const About = () => {
             style={{ zIndex: 0, pointerEvents: "none", userSelect: "none" }}
           >
             <span
-              className="font-researcher absolute right-[0%] top-[50%] -translate-y-[50%] text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
+              className="font-researcher absolute right-[0%] top-[50%] -translate-y-[50%] text-[5rem] sm:text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
               style={{ color: "rgb(58, 50, 43)", opacity: 0.10 }}
             >
               2028
@@ -55,7 +55,7 @@ export const About = () => {
               </div>
 
               {/* Institution */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] scale-x-[1.25] origin-right inline-block">
+              <h3 className="font-geist text-[1.8rem] sm:text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] md:scale-x-[1.25] origin-right inline-block">
                 SRM University AP
               </h3>
 
@@ -104,7 +104,7 @@ export const About = () => {
             style={{ zIndex: 0, pointerEvents: "none", userSelect: "none" }}
           >
             <span
-              className="font-researcher absolute left-[0%] top-[50%] -translate-y-[50%] text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
+              className="font-researcher absolute left-[0%] top-[50%] -translate-y-[50%] text-[5rem] sm:text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
               style={{ color: "rgb(58, 50, 43)", opacity: 0.10 }}
             >
               2024
@@ -123,7 +123,7 @@ export const About = () => {
               </div>
 
               {/* Institution */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-left">
+              <h3 className="font-geist text-[1.8rem] sm:text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block md:scale-x-[1.25] origin-left">
                 Geethanjali Olympiad School
               </h3>
 
@@ -172,7 +172,7 @@ export const About = () => {
             style={{ zIndex: 0, pointerEvents: "none", userSelect: "none" }}
           >
             <span
-              className="font-researcher absolute right-[0%] top-[50%] -translate-y-[50%] text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
+              className="font-researcher absolute right-[0%] top-[50%] -translate-y-[50%] text-[5rem] sm:text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
               style={{ color: "rgb(58, 50, 43)", opacity: 0.10 }}
             >
               2026
@@ -191,7 +191,7 @@ export const About = () => {
               </div>
 
               {/* Institution/Role */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-right">
+              <h3 className="font-geist text-[1.8rem] sm:text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block md:scale-x-[1.25] origin-right">
                 Google Student Ambassador
               </h3>
 
@@ -240,7 +240,7 @@ export const About = () => {
             style={{ zIndex: 0, pointerEvents: "none", userSelect: "none" }}
           >
             <span
-              className="font-researcher absolute left-[0%] top-[50%] -translate-y-[50%] text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
+              className="font-researcher absolute left-[0%] top-[50%] -translate-y-[50%] text-[5rem] sm:text-[9rem] md:text-[15rem] lg:text-[20rem] font-semibold leading-none tracking-tighter"
               style={{ color: "rgb(58, 50, 43)", opacity: 0.10 }}
             >
               2026
@@ -259,7 +259,7 @@ export const About = () => {
               </div>
 
               {/* Institution/Role */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-left">
+              <h3 className="font-geist text-[1.8rem] sm:text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block md:scale-x-[1.25] origin-left">
                 Data Analyst Intern
               </h3>
 

@@ -26,9 +26,10 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
   setEmail?: (v: string) => void,
   setProjectDetails?: (v: string) => void,
   handleSubmit?: (e: React.FormEvent) => void,
-  onClose?: () => void
+  onClose?: () => void,
+  showResume?: boolean
 }>((props, ref) => {
-  const { name, email, projectDetails, formState, errors, isCaptureMode, setName, setEmail, setProjectDetails, handleSubmit, onClose } = props;
+  const { name, email, projectDetails, formState, errors, isCaptureMode, setName, setEmail, setProjectDetails, handleSubmit, onClose, showResume } = props;
 
   return (
     <div
@@ -36,7 +37,7 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
       role={isCaptureMode ? undefined : "dialog"}
       aria-modal={isCaptureMode ? undefined : "true"}
       aria-labelledby={isCaptureMode ? undefined : "hire-me-title"}
-      className={`relative w-full max-w-[1100px] max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-[28px] md:rounded-[36px] border border-[var(--border-medium)] p-6 md:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.6),0_0_35px_rgba(255,138,61,0.15)] custom-scrollbar ${
+      className={`relative w-full max-w-[1100px] max-h-[95svh] overflow-y-auto overflow-x-hidden rounded-[20px] sm:rounded-[28px] md:rounded-[36px] border border-[var(--border-medium)] p-5 sm:p-6 md:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.6),0_0_35px_rgba(255,138,61,0.15)] custom-scrollbar ${
         isCaptureMode ? "bg-white" : "bg-[var(--bg-card)]"
       }`}
     >
@@ -195,13 +196,14 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
                  <span className="text-[#3a2a1c]/20 font-syne font-bold text-3xl tracking-widest uppercase">Resume</span>
                  <span className="text-[#3a2a1c]/20 font-syne text-sm tracking-wider uppercase mt-2">Prajit Balaji K</span>
                </div>
-            ) : (
+            ) : showResume ? (
+              // Mounted on the first genuine intent (hover/focus of HIRE ME) or on open — never during page load
               <iframe
                 src="/Prajit_Balaji_Resume.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0"
                 className="absolute -top-[20px] -left-[20px] w-[calc(100%+40px)] h-[calc(100%+40px)] pointer-events-none border-none bg-white"
                 title="Prajit Balaji Resume"
               />
-            )}
+            ) : null}
             <div className="absolute inset-0 z-10" />
           </div>
 
@@ -224,6 +226,123 @@ ModalContent.displayName = "ModalContent";
 
 
 // ────────────────────────────────────────────────────────────────────────────────
+// Genie snapshot helpers (FIX-05)
+// ────────────────────────────────────────────────────────────────────────────────
+const HIRE_ME_SELECTOR = '[aria-label="Hire Me"]';
+const SNAPSHOT_DELAY_AFTER_LOAD_MS = 5000; // the intro finishes ~3–5 s after load
+const SNAPSHOT_IDLE_TIMEOUT_MS = 3000;
+const SNAPSHOT_RESIZE_DEBOUNCE_MS = 400;
+const SNAPSHOT_REFRESH_AFTER_CLOSE_MS = 1000; // let the close warp finish first
+
+/** Layout key the snapshot depends on (scrollbar-independent, stable across mobile URL-bar changes). */
+const viewportKey = () => `${window.innerWidth}x${document.documentElement.clientHeight}`;
+
+function runWhenIdle(fn: () => void, timeout: number): () => void {
+  if (typeof window.requestIdleCallback === "function") {
+    const id = window.requestIdleCallback(() => fn(), { timeout });
+    return () => window.cancelIdleCallback(id);
+  }
+  const id = window.setTimeout(fn, 1);
+  return () => window.clearTimeout(id);
+}
+
+// html-to-image's default font embedding inlines every @font-face of every family
+// the node uses — all unicode subsets and every listed format — and re-fetches them
+// on each capture. The snapshot only needs the faces that can render the modal's own
+// text, so that CSS is built once (woff2 preferred) and reused.
+let modalFontCSS: Promise<string> | null = null;
+
+function getModalFontCSS(node: HTMLElement): Promise<string> {
+  modalFontCSS ??= buildFontEmbedCSS(node).catch((err) => {
+    modalFontCSS = null;
+    throw err;
+  });
+  return modalFontCSS;
+}
+
+const unquote = (s: string) => s.trim().replace(/^["']|["']$/g, "");
+
+function inUnicodeRange(range: string, codePoints: Set<number>): boolean {
+  if (!range.trim()) return true;
+  return range.split(",").some((part) => {
+    const p = part.trim().replace(/^u\+/i, "");
+    let lo: number;
+    let hi: number;
+    if (p.includes("-")) [lo, hi] = p.split("-").map((h) => parseInt(h, 16));
+    else if (p.includes("?")) {
+      lo = parseInt(p.replace(/\?/g, "0"), 16);
+      hi = parseInt(p.replace(/\?/g, "F"), 16);
+    } else lo = hi = parseInt(p, 16);
+    for (const cp of codePoints) if (cp >= lo && cp <= hi) return true;
+    return false;
+  });
+}
+
+async function toDataURL(url: string): Promise<string> {
+  const blob = await (await fetch(url, { cache: "force-cache" })).blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function buildFontEmbedCSS(node: HTMLElement): Promise<string> {
+  const families = new Set<string>();
+  let text = node.textContent ?? "";
+  for (const el of [node, ...Array.from(node.querySelectorAll<HTMLElement>("*"))]) {
+    getComputedStyle(el).fontFamily.split(",").forEach((f) => families.add(unquote(f)));
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) text += el.placeholder + el.value;
+  }
+  const codePoints = new Set(Array.from(text, (ch) => ch.codePointAt(0) ?? 0));
+
+  const faces: { rule: CSSFontFaceRule; base: string }[] = [];
+  const collect = (rules: CSSRuleList, base: string) => {
+    for (const rule of Array.from(rules)) {
+      if (rule instanceof CSSFontFaceRule) faces.push({ rule, base });
+      else if (rule instanceof CSSGroupingRule) collect(rule.cssRules, base);
+    }
+  };
+  for (const sheet of Array.from(document.styleSheets)) {
+    let rules: CSSRuleList;
+    try {
+      rules = sheet.cssRules;
+    } catch {
+      continue; // cross-origin sheet — none of the modal's fonts come from one
+    }
+    collect(rules, sheet.href ?? document.baseURI);
+  }
+
+  const css = await Promise.all(
+    faces
+      .filter(
+        ({ rule }) =>
+          families.has(unquote(rule.style.getPropertyValue("font-family"))) &&
+          inUnicodeRange(rule.style.getPropertyValue("unicode-range"), codePoints)
+      )
+      .map(async ({ rule, base }) => {
+        const src = rule.style.getPropertyValue("src");
+        const sources = Array.from(
+          src.matchAll(/url\(\s*(["']?)(.*?)\1\s*\)(?:\s*format\(\s*(["']?)(.*?)\3\s*\))?/g),
+          (m) => ({ url: m[2], format: m[4] })
+        );
+        const pick = sources.find((s) => s.format === "woff2") ?? sources[0];
+        if (!pick) return rule.cssText; // local() only — metric-adjusted fallback faces
+        const embedded = `url(${await toDataURL(new URL(pick.url, base).href)})${pick.format ? ` format("${pick.format}")` : ""}`;
+        if (rule.cssText.includes(src)) return rule.cssText.split(src).join(embedded);
+        const descriptors = ["font-family", "font-style", "font-weight", "font-stretch", "unicode-range", "size-adjust", "ascent-override", "descent-override", "line-gap-override"]
+          .map((p) => [p, rule.style.getPropertyValue(p)])
+          .filter(([, v]) => v)
+          .map(([p, v]) => `${p}: ${v};`)
+          .join(" ");
+        return `@font-face { ${descriptors} src: ${embedded}; }`;
+      })
+  );
+  return css.join("\n");
+}
+
+// ────────────────────────────────────────────────────────────────────────────────
 // Main Modal
 // ────────────────────────────────────────────────────────────────────────────────
 export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
@@ -233,42 +352,163 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
   const [formState, setFormState] = useState<"idle" | "loading" | "success">("idle");
   const [errors, setErrors] = useState<{ name?: string; email?: string; projectDetails?: string }>({});
 
-  const hiddenCaptureRef = useRef<HTMLDivElement>(null);
-  const cachedCanvasRef = useRef<HTMLCanvasElement | null>(null);
-
   const [scrollbarWidth, setScrollbarWidth] = useState(0);
 
-  // 1. Pre-capture the modal invisibly after mount to ensure absolutely zero delay on click
+  // Measure scrollbar exactly once on mount
   useEffect(() => {
-    // Measure scrollbar exactly once on mount
     setScrollbarWidth(window.innerWidth - document.documentElement.clientWidth);
+  }, []);
 
-    // Wait for fonts to load
-    const timer = setTimeout(() => {
-      if (hiddenCaptureRef.current && !cachedCanvasRef.current) {
-        toCanvas(hiddenCaptureRef.current, {
+  // ── Genie snapshot (FIX-05) ──────────────────────────────────────────────────
+  // The warp needs a bitmap of the modal. It is captured once, off the critical
+  // path — when the page is idle after the intro, or on the first intent (hover /
+  // focus of HIRE ME), whichever comes first — and reused for every open/close.
+  // The capture copy exists only while a capture runs (inert + aria-hidden).
+  const [captureMounted, setCaptureMounted] = useState(false);
+  const captureNodeRef = useRef<HTMLDivElement | null>(null);
+  const captureNodeWaiterRef = useRef<((el: HTMLDivElement) => void) | null>(null);
+  const snapshotRef = useRef<{ canvas: HTMLCanvasElement; key: string } | null>(null);
+  const snapshotJobRef = useRef<Promise<HTMLCanvasElement> | null>(null);
+  const snapshotStaleRef = useRef(false);
+  const isOpenRef = useRef(isOpen);
+
+  // PDF preview: mounted on the first genuine intent or on open, then kept mounted.
+  const [resumeRequested, setResumeRequested] = useState(false);
+  if (isOpen && !resumeRequested) setResumeRequested(true);
+
+  const setCaptureNode = useCallback((el: HTMLDivElement | null) => {
+    captureNodeRef.current = el;
+    const resolve = captureNodeWaiterRef.current;
+    if (el && resolve) {
+      captureNodeWaiterRef.current = null;
+      resolve(el);
+    }
+  }, []);
+
+  // Single-flight: idle, intent and Genie all share one in-progress capture.
+  const ensureSnapshot = useCallback((): Promise<HTMLCanvasElement> => {
+    if (snapshotRef.current) return Promise.resolve(snapshotRef.current.canvas);
+    if (snapshotJobRef.current) return snapshotJobRef.current;
+    const job = (async () => {
+      try {
+        const key = viewportKey();
+        const node =
+          captureNodeRef.current ??
+          (await new Promise<HTMLDivElement>((resolve) => {
+            captureNodeWaiterRef.current = resolve;
+            setCaptureMounted(true);
+          }));
+        const canvas = await toCanvas(node, {
           pixelRatio: 1.5, // Reduced from 2 for much smoother WebGL framerates
           backgroundColor: "transparent",
-          skipFonts: false,
+          fontEmbedCSS: await getModalFontCSS(node),
           style: {
             opacity: "1",
             visibility: "visible",
-          }
-        }).then((canvas) => {
-          cachedCanvasRef.current = canvas;
-        }).catch(err => console.warn("Pre-capture failed:", err));
+          },
+        });
+        snapshotRef.current = { canvas, key };
+        return canvas;
+      } finally {
+        snapshotJobRef.current = null;
+        setCaptureMounted(false);
       }
-    }, 600);
-    return () => clearTimeout(timer);
+    })();
+    snapshotJobRef.current = job;
+    return job;
   }, []);
 
-  // 2. The instant capture function passed to Genie WebGL
-  const instantCapture = useCallback(async (el: HTMLElement) => {
-    if (cachedCanvasRef.current) {
-      return cachedCanvasRef.current;
+  const requestSnapshot = useCallback(() => {
+    ensureSnapshot().catch((err) => console.warn("Hire Me snapshot failed:", err));
+  }, [ensureSnapshot]);
+
+  // What Genie calls on every show/hide: the cached snapshot (instant) or the
+  // in-flight capture; only if that fails, a live capture as before.
+  const captureForGenie = useCallback(async (el: HTMLElement): Promise<HTMLCanvasElement> => {
+    try {
+      return await ensureSnapshot();
+    } catch (err) {
+      console.warn("Hire Me snapshot failed, using a live capture:", err);
+      try {
+        return await toCanvas(el, { pixelRatio: 1.5, backgroundColor: "transparent" });
+      } catch {
+        const blank = document.createElement("canvas");
+        blank.width = blank.height = 1;
+        return blank;
+      }
     }
-    return toCanvas(el, { pixelRatio: 1.5, backgroundColor: "transparent" });
-  }, []);
+  }, [ensureSnapshot]);
+
+  // 1. Idle capture once the intro has finished.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelIdle: (() => void) | undefined;
+    const schedule = () => {
+      timer = setTimeout(() => {
+        cancelIdle = runWhenIdle(requestSnapshot, SNAPSHOT_IDLE_TIMEOUT_MS);
+      }, SNAPSHOT_DELAY_AFTER_LOAD_MS);
+    };
+    if (document.readyState === "complete") schedule();
+    else window.addEventListener("load", schedule, { once: true });
+    return () => {
+      window.removeEventListener("load", schedule);
+      if (timer !== undefined) clearTimeout(timer);
+      cancelIdle?.();
+    };
+  }, [requestSnapshot]);
+
+  // 2. First genuine intent on HIRE ME (hover / keyboard focus): capture now, preload the PDF.
+  useEffect(() => {
+    const trigger = document.querySelector<HTMLElement>(HIRE_ME_SELECTOR);
+    if (!trigger) return;
+    const onIntent = () => {
+      setResumeRequested(true);
+      requestSnapshot();
+    };
+    trigger.addEventListener("pointerenter", onIntent);
+    trigger.addEventListener("focus", onIntent);
+    return () => {
+      trigger.removeEventListener("pointerenter", onIntent);
+      trigger.removeEventListener("focus", onIntent);
+    };
+  }, [requestSnapshot]);
+
+  // 3. Keep the snapshot matched to the layout: after a resize, re-capture while closed.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelIdle: (() => void) | undefined;
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const snap = snapshotRef.current;
+        if (!snap || snap.key === viewportKey()) return;
+        if (isOpenRef.current) {
+          snapshotStaleRef.current = true; // keep using it until the modal has closed
+          return;
+        }
+        snapshotRef.current = null;
+        cancelIdle?.();
+        cancelIdle = runWhenIdle(requestSnapshot, SNAPSHOT_IDLE_TIMEOUT_MS);
+      }, SNAPSHOT_RESIZE_DEBOUNCE_MS);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      clearTimeout(timer);
+      cancelIdle?.();
+    };
+  }, [requestSnapshot]);
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+    if (isOpen || !snapshotStaleRef.current) return;
+    const timer = setTimeout(() => {
+      snapshotStaleRef.current = false;
+      snapshotRef.current = null;
+      requestSnapshot();
+    }, SNAPSHOT_REFRESH_AFTER_CLOSE_MS);
+    return () => clearTimeout(timer);
+  }, [isOpen, requestSnapshot]);
 
   // Close on ESC key press & lock body scroll, with layout shift prevention
   useEffect(() => {
@@ -357,25 +597,33 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
 
   return (
     <>
-      {/* 
-        PRE-CAPTURE NODE
-        Rendered identically to the real modal, ensuring EXACT padding and dimensions
-        so the WebGL snapshot matches the final DOM pixel-for-pixel.
+      {/*
+        SNAPSHOT COPY (FIX-05)
+        Mounted only while the Genie snapshot is being captured. It uses the same box
+        structure as the Genie wrapper below (the bare <div> stands in for Genie's own
+        element), so it lays out at exactly the real modal's size. Hidden from
+        assistive technology and keyboard focus.
       */}
-      <div 
-        className="fixed top-0 bottom-0 left-0 z-[-9999] pointer-events-none flex items-center justify-center p-4 sm:p-6 md:p-8"
-        style={{ right: "0px" }}
-      >
-         <ModalContent 
-           ref={hiddenCaptureRef}
-           name={name}
-           email={email}
-           projectDetails={projectDetails}
-           formState={formState}
-           errors={errors}
-           isCaptureMode={true}
-         />
-      </div>
+      {captureMounted && (
+        <div
+          aria-hidden="true"
+          inert
+          className="fixed top-0 bottom-0 left-0 z-[-9999] pointer-events-none flex items-center justify-center p-4 sm:p-6 md:p-8"
+          style={{ right: isOpen ? `${scrollbarWidth}px` : "0px" }}
+        >
+          <div>
+            <ModalContent
+              ref={setCaptureNode}
+              name={name}
+              email={email}
+              projectDetails={projectDetails}
+              formState={formState}
+              errors={errors}
+              isCaptureMode={true}
+            />
+          </div>
+        </div>
+      )}
 
       {/* 
         THE GENIE WRAPPER
@@ -391,7 +639,7 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
           config={{ 
             duration: 480, // Reduced from 850 for much faster, snappier movement
             direction: "auto",
-            capture: instantCapture
+            capture: captureForGenie
           }}
           className="pointer-events-auto"
         >
@@ -407,6 +655,7 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
            setProjectDetails={setProjectDetails}
            handleSubmit={handleSubmit}
            onClose={onClose}
+           showResume={resumeRequested}
          />
         </Genie>
       </div>

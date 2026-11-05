@@ -563,9 +563,9 @@ export function ProjectWheel3D({
   const isMobile = dims.w < 768;
 
   // Wide radius — gentle bracelet curvature (DON'T change)
-  const radius = isMobile ? 500 : Math.min(dims.w * 0.65, 1200);
-  // Card dimensions stay large (DON'T change)
-  const cardWidth = isMobile ? 280 : Math.min(dims.w * 0.42, 800);
+  const radius = isMobile ? 450 : Math.min(dims.w * 0.65, 1200);
+  // Card dimensions — responsive on mobile
+  const cardWidth = isMobile ? Math.min(dims.w * 0.72, 300) : Math.min(dims.w * 0.42, 800);
   const cardHeight = cardWidth * 0.62;
 
   // Dynamically duplicate items to form a dense, continuous horizontal bracelet

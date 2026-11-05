@@ -44,7 +44,7 @@ function ParallaxText({
             key={i}
             className="block px-8"
             style={{
-              fontSize: "clamp(4rem, 15vw, 12rem)",
+              fontSize: "clamp(2.5rem, 15vw, 12rem)",
               color: "transparent",
               WebkitTextStroke: `${strokeWidth}px currentColor`,
             }}

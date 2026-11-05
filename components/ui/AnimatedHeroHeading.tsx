@@ -66,11 +66,10 @@ export function AnimatedHeroHeading({
                 // Critical: Syne 800 for the big editorial feel
                 fontFamily: "var(--next-font-syne), 'Cabinet Grotesk', system-ui, sans-serif",
                 fontWeight: 800,
-                fontSize: "clamp(1.8rem, 3.5vw, 3.8rem)",
+                fontSize: "clamp(1.5rem, 3.5vw, 3.8rem)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
                 textTransform: "uppercase",
-                whiteSpace: "nowrap",
               }}
             >
               {words.map((word, wordIdx) => {

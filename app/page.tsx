@@ -257,7 +257,7 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
         <ScrollReveal
           key={node.year}
           initialTransform="translateY(40px)"
-          className={`relative mb-20 grid grid-cols-12 items-start gap-6 ${
+          className={`relative mb-12 md:mb-20 grid grid-cols-12 items-start gap-4 md:gap-6 ${
             node.side === "right" ? "md:flex-row-reverse" : ""
           }`}
         >
@@ -273,11 +273,11 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
                   <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
                 </div>
               )}
-              <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
+              <div className="font-display text-3xl sm:text-5xl font-semibold tracking-tight md:text-7xl">
                 {node.year}
               </div>
             </div>
-            <div className="mt-4 uppercase font-syne text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-extrabold">
+            <div className="mt-3 md:mt-4 uppercase font-syne text-base sm:text-xl text-[#dfd3c0] md:text-2xl dark:text-[#dfd3c0] light:text-[#3a352f] font-extrabold">
               {node.role.split(" ").map((w, i, arr) => {
                 const cleanWord = w.replace(/[^a-zA-Z0-9&]/g, "").toUpperCase();
                 const isOrange = ["INTERNSHIP", "DATA", "SCIENTIST", "LLM", "VISION", "MISSION"].includes(cleanWord);
@@ -292,7 +292,7 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
                 );
               })}
             </div>
-            <p className="mt-4 text-xl md:text-2xl text-[#110e0c] font-syne leading-relaxed">
+            <p className="mt-3 md:mt-4 text-sm sm:text-base md:text-xl lg:text-2xl text-[#110e0c] font-syne leading-relaxed">
               {node.desc}
             </p>
           </div>
@@ -320,7 +320,7 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
             {node.side === "right" && (
               <>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
-                  <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
+                  <div className="font-display text-3xl sm:text-5xl font-semibold tracking-tight md:text-7xl">
                     {node.year}
                   </div>
                   {node.logoSrc && (
@@ -344,7 +344,7 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
                     );
                   })}
                 </div>
-                <p className="mt-4 text-xl md:text-2xl text-[#110e0c] font-syne leading-relaxed">
+                <p className="mt-3 md:mt-4 text-sm sm:text-base md:text-xl lg:text-2xl text-[#110e0c] font-syne leading-relaxed">
                   {node.desc}
                 </p>
               </>
@@ -365,6 +365,18 @@ export default function Home() {
   const [hireMeOpen, setHireMeOpen] = useState(false);
   // Mouse-driven effects (WebGL hero mesh) only make sense with a fine pointer
   const [isFinePointer, setIsFinePointer] = useState(false);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (menuOpen) setMenuOpen(false);
+        if (hireMeOpen) setHireMeOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [menuOpen, hireMeOpen]);
 
   // Form Fields
   const [name, setName] = useState("");
@@ -691,7 +703,7 @@ export default function Home() {
           pointer-events: none;
         }
       `}} />
-      <div className="fixed z-[90] flex gap-3 max-md:bottom-5 max-md:left-1/2 max-md:-translate-x-1/2 max-md:flex-row md:right-5 md:top-1/2 md:-translate-y-1/2 md:flex-col">
+      <div className="fixed z-[90] flex gap-2 sm:gap-3 max-md:bottom-[52px] max-md:left-1/2 max-md:-translate-x-1/2 max-md:flex-row md:right-5 md:top-1/2 md:-translate-y-1/2 md:flex-col">
         {[
           {
             label: "Github",
@@ -736,7 +748,7 @@ export default function Home() {
               target={item.href.startsWith("mailto:") ? undefined : "_blank"}
               rel="noopener noreferrer"
               aria-label={item.label}
-              className="glass-icon-btn group relative z-10 flex h-14 w-14 items-center justify-center rounded-full"
+              className="glass-icon-btn group relative z-10 flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-full"
             >
               <span className="relative z-10 scale-110">{item.icon}</span>
               {/* Hover label — bright orange bg with black text */}
@@ -763,7 +775,7 @@ export default function Home() {
 
       {/* Floating Header Navbar */}
       <nav
-        className="fixed top-4 left-[calc(50%+16px)] z-50 -translate-x-1/2 transition-all duration-700 w-[min(95%,760px)]"
+        className="fixed top-4 left-1/2 z-50 -translate-x-1/2 transition-all duration-700 w-[min(92%,760px)]"
         style={{
           opacity: mounted ? 1 : 0,
           transform: mounted ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-40px)",
@@ -900,9 +912,9 @@ export default function Home() {
         {/* Background */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_50%,rgba(40,18,8,0.9),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_70%_50%,rgba(40,18,8,0.9),transparent_60%)] light:bg-[radial-gradient(ellipse_at_70%_50%,rgba(255,240,225,0.4),transparent_60%)]"></div>
-          <div className="absolute left-[8%] top-[18%] h-[400px] w-[400px] rounded-full bg-[#c2410c]/20 blur-[80px] light:bg-[#c2410c]/8 light:blur-[80px]"></div>
-          <div className="absolute right-[5%] top-[35%] h-[500px] w-[500px] rounded-full bg-[#ff8a3d]/15 blur-[100px] light:bg-[#ff8a3d]/6 light:blur-[100px]"></div>
-          <div className="absolute bottom-[-10%] left-1/2 h-[350px] w-[70%] -translate-x-1/2 rounded-full bg-[#b87333]/18 blur-[80px] light:bg-[#b87333]/8 light:blur-[80px]"></div>
+          <div className="absolute left-[8%] top-[18%] h-[200px] w-[200px] md:h-[400px] md:w-[400px] rounded-full bg-[#c2410c]/20 blur-[60px] md:blur-[80px] light:bg-[#c2410c]/8 light:blur-[80px]"></div>
+          <div className="absolute right-[5%] top-[35%] h-[250px] w-[250px] md:h-[500px] md:w-[500px] rounded-full bg-[#ff8a3d]/15 blur-[60px] md:blur-[100px] light:bg-[#ff8a3d]/6 light:blur-[100px]"></div>
+          <div className="absolute bottom-[-10%] left-1/2 h-[200px] w-[85%] md:h-[350px] md:w-[70%] -translate-x-1/2 rounded-full bg-[#b87333]/18 blur-[60px] md:blur-[80px] light:bg-[#b87333]/8 light:blur-[80px]"></div>
           <div className="absolute inset-x-0 bottom-0 h-[40vh] bg-gradient-to-t from-[#1a0d05]/80 via-[#0d0807]/40 to-transparent dark:from-[#1a0d05]/80 dark:via-[#0d0807]/40 light:from-[#f5efe6] light:to-transparent"></div>
         </div>
 
@@ -910,7 +922,7 @@ export default function Home() {
         <DinoRunner />
 
         {/* Hero layout: flex column filling full viewport height */}
-        <div className="relative z-10 flex min-h-[100svh] flex-col justify-between pt-32 pb-10">
+        <div className="relative z-10 flex min-h-[100svh] flex-col justify-between pt-24 md:pt-32 pb-14 md:pb-10">
 
           {/* Top metadata row — constrained to 1600px */}
           <ScrollReveal
@@ -934,9 +946,9 @@ export default function Home() {
               <motion.div style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}>
                 <Magnetic strength={0.08}>
                   <ElasticHeroTitle
-                    className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
+                    className="font-montserrat font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
                     style={{
-                      fontSize: "clamp(2rem, 12.5vw, 18rem)",
+                      fontSize: "clamp(2.2rem, 12.5vw, 18rem)",
                       lineHeight: "0.85",
                       letterSpacing: "-0.06em",
                       position: "relative",
@@ -947,7 +959,7 @@ export default function Home() {
             </ScrollReveal>
 
             {/* Sub-info row — centered directly underneath */}
-            <div className="mt-12 flex flex-col items-center justify-center gap-6 px-6 md:px-12 w-full max-w-[1600px]">
+            <div className="mt-8 md:mt-12 flex flex-col items-center justify-center gap-4 md:gap-6 px-4 md:px-12 w-full max-w-[1600px]">
               <ScrollReveal
                 initialTransform="translateY(30px)"
                 className="relative w-full flex justify-center"
@@ -991,7 +1003,7 @@ export default function Home() {
       </section>
 
       {/* ── Bottom Ticker — fixed to viewport bottom, visible immediately ── */}
-      <div className="fixed bottom-0 left-0 w-full z-[60]">
+      <div className="fixed bottom-0 left-0 w-full z-[60]" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         <BottomTicker />
       </div>
 
@@ -1017,7 +1029,7 @@ export default function Home() {
             </div>
 
             {/* Portrait — bleeds to full height, soft bottom fade */}
-            <div className="relative z-10 w-full h-[70vh] md:h-[100vh] group">
+            <div className="relative z-10 w-full h-[50vh] sm:h-[60vh] md:h-[100vh] group">
               <Image
                 src="/portrait/My Portrait White Shirt.png"
                 alt="Prajit Balaji"
@@ -1140,7 +1152,7 @@ export default function Home() {
       <Expertise />
 
       {/* Section 5: Projects */}
-      <section id="projects" className="relative py-32 md:py-48">
+      <section id="projects" className="relative py-20 md:py-32 lg:py-48">
         <div className="mx-auto max-w-[1920px] px-6 md:px-12">
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
             <span>05</span>
@@ -1205,7 +1217,7 @@ export default function Home() {
       <Credentials />
 
       {/* Section 8: Journey */}
-      <section id="journey" className="relative mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
+      <section id="journey" className="relative mx-auto max-w-[1600px] px-6 py-20 md:px-12 md:py-32 lg:py-48">
         <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
           <span>08</span>
           <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
@@ -1224,7 +1236,7 @@ export default function Home() {
 
       {/* Section 9: Contact */}
       <section id="contact" className="relative overflow-hidden">
-        <div className="mx-auto max-w-[1600px] px-6 py-32 md:px-12 md:py-48">
+        <div className="mx-auto max-w-[1600px] px-6 py-20 md:px-12 md:py-32 lg:py-48">
           <div className="mb-8 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-[#a89c8d]/70 font-researcher">
             <span>09</span>
             <span className="h-px w-12 bg-[#5a3f2a]/60 dark:bg-[#5a3f2a]/60 light:bg-black/10"></span>
@@ -1329,7 +1341,7 @@ export default function Home() {
                 </div>
                 <a
                   href="mailto:prajitk299@gmail.com"
-                  className="font-display mt-2 block text-2xl tracking-tight hover:text-[#c9bcaa] md:text-3xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors"
+                  className="font-display mt-2 block text-lg sm:text-2xl tracking-tight hover:text-[#c9bcaa] md:text-3xl text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] transition-colors break-all sm:break-normal"
                 >
                   prajitk299@gmail.com
                 </a>

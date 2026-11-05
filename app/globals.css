@@ -985,3 +985,27 @@ html.theme-transitioning *::after {
     @apply font-sans;
   }
 }
+/* Mobile responsive enhancements */
+@media (max-width: 767px) {
+  .glow-orb { filter: blur(24px); }
+  .vignette { opacity: 0.6; }
+  .rainbow-halo .rainbow-conic { filter: blur(12px); }
+  .rainbow-conic { width: 120%; }
+  body { background-size: 24px 24px; }
+  .grid-overlay { background-size: 24px 24px; }
+}
+
+@media (pointer: coarse) {
+  .glass-button-wrap:hover { transform: none; }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain, .vignette { display: none; }
+}

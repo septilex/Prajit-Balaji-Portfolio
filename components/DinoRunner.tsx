@@ -1,6 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useAnimationBudget } from "@/lib/useAnimationBudget";
+
+// ── Frame scheduling ───────────────────────────────────────────────────────
+// All motion below is scaled by `dt` (in 60 fps frame units), so the game
+// looks the same at any frame rate. On high-refresh displays (120/144 Hz)
+// drawing every vsync only doubles the canvas work for no visible gain, so
+// frames closer together than this are skipped (≈60 fps ceiling, with
+// headroom for vsync jitter so 60 Hz displays never drop a frame).
+const MIN_FRAME_MS = (1000 / 60) * 0.8;
+// The canvas fills the hero; at DPR 3 (phones) the backing store would be
+// ~3 MP redrawn every frame. Pixel-art fillRects stay crisp at 2×.
+const MAX_DPR = 2;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DinoRunner — Ambient Chrome-Dino-inspired infinite runner Easter egg.
@@ -261,6 +273,12 @@ export function DinoRunner() {
   const cvs = useRef<HTMLCanvasElement>(null);
   const rid = useRef(0);
   const currentWeapon = useRef<WeaponType>("mp5");
+  // Loop control exposed by the setup effect to the lifecycle effect below.
+  const loopControl = useRef<{ start: () => void; stop: () => void; drawStatic: () => void } | null>(null);
+
+  // Run only while the hero canvas is on screen and the tab is visible;
+  // under prefers-reduced-motion draw a single static scene instead.
+  const { shouldRender, shouldAnimate } = useAnimationBudget(cvs);
 
   useEffect(() => {
     // Determine weapon on mount (client-side only)
@@ -289,6 +307,19 @@ export function DinoRunner() {
     let muzzleFlash = 0;
     let oCD = 80, bCD = 0, cCD = 0;
     let init = false;
+
+    // Loop lifecycle (driven by the animation budget)
+    let running = false;      // rAF loop active
+    let staticWanted = false; // reduced motion: keep a static frame painted
+
+    // Paint one frame without starting the loop (reduced-motion static scene).
+    // Hoisted so sprite loaders and `resize` can call it; it only touches
+    // `frame` once a static scene has been requested (after setup completes).
+    function redrawIfStatic() {
+      if (!staticWanted || running) return;
+      prev = 0;
+      frame(performance.now());
+    }
 
     // Jump state scaled to medium-subtle size
     let jumpY = 0, jumpVel = 0, isJumping = false;
@@ -385,6 +416,7 @@ export function DinoRunner() {
 
       dinoAspect = selectedDinoCanvas.width / selectedDinoCanvas.height;
       dinoLoaded = true;
+      redrawIfStatic();
     };
 
     const petStripImg = new Image();
@@ -472,6 +504,7 @@ export function DinoRunner() {
         }
       }
       petsLoaded = true;
+      redrawIfStatic();
     };
 
     /** Spawn initial birds so they're visible on page load */
@@ -519,7 +552,7 @@ export function DinoRunner() {
     };
 
     const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
       const r = el.getBoundingClientRect();
       W = r.width; H = r.height;
       el.width = W * dpr; el.height = H * dpr;
@@ -553,6 +586,8 @@ export function DinoRunner() {
 
         init = true;
       }
+      // Resizing clears the canvas; repaint the static scene if one is shown.
+      redrawIfStatic();
     };
     resize();
     window.addEventListener("resize", resize);
@@ -1194,23 +1229,63 @@ export function DinoRunner() {
         }
         ctx.restore();
       }
-
-      rid.current = requestAnimationFrame(frame);
     };
 
-    rid.current = requestAnimationFrame(frame);
+    // ── Loop scheduling ──
+    const loop = (t: number) => {
+      if (!running) return;
+      rid.current = requestAnimationFrame(loop);
+      if (prev && t - prev < MIN_FRAME_MS) return; // ≈60 fps ceiling
+      frame(t);
+    };
+
+    loopControl.current = {
+      start() {
+        if (running) return;
+        running = true;
+        staticWanted = false;
+        prev = 0; // resume with dt = 1 instead of one huge catch-up step
+        rid.current = requestAnimationFrame(loop);
+      },
+      stop() {
+        running = false;
+        staticWanted = false;
+        cancelAnimationFrame(rid.current);
+      },
+      drawStatic() {
+        if (running) return;
+        staticWanted = true;
+        redrawIfStatic();
+      },
+    };
 
     return () => {
-      cancelAnimationFrame(rid.current);
+      loopControl.current?.stop();
+      loopControl.current = null;
       window.removeEventListener("resize", resize);
     };
   }, []);
+
+  // Start/stop the loop as the canvas scrolls in and out of view, the tab is
+  // hidden/shown, or the motion preference changes.
+  useEffect(() => {
+    const control = loopControl.current;
+    if (!control) return;
+    if (shouldAnimate) {
+      control.start();
+    } else {
+      control.stop();
+      if (shouldRender) control.drawStatic(); // reduced motion: static scene
+    }
+  }, [shouldAnimate, shouldRender]);
 
   return (
     <canvas
       ref={cvs}
       className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 1 }}
+      // imageRendering only matters when the DPR cap upscales the canvas
+      // (DPR > 2): keep pixel-art edges hard instead of bilinear-smoothed.
+      style={{ zIndex: 1, imageRendering: "pixelated" }}
       aria-hidden="true"
     />
   );

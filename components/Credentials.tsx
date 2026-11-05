@@ -143,7 +143,7 @@ export function Credentials() {
                     <div className="absolute inset-0 rounded-full border border-[#ff8a3d]/40 animate-ping"></div>
                   </div>
                   
-                  <span className={`font-syne uppercase text-2xl md:text-3xl font-semibold tracking-tight transition-colors duration-300 flex items-center ${
+                  <span className={`font-syne uppercase text-lg sm:text-2xl md:text-3xl font-semibold tracking-tight transition-colors duration-300 flex items-center ${
                     isActive ? "text-[#110e0c]" : "text-[#8c7d6e]"
                   }`}>
                     {cred.tickerLabel.split(" ").map((w, i, arr) => (
@@ -164,7 +164,7 @@ export function Credentials() {
       </div>
 
       {/* Content Area */}
-      <div className="mx-auto max-w-[1600px] w-full px-6 md:px-12 relative z-10 pt-12 md:pt-16 min-h-[1000px] lg:min-h-[750px]">
+      <div className="mx-auto max-w-[1600px] w-full px-6 md:px-12 relative z-10 pt-8 md:pt-16 min-h-[700px] sm:min-h-[800px] lg:min-h-[750px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeId}
@@ -203,7 +203,7 @@ export function Credentials() {
                   <span>VERIFIED • {activeCredential.date.split(" ").pop()}</span>
                 </div>
                 
-                <h3 className="font-syne uppercase text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight text-[#110e0c] flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h3 className="font-syne uppercase text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.05] tracking-tight text-[#110e0c] flex flex-wrap items-baseline gap-x-2 sm:gap-x-3 gap-y-1">
                   {activeCredential.title.split(" ").map((w, i) => (
                     <span key={i} className="inline-block">
                       <span className="text-[1.25em] leading-none">{w.charAt(0)}</span>

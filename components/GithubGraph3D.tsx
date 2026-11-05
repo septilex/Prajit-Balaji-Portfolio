@@ -7,6 +7,13 @@ import * as THREE from 'three';
 import { ContributionDay } from '@/lib/githubContributions';
 import { Magnetic } from '@/components/ui/Magnetic';
 import { Loader2 } from 'lucide-react';
+import { useAnimationBudget } from '@/lib/useAnimationBudget';
+
+// The render loop pauses while the graph is off-screen (or, under reduced
+// motion, whenever nothing is moving). R3F's clock then reports the whole
+// pause as one frame delta on resume; clamp it so springs/lerps continue
+// smoothly instead of snapping to their targets.
+const MAX_FRAME_DELTA = 0.1; // seconds
 
 const THEME = {
   0: '#ebedf0',
@@ -60,12 +67,25 @@ instancedMaterial.onBeforeCompile = (shader) => {
   );
 };
 
-function DelayedSnapControls({ children }: { children: React.ReactNode }) {
-  const { gl, size, viewport } = useThree();
+function DelayedSnapControls({ children, active, onSettledChange }: {
+  children: React.ReactNode;
+  active: boolean;
+  /** Reports transitions between "rotating/dragging" and "at rest". */
+  onSettledChange: (settled: boolean) => void;
+}) {
+  // Primitive selectors: the canvas `size` object is replaced whenever its
+  // page offset changes (react-use-measure tracks scroll), which previously
+  // re-rendered this component and re-bound its listeners after every scroll.
+  const gl = useThree((s) => s.gl);
+  const width = useThree((s) => s.size.width);
+  const height = useThree((s) => s.size.height);
+  const viewportWidth = useThree((s) => s.viewport.width);
+  const invalidate = useThree((s) => s.invalidate);
   const groupRef = useRef<THREE.Group>(null!);
   const targetRotation = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
   const idleTimer = useRef<NodeJS.Timeout | null>(null);
+  const lastSettled = useRef<boolean | null>(null);
 
   React.useEffect(() => {
     const canvas = gl.domElement;
@@ -78,6 +98,7 @@ function DelayedSnapControls({ children }: { children: React.ReactNode }) {
       lastY = e.clientY;
       if (idleTimer.current) clearTimeout(idleTimer.current);
       canvas.style.cursor = 'grabbing';
+      invalidate();
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -87,17 +108,19 @@ function DelayedSnapControls({ children }: { children: React.ReactNode }) {
       lastX = e.clientX;
       lastY = e.clientY;
 
-      targetRotation.current.y += (deltaX / size.width) * Math.PI * 1.5;
-      targetRotation.current.x += (deltaY / size.height) * Math.PI * 1.5;
+      targetRotation.current.y += (deltaX / width) * Math.PI * 1.5;
+      targetRotation.current.x += (deltaY / height) * Math.PI * 1.5;
+      invalidate();
     };
 
     const onPointerUp = () => {
       isDragging.current = false;
       canvas.style.cursor = 'grab';
-      
+
       if (idleTimer.current) clearTimeout(idleTimer.current);
       idleTimer.current = setTimeout(() => {
         targetRotation.current = { x: 0, y: 0 };
+        invalidate();
       }, 1000);
     };
 
@@ -113,16 +136,31 @@ function DelayedSnapControls({ children }: { children: React.ReactNode }) {
       if (idleTimer.current) clearTimeout(idleTimer.current);
       canvas.style.cursor = '';
     };
-  }, [gl, size]);
+  }, [gl, width, height, invalidate]);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
+    const dt = Math.min(delta, MAX_FRAME_DELTA);
     const lerpFactor = isDragging.current ? 25 : 3;
-    groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotation.current.x, delta * lerpFactor);
-    groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotation.current.y, delta * lerpFactor);
+    const rot = groupRef.current.rotation;
+    rot.x = THREE.MathUtils.lerp(rot.x, targetRotation.current.x, dt * lerpFactor);
+    rot.y = THREE.MathUtils.lerp(rot.y, targetRotation.current.y, dt * lerpFactor);
+    // In on-demand mode keep frames coming until the snap-back has settled.
+    const moving =
+      isDragging.current ||
+      Math.abs(rot.x - targetRotation.current.x) > 1e-4 ||
+      Math.abs(rot.y - targetRotation.current.y) > 1e-4;
+    if (active && moving) state.invalidate();
+
+    const settled = !moving;
+    if (lastSettled.current !== settled) {
+      lastSettled.current = settled;
+      onSettledChange(settled);
+      if (settled && active) state.invalidate(); // let the shadow pass capture the rest pose
+    }
   });
 
-  const responsiveScale = Math.min(0.8, viewport.width / 48);
+  const responsiveScale = Math.min(0.8, viewportWidth / 48);
 
   return (
     <group ref={groupRef} scale={responsiveScale}>
@@ -131,12 +169,18 @@ function DelayedSnapControls({ children }: { children: React.ReactNode }) {
   );
 }
 
-function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: { 
-  cubes: { position: [number, number, number], level: number, text: string }[], 
-  onHover: (t: string) => void, 
+function InstancedCubes({ cubes, onHover, onHoverOut, active, ambientMotion, onSettledChange }: {
+  cubes: { position: [number, number, number], level: number, text: string }[],
+  onHover: (t: string) => void,
   onHoverOut: () => void,
-  isInView?: boolean
+  /** Graph is on screen and the tab is visible — allowed to request frames. */
+  active: boolean,
+  /** Idle wave allowed (false under prefers-reduced-motion). */
+  ambientMotion: boolean,
+  /** Reports transitions between "something is moving" and "settled" (idle wave excluded). */
+  onSettledChange: (settled: boolean) => void
 }) {
+  const invalidate = useThree((s) => s.invalidate);
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const emissiveRef = useRef<THREE.InstancedBufferAttribute>(null!);
   const count = cubes.length;
@@ -231,49 +275,41 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
     if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
   }, [count, cubes, tempMatrix, tempPosition, tempRotation, tempScale, currentX, currentY, activePositionsX, activePositionsY, currentColorArray]);
 
-  const hasPlayedEntrance = useRef(false);
-
-  // Reset entrance tracker when data changes
+  // Staggered entrance (and year switching) via a shared timeline. The timeline
+  // is armed when data arrives but only starts on the first frame rendered
+  // while the graph is on screen, so the stagger is actually seen instead of
+  // playing out while the section is still far below the fold.
+  const entrancePending = useRef(false);
   React.useEffect(() => {
-    hasPlayedEntrance.current = false;
+    entrancePending.current = true;
+    entranceStartTime.current = null;
+    entranceProgressIndex.current = 0;
   }, [cubes]);
 
-  // Staggered entrance and year switching via shared timeline
+  // Wake the render loop (it may be on-demand) when the graph becomes active
+  // or new data arrives while it is active.
   React.useEffect(() => {
-    if (!isInView) {
-      hasPlayedEntrance.current = false;
-      // Reset visual state instantly while offscreen so it staggers up again next time
-      const baseC = THEME_COLORS[0];
-      for (let i = 0; i < count; i++) {
-        activeLevels[i] = 0;
-        currentX[i] = startX[i];
-        currentY[i] = startY[i];
-        currentZ[i] = startZ[i];
-        currentRotX[i] = startRotX[i];
-        currentRotY[i] = startRotY[i];
-        currentRotZ[i] = startRotZ[i];
-        currentColorArray[i * 3] = baseC.r;
-        currentColorArray[i * 3 + 1] = baseC.g;
-        currentColorArray[i * 3 + 2] = baseC.b;
-        emissiveArray[i * 3] = 0;
-        emissiveArray[i * 3 + 1] = 0;
-        emissiveArray[i * 3 + 2] = 0;
-      }
-      return;
-    }
-    
-    if (hasPlayedEntrance.current) return;
+    if (active) invalidate();
+  }, [active, cubes, invalidate]);
 
-    hasPlayedEntrance.current = true;
-    entranceStartTime.current = performance.now();
-    entranceProgressIndex.current = 0;
-  }, [cubes, activeLevels, isInView, count, currentZ, currentColorArray, emissiveArray]);
+  const lastSettled = useRef<boolean | null>(null);
 
   useFrame((state, delta) => {
-    if (!meshRef.current || count === 0 || !isInView) return;
-    const speed = 5;
-    const time = state.clock.elapsedTime;
+    if (!meshRef.current || count === 0) return;
     const now = performance.now();
+
+    // Start the armed entrance on the first frame rendered while on screen.
+    if (entrancePending.current && active) {
+      entrancePending.current = false;
+      entranceStartTime.current = now;
+    }
+
+    const dt = Math.min(delta, MAX_FRAME_DELTA);
+    const time = state.clock.elapsedTime;
+    const waveAmplitude = ambientMotion ? 0.1 : 0;
+
+    // "Settling" = any motion other than the idle wave (entrance, hover, colour fades).
+    let settling = entrancePending.current;
 
     // Process shared entrance timeline
     if (entranceStartTime.current !== null) {
@@ -288,6 +324,8 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
       }
       if (allDone) {
         entranceStartTime.current = null;
+      } else {
+        settling = true;
       }
     }
 
@@ -303,7 +341,7 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
       const targetHover = isHovered ? 1 : 0;
       
       let hoverChanged = false;
-      const hoverLerpAmt = 1 - Math.exp(-12 * delta); // Hover is fast
+      const hoverLerpAmt = 1 - Math.exp(-12 * dt); // Hover is fast
       if (hoverAmt[i] !== targetHover) {
         hoverAmt[i] = THREE.MathUtils.lerp(hoverAmt[i], targetHover, hoverLerpAmt);
         if (Math.abs(hoverAmt[i] - targetHover) < 0.01) hoverAmt[i] = targetHover;
@@ -320,17 +358,23 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
       const targetZ = baseZ + (hoverZ - baseZ) * amt;
       
       let finalZ = targetZ;
-      if (amt < 1) {
-        const wave = Math.sin(time * 3 + i * 0.1) * 0.1;
+      if (amt < 1 && waveAmplitude > 0) {
+        const wave = Math.sin(time * 3 + i * 0.1) * waveAmplitude;
         finalZ += wave * (1 - amt);
       }
 
-      const lerpAmt = 1 - Math.exp(-springs[i] * delta); // Smooth frame-rate independent spring based on random spring stiffness
+      const lerpAmt = 1 - Math.exp(-springs[i] * dt); // Smooth frame-rate independent spring based on random spring stiffness
       const scaleChanged = Math.abs(currentScale[i] - targetScale) > 0.001;
-      const zChanged = Math.abs(currentZ[i] - finalZ) > 0.001 || amt < 1;
+      // Only rewrite this instance's matrix when its pose actually changes.
+      // (The idle wave keeps finalZ moving every frame while it is enabled.)
+      const zChanged = Math.abs(currentZ[i] - finalZ) > 0.001;
       const xChanged = Math.abs(currentX[i] - activePositionsX[i]) > 0.001;
       const yChanged = Math.abs(currentY[i] - activePositionsY[i]) > 0.001;
       const rotChanged = Math.abs(currentRotX[i]) > 0.001 || Math.abs(currentRotY[i]) > 0.001 || Math.abs(currentRotZ[i]) > 0.001;
+      // Depth still travelling towards its level/hover target beyond the wave band.
+      const zSettling = Math.abs(currentZ[i] - targetZ) > waveAmplitude + 0.01;
+
+      if (scaleChanged || hoverChanged || xChanged || yChanged || rotChanged || zSettling) settling = true;
 
       if (scaleChanged || zChanged || hoverChanged || xChanged || yChanged || rotChanged) {
         currentScale[i] = THREE.MathUtils.lerp(currentScale[i], targetScale, lerpAmt);
@@ -377,7 +421,8 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
                     Math.abs(emissiveArray[rIdx+2] - emissiveTargetB);
 
       if (cDiff > 0.005 || eDiff > 0.005) {
-        const cLerpAmt = 1 - Math.exp(-6 * delta);
+        settling = true;
+        const cLerpAmt = 1 - Math.exp(-6 * dt);
         currentColorArray[rIdx] = THREE.MathUtils.lerp(currentColorArray[rIdx], hoverR, cLerpAmt);
         currentColorArray[rIdx + 1] = THREE.MathUtils.lerp(currentColorArray[rIdx + 1], hoverG, cLerpAmt);
         currentColorArray[rIdx + 2] = THREE.MathUtils.lerp(currentColorArray[rIdx + 2], hoverB, cLerpAmt);
@@ -400,6 +445,17 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
       if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
       if (emissiveRef.current) emissiveRef.current.needsUpdate = true;
     }
+
+    // On-demand mode: keep requesting frames only while something still moves.
+    if (active && (needsMatrixUpdate || needsColorUpdate || settling)) state.invalidate();
+
+    const settled = !settling;
+    if (lastSettled.current !== settled) {
+      lastSettled.current = settled;
+      onSettledChange(settled);
+      // One more frame so the contact-shadow pass captures the settled pose.
+      if (settled && active) state.invalidate();
+    }
   });
 
   return (
@@ -414,12 +470,14 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
           if (hoveredIndex.current !== e.instanceId) {
             hoveredIndex.current = e.instanceId;
             onHover(cubes[e.instanceId].text);
+            invalidate();
           }
         }
       }}
       onPointerOut={() => {
         hoveredIndex.current = -1;
         onHoverOut();
+        invalidate();
       }}
     >
       <boxGeometry args={[0.75, 0.75, 1]}>
@@ -434,22 +492,84 @@ function InstancedCubes({ cubes, onHover, onHoverOut, isInView = true }: {
   );
 }
 
-export default function GithubGraph3D({ 
+type GraphCube = { position: [number, number, number], level: number, text: string };
+type MonthLabel = { id: string, text: string, x: number };
+
+function GraphScene({ cubes, monthLabels, onHover, onHoverOut, active, ambientMotion }: {
+  cubes: GraphCube[],
+  monthLabels: MonthLabel[],
+  onHover: (t: string) => void,
+  onHoverOut: () => void,
+  active: boolean,
+  ambientMotion: boolean,
+}) {
+  // Contact shadows re-render every frame only while something moves for a
+  // reason other than the idle wave (entrance, hover, year switch, drag /
+  // snap-back). Once everything is at rest, ContactShadows renders one final
+  // frame (frames={1}) and keeps showing it until the next change.
+  // The group rotation must be part of this: drei's shadow blur pass is only
+  // correct when the group is unrotated, so a frame captured mid-drag must not
+  // be the one that is kept.
+  const [cubesSettled, setCubesSettled] = useState(false);
+  const [rotationSettled, setRotationSettled] = useState(true);
+  const shadowsSettled = cubesSettled && rotationSettled;
+
+  return (
+    <DelayedSnapControls active={active} onSettledChange={setRotationSettled}>
+      <group rotation={[0, 0, 0]}>
+      <InstancedCubes
+        cubes={cubes}
+        onHover={onHover}
+        onHoverOut={onHoverOut}
+        active={active}
+        ambientMotion={ambientMotion}
+        onSettledChange={setCubesSettled}
+      />
+
+      {monthLabels.map((label) => (
+        <Html
+          key={label.id}
+          position={[label.x, 4.5, 0]}
+          center
+          className="pointer-events-none"
+        >
+          <div className="text-[10px] uppercase tracking-[0.3em] text-black font-researcher font-black select-none whitespace-nowrap opacity-90 drop-shadow-sm" style={{ transform: 'translate3d(0,0,0)' }}>
+            {label.text}
+          </div>
+        </Html>
+      ))}
+
+      <ContactShadows
+        frames={shadowsSettled ? 1 : Infinity}
+        position={[0, -5, -1]}
+        opacity={0.6}
+        scale={70}
+        blur={2.5}
+        far={10}
+        color="#a8d3b5"
+      />
+      </group>
+    </DelayedSnapControls>
+  );
+}
+
+export default function GithubGraph3D({
   data, 
   year = "2026", 
   onYearChange,
   isFetching = false,
   totalContributions = "0",
-  isInView = true
-}: { 
-  data: ContributionDay[], 
+}: {
+  data: ContributionDay[],
   year?: "2026" | "2025",
   onYearChange?: (year: string) => void,
   isFetching?: boolean,
   totalContributions?: string,
-  isInView?: boolean
 }) {
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  // Wake slightly before the graph scrolls into view so the first frame is ready.
+  const { shouldRender, shouldAnimate, reducedMotion } = useAnimationBudget(containerRef, { rootMargin: "200px 0px" });
   
   const handleHover = React.useCallback((text: string) => {
     if (tooltipRef.current) {
@@ -528,7 +648,8 @@ export default function GithubGraph3D({
   }, [data]);
 
   return (
-    <div 
+    <div
+      ref={containerRef}
       data-cursor="github-graph"
       className="w-full h-[600px] rounded-3xl overflow-hidden bg-gradient-to-br from-neutral-50 to-neutral-200 relative group shadow-2xl border border-white/50"
       onPointerMove={(e) => {
@@ -548,7 +669,11 @@ export default function GithubGraph3D({
         className="absolute top-0 left-0 z-50 pointer-events-none px-4 py-2 bg-neutral-900/90 text-white text-[13px] font-syne font-medium tracking-wide rounded-xl shadow-xl opacity-0 transition-opacity duration-150 whitespace-nowrap backdrop-blur-md border border-white/10"
         style={{ transform: 'translate3d(0,0,0)', willChange: 'transform, opacity' }}
       ></div>
-      <Canvas camera={{ position: [0, 0, 30], fov: 40 }}>
+      {/* Continuous rendering only while the graph is near the viewport and motion
+          is allowed (the idle wave needs every frame). Otherwise frames are
+          rendered on demand — when something actually moves — and not at all
+          while off-screen. */}
+      <Canvas camera={{ position: [0, 0, 30], fov: 40 }} frameloop={shouldAnimate ? "always" : "demand"}>
         <ambientLight intensity={0.6} />
         <directionalLight 
           position={[20, 20, 20]} 
@@ -562,40 +687,16 @@ export default function GithubGraph3D({
           shadow-camera-bottom={-20}
         />
         <pointLight position={[-20, -20, -20]} intensity={0.4} color="#a8ffb5" />
-        
-        <DelayedSnapControls>
-          <group rotation={[0, 0, 0]}>
-          <InstancedCubes 
-            cubes={cubes}
-            onHover={handleHover}
-            onHoverOut={handleHoverOut}
-            isInView={isInView}
-          />
-          
-          {monthLabels.map((label) => (
-            <Html 
-              key={label.id} 
-              position={[label.x, 4.5, 0]} 
-              center
-              className="pointer-events-none"
-            >
-              <div className="text-[10px] uppercase tracking-[0.3em] text-black font-researcher font-black select-none whitespace-nowrap opacity-90 drop-shadow-sm" style={{ transform: 'translate3d(0,0,0)' }}>
-                {label.text}
-              </div>
-            </Html>
-          ))}
 
-          <ContactShadows 
-            position={[0, -5, -1]} 
-            opacity={0.6} 
-            scale={70} 
-            blur={2.5} 
-            far={10} 
-            color="#a8d3b5"
-          />
-          </group>
-        </DelayedSnapControls>
-        
+        <GraphScene
+          cubes={cubes}
+          monthLabels={monthLabels}
+          onHover={handleHover}
+          onHoverOut={handleHoverOut}
+          active={shouldRender}
+          ambientMotion={!reducedMotion}
+        />
+
         <Environment preset="city" />
       </Canvas>
 
