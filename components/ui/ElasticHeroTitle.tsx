@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useCallback } from "react";
 import { gsap } from "gsap";
+import { onIntroPhase } from "@/lib/intro";
 
 // ─── ElasticHeroTitle ─────────────────────────────────────────────────────────
 // Renders "PRAJIT BALAJI" with each letter in its own clipped slot.
@@ -216,13 +217,17 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
   useEffect(() => {
     mountedRef.current = true;
 
-    // Delay first animation slightly so page settles in, but start soon
-    const initialDelay = 500 + Math.random() * 500;
-    loopRef.current = setTimeout(() => {
-      if (mountedRef.current) scheduleNext();
-    }, initialDelay);
+    // Start the letter loop only once the intro curtain is fully gone, so the
+    // GSAP tweens never compete with the preloader / curtain-lift animation.
+    const cancelIntro = onIntroPhase("done", () => {
+      const initialDelay = 300 + Math.random() * 400;
+      loopRef.current = setTimeout(() => {
+        if (mountedRef.current) scheduleNext();
+      }, initialDelay);
+    });
 
     return () => {
+      cancelIntro();
       mountedRef.current = false;
       if (loopRef.current) clearTimeout(loopRef.current);
       // Clean up GSAP timelines on unmount (fixes hot-reloading issues)

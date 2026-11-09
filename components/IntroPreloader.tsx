@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IntroLoadingBar } from "@/components/ui/IntroLoadingBar";
+import { setIntroPhase } from "@/lib/intro";
 
 export function IntroPreloader() {
   const [isVisible, setIsVisible] = useState(true);
@@ -20,6 +21,8 @@ export function IntroPreloader() {
     // Slide up the entire overlay at 2.3s
     const overlayTimer = setTimeout(() => {
       setIsVisible(false);
+      // Curtain starts lifting — hero animations may begin now
+      setIntroPhase("revealing");
       document.body.style.overflow = "";
     }, 2300);
 
@@ -33,7 +36,8 @@ export function IntroPreloader() {
   const words = ["Innovating,", "Empowering,", "Delivering."];
 
   return (
-    <AnimatePresence>
+    // Curtain fully gone — deferred heavy work may run now
+    <AnimatePresence onExitComplete={() => setIntroPhase("done")}>
       {isVisible && (
         <motion.div
           initial={{ y: 0 }}

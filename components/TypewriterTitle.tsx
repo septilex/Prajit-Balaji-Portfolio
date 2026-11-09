@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { onIntroPhase } from "@/lib/intro";
 
 const TITLES = [
   "Full Stack Developer",
@@ -51,10 +52,15 @@ export const TypewriterTitle = () => {
       }
     };
 
-    // Start the animation
-    timeoutId = setTimeout(tick, 500);
+    // Start typing shortly after the intro curtain starts lifting
+    const cancelIntro = onIntroPhase("revealing", () => {
+      timeoutId = setTimeout(tick, 500);
+    });
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      cancelIntro();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return (

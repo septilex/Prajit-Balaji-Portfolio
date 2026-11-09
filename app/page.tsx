@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowDown,
@@ -16,7 +17,6 @@ import {
   X,
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
-import { LiquidGlassCarousel } from "@/components/ui/liquid-glass-carousel";
 import { ProjectWheel3D } from "@/components/ui/ProjectWheel3D";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { BackgroundTypography } from "@/components/BackgroundTypography";
@@ -38,8 +38,14 @@ import { TimePill } from "@/components/TimePill";
 import { StatsCard } from "@/components/StatsCard";
 import { BottomTicker } from "@/components/BottomTicker";
 import { DinoRunner } from "@/components/DinoRunner";
-import { HireMeModal } from "@/components/HireMeModal";
 import GithubContributions from "@/components/GithubContributions";
+
+// The Hire Me modal pulls in a WebGL "genie" effect and html-to-image; it's
+// closed on load, so ship it as a separate chunk instead of the initial bundle.
+const HireMeModal = dynamic(
+  () => import("@/components/HireMeModal").then((m) => m.HireMeModal),
+  { ssr: false }
+);
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -270,7 +276,7 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
             <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 ${node.side === "left" ? "md:justify-end" : ""}`}>
               {node.side === "left" && node.logoSrc && (
                 <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
-                  <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
+                  <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} />
                 </div>
               )}
               <div className="font-display text-5xl font-semibold tracking-tight md:text-7xl">
@@ -325,7 +331,7 @@ function JourneyTimeline({ timeline }: { timeline: TimelineNode[] }) {
                   </div>
                   {node.logoSrc && (
                     <div className="group/logo flex h-16 sm:h-20 px-6 sm:px-8 items-center justify-center rounded-[20px] bg-white shadow-[0_15px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.2)] light:shadow-[0_15px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,138,61,0.25)] overflow-hidden border border-black/5 dark:border-white/10 shrink-0">
-                      <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} priority />
+                      <Image src={node.logoSrc} alt={node.role} width={200} height={80} className={`object-contain h-10 sm:h-12 w-auto ${node.logoClass || ""}`} />
                     </div>
                   )}
                 </div>
@@ -1031,7 +1037,6 @@ export default function Home() {
                   mixBlendMode: "multiply",
                 }}
                 sizes="(max-width: 768px) 100vw, 58vw"
-                priority
               />
               {/* Warm ambient glow */}
               <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#f2ece1] via-[#f2ece1]/30 to-transparent pointer-events-none" />

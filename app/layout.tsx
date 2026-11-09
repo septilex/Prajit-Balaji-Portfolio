@@ -68,6 +68,25 @@ export default function RootLayout({
       className={cn("light", inter.variable, spaceGrotesk.variable, instrumentSerif.variable, montserrat.variable, researcher.variable, GeistSans.variable, GeistMono.variable, syne.variable, "font-sans", geist.variable)}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
+        {/* Intro preloader font — listed first so it wins the race */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montenegrin+Gothic+One&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@800;900&family=Space+Mono:wght@400;700&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400,900&f[]=switzer@400,500,600,700&display=swap"
+        />
+      </head>
       <body className="antialiased min-h-screen">
           <CustomCursor />
           <CursorGlow />

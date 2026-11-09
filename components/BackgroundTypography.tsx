@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useIntroRevealed } from "@/lib/intro";
 
 export interface BackgroundTypographyProps {
   rows?: string[];
@@ -64,6 +65,8 @@ export function BackgroundTypography({
 }: BackgroundTypographyProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(true);
+  // Hidden under the intro overlay until it lifts — don't animate until then
+  const introRevealed = useIntroRevealed();
 
   // These are four giant stroked-text layers — pause them the moment the
   // hero scrolls out of view instead of animating them forever.
@@ -88,7 +91,7 @@ export function BackgroundTypography({
           direction={i % 2 === 0 ? "normal" : "reverse"}
           duration={60 + i * 8}
           strokeWidth={strokeWidth}
-          playing={inView}
+          playing={inView && introRevealed}
         >
           {row}
         </ParallaxText>

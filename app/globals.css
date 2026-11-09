@@ -1,7 +1,6 @@
-@import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400,900&f[]=switzer@400,500,600,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montenegrin+Gothic+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=Space+Mono:wght@400;700&display=swap');
+/* External web fonts are loaded via <link> tags in app/layout.tsx (with
+   preconnect) instead of chained @imports here, so they download in parallel
+   and the intro font is ready before the intro animation plays. */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";

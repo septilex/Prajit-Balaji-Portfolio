@@ -6,6 +6,7 @@ import { GlowButton } from "@/components/ui/glow";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { Genie } from "genie-web/react";
 import { toCanvas } from "html-to-image";
+import { afterIntroIdle } from "@/lib/intro";
 
 interface HireMeModalProps {
   isOpen: boolean;
@@ -239,12 +240,16 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
   const [scrollbarWidth, setScrollbarWidth] = useState(0);
 
   // 1. Pre-capture the modal invisibly after mount to ensure absolutely zero delay on click
+  // html-to-image serialises the DOM and inlines every web font as base64 —
+  // a big main-thread job. It used to fire 600ms after mount, i.e. right in the
+  // middle of the intro, causing a visible hitch. Now it waits until the intro
+  // is fully done and the browser is idle (fonts are loaded by then too).
   useEffect(() => {
-    // Measure scrollbar exactly once on mount
-    setScrollbarWidth(window.innerWidth - document.documentElement.clientWidth);
+    return afterIntroIdle(() => {
+      // Measured after the intro: the preloader sets body overflow:hidden,
+      // which would make the scrollbar width read as 0.
+      setScrollbarWidth(window.innerWidth - document.documentElement.clientWidth);
 
-    // Wait for fonts to load
-    const timer = setTimeout(() => {
       if (hiddenCaptureRef.current && !cachedCanvasRef.current) {
         toCanvas(hiddenCaptureRef.current, {
           pixelRatio: 1.5, // Reduced from 2 for much smoother WebGL framerates
@@ -258,8 +263,7 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
           cachedCanvasRef.current = canvas;
         }).catch(err => console.warn("Pre-capture failed:", err));
       }
-    }, 600);
-    return () => clearTimeout(timer);
+    }, 3000);
   }, []);
 
   // 2. The instant capture function passed to Genie WebGL

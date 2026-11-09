@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { useIntroRevealed } from "@/lib/intro";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -23,7 +24,11 @@ export function ScrollReveal({
   triggerOnce = true,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: triggerOnce, margin: "-10% 0px" });
+  const inViewport = useInView(ref, { once: triggerOnce, margin: "-10% 0px" });
+  // Hold reveals until the intro curtain lifts — otherwise the hero animates
+  // invisibly underneath the preloader and steals frames from it.
+  const introRevealed = useIntroRevealed();
+  const isInView = inViewport && introRevealed;
 
   return (
     <motion.div

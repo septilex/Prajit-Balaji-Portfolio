@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 // ─── IntroLoadingBar ──────────────────────────────────────────────────────────
 // An 8-bit retro progress bar embedded inside the intro preloader.
-// Adapted for high-fps composite rendering with no Framer Motion color interpolation errors.
+//
+// Performance: progress is written straight to the DOM from a single rAF loop
+// (refs, no React state per frame). The only React re-render is the one-time
+// "done" flip at 100%. Previously every frame triggered a re-render of the
+// whole bar, which competed with the intro animations for the main thread.
 
 interface IntroLoadingBarProps {
   startDelay?: number;
@@ -15,35 +19,65 @@ interface IntroLoadingBarProps {
 
 const PIXEL_COLS = 24; // number of pixel columns in the bar
 
+const FILLED_EDGE = "#ff8a3d";
+const FILLED_ACCENT = "rgba(255, 138, 61, 0.8)";
+const FILLED_BASE = "rgba(58, 50, 43, 0.6)";
+
+function colColor(i: number, filledCols: number) {
+  if (i >= filledCols) return "transparent";
+  if (i === filledCols - 1) return FILLED_EDGE;
+  return i % 3 === 0 ? FILLED_ACCENT : FILLED_BASE;
+}
+
 export function IntroLoadingBar({
   startDelay = 300,
   duration = 1300,
   onComplete,
 }: IntroLoadingBarProps) {
-  const [progress, setProgress] = useState(0);        // 0–100
-  const [filledCols, setFilledCols] = useState(0);    // 0–PIXEL_COLS
   const [done, setDone] = useState(false);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const colRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const onCompleteRef = useRef(onComplete);
 
-  // Smoothly animate progress from 0→100 after startDelay
   useEffect(() => {
-    let raf: number;
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  useEffect(() => {
+    let raf = 0;
     let startTime: number | null = null;
+    let lastCols = -1;
+    let lastPct = -1;
+
+    const tick = (ts: number) => {
+      if (startTime === null) startTime = ts;
+      const pct = Math.min(((ts - startTime) / duration) * 100, 100);
+      const whole = Math.floor(pct);
+      const cols = Math.floor((pct / 100) * PIXEL_COLS);
+
+      if (whole !== lastPct && labelRef.current) {
+        labelRef.current.textContent = `${whole}%`;
+        lastPct = whole;
+      }
+      if (cols !== lastCols) {
+        // Only the columns whose state can change (old edge → new edge) are touched
+        const from = Math.max(0, lastCols - 1);
+        for (let i = from; i < Math.min(PIXEL_COLS, cols + 1); i++) {
+          const el = colRefs.current[i];
+          if (el) el.style.backgroundColor = colColor(i, cols);
+        }
+        lastCols = cols;
+      }
+
+      if (pct < 100) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setDone(true);
+        onCompleteRef.current?.();
+      }
+    };
 
     const delay = setTimeout(() => {
-      const tick = (ts: number) => {
-        if (!startTime) startTime = ts;
-        const elapsed = ts - startTime;
-        const pct = Math.min((elapsed / duration) * 100, 100);
-        setProgress(pct);
-        setFilledCols(Math.floor((pct / 100) * PIXEL_COLS));
-
-        if (pct < 100) {
-          raf = requestAnimationFrame(tick);
-        } else {
-          setDone(true);
-          onComplete?.();
-        }
-      };
       raf = requestAnimationFrame(tick);
     }, startDelay);
 
@@ -51,9 +85,7 @@ export function IntroLoadingBar({
       clearTimeout(delay);
       cancelAnimationFrame(raf);
     };
-  }, [startDelay, duration, onComplete]);
-
-  const pctLabel = `${Math.floor(progress)}%`;
+  }, [startDelay, duration]);
 
   return (
     <motion.div
@@ -71,10 +103,11 @@ export function IntroLoadingBar({
           LOADING
         </span>
         <span
+          ref={labelRef}
           className="text-[9px] md:text-[10px] tracking-[0.2em] text-[#3a322b]/40 tabular-nums"
           style={{ fontFamily: "'Courier New', monospace" }}
         >
-          {pctLabel}
+          0%
         </span>
       </div>
 
@@ -88,31 +121,22 @@ export function IntroLoadingBar({
       >
         {/* Pixel columns grid */}
         <div className="absolute inset-0 flex gap-[2px] p-[2px]">
-          {Array.from({ length: PIXEL_COLS }).map((_, i) => {
-            const filled = i < filledCols;
-            const isEdge = filled && i === filledCols - 1;
-
-            return (
-              <div
-                key={i}
-                className={`flex-1 h-full rounded-[1px] transition-colors duration-100 ${
-                  filled
-                    ? isEdge
-                      ? "bg-[#ff8a3d]"
-                      : i % 3 === 0
-                      ? "bg-[#ff8a3d]/80"
-                      : "bg-[#3a322b]/60"
-                    : "bg-transparent"
-                }`}
-              />
-            );
-          })}
+          {Array.from({ length: PIXEL_COLS }).map((_, i) => (
+            <div
+              key={i}
+              ref={(el) => {
+                colRefs.current[i] = el;
+              }}
+              className="flex-1 h-full rounded-[1px]"
+              style={{ backgroundColor: "transparent" }}
+            />
+          ))}
         </div>
 
-        {/* Scan-line shimmer overlay — only while in progress */}
+        {/* Scan-line shimmer overlay — only while in progress (transform-only, GPU composited) */}
         {!done && (
           <motion.div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-y-0 left-0 pointer-events-none will-change-transform"
             animate={{ x: ["0%", "100%", "0%"] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
             style={{

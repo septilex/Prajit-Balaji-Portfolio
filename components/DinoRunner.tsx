@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { onIntroPhase } from "@/lib/intro";
+import { loadDinoSprites, type SpriteImage } from "./dinoSprites";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DinoRunner — Ambient Chrome-Dino-inspired infinite runner Easter egg.
@@ -312,7 +314,7 @@ export function DinoRunner() {
     // ── Load Single Dino Variant & Pick from List ──
     const DINO_TOTAL_SKINS = DINO_FILES.length;
     const PET_TOTAL_SKINS = 6;
-    let selectedDinoCanvas: HTMLCanvasElement | null = null;
+    let selectedDinoCanvas: SpriteImage | null = null;
     let dinoLoaded = false;
     let dinoAspect = 1.0;
 
@@ -323,156 +325,27 @@ export function DinoRunner() {
     localStorage.setItem("dinoSkinIndex", String(nextIdx + 1));
 
     // ── Pet Companion System ──
-    const petCanvases: HTMLCanvasElement[] = [];
+    const petCanvases: SpriteImage[] = [];
     let petsLoaded = false;
     let petAspect = 1.0;
 
-    const singleImg = new Image();
-    singleImg.src = DINO_FILES[chosenDinoIdx];
-    singleImg.onload = () => {
-      const sw = singleImg.naturalWidth;
-      const sh = singleImg.naturalHeight;
-      const offCanvas = document.createElement("canvas");
-      offCanvas.width = sw;
-      offCanvas.height = sh;
-      const offCtx = offCanvas.getContext("2d");
-      if (!offCtx) return;
-
-      offCtx.drawImage(singleImg, 0, 0);
-
-      const imgData = offCtx.getImageData(0, 0, sw, sh);
-      const data = imgData.data;
-
-      let minX = sw, minY = sh, maxX = 0, maxY = 0;
-
-      for (let y = 0; y < sh; y++) {
-        for (let x = 0; x < sw; x++) {
-          const idx = y * sw + x;
-          const i = idx * 4;
-          if (data[i+3] > 0) { 
-            const distToWhite = Math.abs(data[i] - 255) + Math.abs(data[i+1] - 255) + Math.abs(data[i+2] - 255);
-            if (distToWhite < 40) {
-              data[i] = 0;
-              data[i+1] = 0;
-              data[i+2] = 0;
-              data[i+3] = 255;
-            }
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
+    // Sprites are cleaned up in a Web Worker while the intro plays (see
+    // dinoSprites.ts), so the dino and pet are both ready the moment the
+    // curtain lifts — without blocking the main thread during the intro.
+    let spritesCancelled = false;
+    const spriteJob = loadDinoSprites(DINO_FILES[chosenDinoIdx], "/pets-strip.png");
+    spriteJob.promise
+      .then(({ dino, pets }) => {
+        if (spritesCancelled) return;
+        if (dino) {
+          selectedDinoCanvas = dino;
+          dinoAspect = dino.width / dino.height;
+          dinoLoaded = true;
         }
-      }
-      offCtx.putImageData(imgData, 0, 0);
-
-      if (maxX >= minX && maxY >= minY) {
-         const cropW = maxX - minX + 1;
-         const cropH = maxY - minY + 1;
-         const croppedCanvas = document.createElement("canvas");
-         croppedCanvas.width = cropW;
-         croppedCanvas.height = cropH;
-         const croppedCtx = croppedCanvas.getContext("2d");
-         if (croppedCtx) {
-           croppedCtx.drawImage(offCanvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
-           selectedDinoCanvas = croppedCanvas;
-         } else {
-           selectedDinoCanvas = offCanvas;
-         }
-      } else {
-         selectedDinoCanvas = offCanvas;
-      }
-
-      dinoAspect = selectedDinoCanvas.width / selectedDinoCanvas.height;
-      dinoLoaded = true;
-    };
-
-    const petStripImg = new Image();
-    petStripImg.src = "/pets-strip.png";
-    petStripImg.onload = () => {
-      const sw = petStripImg.naturalWidth || 600;
-      const sh = petStripImg.naturalHeight || 100;
-      
-      const offCanvas = document.createElement("canvas");
-      offCanvas.width = sw;
-      offCanvas.height = sh;
-      const offCtx = offCanvas.getContext("2d");
-      if (!offCtx) return;
-      
-      offCtx.drawImage(petStripImg, 0, 0);
-      const imgData = offCtx.getImageData(0, 0, sw, sh);
-      const data = imgData.data;
-      const bgR = data[0], bgG = data[1], bgB = data[2];
-
-      const colHits = new Array(sw).fill(false);
-      for (let x = 0; x < sw; x++) {
-        for (let y = 0; y < sh; y++) {
-          const i = (y * sw + x) * 4;
-          const dist = Math.abs(data[i] - bgR) + Math.abs(data[i+1] - bgG) + Math.abs(data[i+2] - bgB);
-          if (dist > 30) {
-            colHits[x] = true;
-            break;
-          }
-        }
-      }
-
-      const segments: {startX: number, endX: number}[] = [];
-      let inSeg = false;
-      let segStart = 0;
-      let gapCount = 0;
-
-      for (let x = 0; x < sw; x++) {
-        if (colHits[x]) {
-          if (!inSeg) { inSeg = true; segStart = x; }
-          gapCount = 0;
-        } else if (inSeg) {
-          gapCount++;
-          if (gapCount > 3) {
-            segments.push({startX: segStart, endX: x - gapCount});
-            inSeg = false;
-          }
-        }
-      }
-      if (inSeg) segments.push({startX: segStart, endX: sw - 1});
-
-      const validSegments = segments.filter(seg => (seg.endX - seg.startX) > sw * 0.02);
-
-      for (const seg of validSegments) {
-        let minY = sh, maxY = 0;
-        for (let x = seg.startX; x <= seg.endX; x++) {
-          for (let y = 0; y < sh; y++) {
-            const i = (y * sw + x) * 4;
-            const dist = Math.abs(data[i] - bgR) + Math.abs(data[i+1] - bgG) + Math.abs(data[i+2] - bgB);
-            if (dist > 30) {
-              if (y < minY) minY = y;
-              if (y > maxY) maxY = y;
-            }
-          }
-        }
-
-        if (maxY >= minY) {
-           const cropW = seg.endX - seg.startX + 1;
-           const cropH = maxY - minY + 1;
-           const fCanvas = document.createElement("canvas");
-           fCanvas.width = cropW;
-           fCanvas.height = cropH;
-           const fCtx = fCanvas.getContext("2d");
-           if (fCtx) {
-             fCtx.drawImage(petStripImg, seg.startX, minY, cropW, cropH, 0, 0, cropW, cropH);
-             
-             const fData = fCtx.getImageData(0, 0, cropW, cropH);
-             const fd = fData.data;
-             for (let i = 0; i < fd.length; i += 4) {
-               const dist = Math.abs(fd[i] - bgR) + Math.abs(fd[i+1] - bgG) + Math.abs(fd[i+2] - bgB);
-               if (dist < 40) fd[i+3] = 0;
-             }
-             fCtx.putImageData(fData, 0, 0);
-             petCanvases.push(fCanvas);
-           }
-        }
-      }
-      petsLoaded = true;
-    };
+        petCanvases.push(...pets);
+        petsLoaded = true;
+      })
+      .catch((err) => console.warn("Dino sprites failed to load:", err));
 
     /** Spawn initial birds so they're visible on page load */
     const spawnInitialBirds = () => {
@@ -1014,7 +887,7 @@ export function DinoRunner() {
         const petBounce = petIsJumping ? 0 : (dF ? -PX * 1.0 : 0);
         // Use independent petJumpY instead of following the main dino's dy
         const petY = g - petTargetH + petJumpY + petBounce;
-        
+
         ctx.save();
         ctx.globalAlpha = 0.92;
         ctx.imageSmoothingEnabled = false;
@@ -1198,9 +1071,16 @@ export function DinoRunner() {
       rid.current = requestAnimationFrame(frame);
     };
 
-    rid.current = requestAnimationFrame(frame);
+    // The canvas sits under the intro overlay — start drawing only when the
+    // curtain begins to lift instead of rendering invisible frames.
+    const cancelStart = onIntroPhase("revealing", () => {
+      rid.current = requestAnimationFrame(frame);
+    });
 
     return () => {
+      cancelStart();
+      spritesCancelled = true;
+      spriteJob.cancel();
       cancelAnimationFrame(rid.current);
       window.removeEventListener("resize", resize);
     };
