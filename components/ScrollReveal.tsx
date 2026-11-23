@@ -34,20 +34,16 @@ export function ScrollReveal({
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, y: 60, rotateX: 15, scale: 0.95 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={
         isInView
-          ? { opacity: 1, y: 0, rotateX: 0, scale: 1 }
-          : { opacity: 0, y: 60, rotateX: 15, scale: 0.95 }
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 40 }
       }
       transition={{
         duration: duration / 1000,
         delay: delay / 1000,
         ease: [0.16, 1, 0.3, 1],
-      }}
-      style={{
-        transformStyle: "preserve-3d",
-        perspective: "1200px"
       }}
     >
       {children}

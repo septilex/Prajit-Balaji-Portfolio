@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { X, Sparkles, Send, CheckCircle2, Loader2, Download } from "lucide-react";
-import { GlowButton } from "@/components/ui/glow";
+import { X, Sparkles, CheckCircle2, Loader2, Download } from "lucide-react";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { Genie } from "genie-web/react";
 import { toCanvas } from "html-to-image";
 import { afterIntroIdle } from "@/lib/intro";
+import { sendContactInquiry } from "@/lib/contact";
+
+type FormErrors = { name?: string; email?: string; projectDetails?: string };
 
 interface HireMeModalProps {
   isOpen: boolean;
@@ -21,7 +23,8 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
   email: string, 
   projectDetails: string, 
   formState: string, 
-  errors: any, 
+  errors: FormErrors,
+  submitError?: string,
   isCaptureMode?: boolean,
   setName?: (v: string) => void,
   setEmail?: (v: string) => void,
@@ -29,7 +32,7 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
   handleSubmit?: (e: React.FormEvent) => void,
   onClose?: () => void
 }>((props, ref) => {
-  const { name, email, projectDetails, formState, errors, isCaptureMode, setName, setEmail, setProjectDetails, handleSubmit, onClose } = props;
+  const { name, email, projectDetails, formState, errors, submitError, isCaptureMode, setName, setEmail, setProjectDetails, handleSubmit, onClose } = props;
 
   return (
     <div
@@ -37,6 +40,7 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
       role={isCaptureMode ? undefined : "dialog"}
       aria-modal={isCaptureMode ? undefined : "true"}
       aria-labelledby={isCaptureMode ? undefined : "hire-me-title"}
+      tabIndex={-1}
       className={`relative w-full max-w-[1100px] max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-[28px] md:rounded-[36px] border border-[var(--border-medium)] p-6 md:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.6),0_0_35px_rgba(255,138,61,0.15)] custom-scrollbar ${
         isCaptureMode ? "bg-white" : "bg-[var(--bg-card)]"
       }`}
@@ -98,85 +102,104 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <form noValidate onSubmit={handleSubmit} className="mt-6 space-y-4">
             {/* Name */}
             <div>
-              <label className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-[var(--fg-mute)] font-semibold font-researcher">
+              <label htmlFor={isCaptureMode ? undefined : "hire-name"} className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-[var(--fg-mute)] font-semibold font-researcher">
                 Name <span className="text-[#ff8a3d]">*</span>
               </label>
               <input
+                id={isCaptureMode ? undefined : "hire-name"}
+                required
+                autoComplete="name"
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name && !isCaptureMode ? "hire-name-error" : undefined}
                 type="text"
                 placeholder="Alex Rivera"
                 value={name}
                 onChange={(e) => {
                   setName?.(e.target.value);
-                  if (errors.name) errors.name = undefined;
                 }}
                 disabled={formState === "loading" || formState === "success"}
                 className={`w-full rounded-2xl border ${isCaptureMode ? "bg-[var(--bg-elev)]" : "bg-[var(--bg-elev)]/60 backdrop-blur-md"} px-4 py-3 text-sm text-[var(--fg-primary)] placeholder:[var(--fg-mute)]/50 transition-all duration-200 focus:border-[#ff8a3d] focus:outline-none focus:ring-1 focus:ring-[#ff8a3d]/50 ${
                   errors.name ? "border-red-500/80" : "border-[var(--border-subtle)]"
                 }`}
               />
+              {!isCaptureMode && errors.name && <p id="hire-name-error" className="mt-1 text-sm text-red-600">{errors.name}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-[var(--fg-mute)] font-semibold font-researcher">
+              <label htmlFor={isCaptureMode ? undefined : "hire-email"} className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-[var(--fg-mute)] font-semibold font-researcher">
                 Email <span className="text-[#ff8a3d]">*</span>
               </label>
               <input
+                id={isCaptureMode ? undefined : "hire-email"}
+                required
+                autoComplete="email"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email && !isCaptureMode ? "hire-email-error" : undefined}
                 type="email"
                 placeholder="alex@company.com"
                 value={email}
                 onChange={(e) => {
                   setEmail?.(e.target.value);
-                  if (errors.email) errors.email = undefined;
                 }}
                 disabled={formState === "loading" || formState === "success"}
                 className={`w-full rounded-2xl border ${isCaptureMode ? "bg-[var(--bg-elev)]" : "bg-[var(--bg-elev)]/60 backdrop-blur-md"} px-4 py-3 text-sm text-[var(--fg-primary)] placeholder:[var(--fg-mute)]/50 transition-all duration-200 focus:border-[#ff8a3d] focus:outline-none focus:ring-1 focus:ring-[#ff8a3d]/50 ${
                   errors.email ? "border-red-500/80" : "border-[var(--border-subtle)]"
                 }`}
               />
+              {!isCaptureMode && errors.email && <p id="hire-email-error" className="mt-1 text-sm text-red-600">{errors.email}</p>}
             </div>
 
             {/* What are you looking to build? */}
             <div>
-              <label className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-[var(--fg-mute)] font-semibold font-researcher">
+              <label htmlFor={isCaptureMode ? undefined : "hire-details"} className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-[var(--fg-mute)] font-semibold font-researcher">
                 What are you looking to build? <span className="text-[#ff8a3d]">*</span>
               </label>
               <textarea
+                id={isCaptureMode ? undefined : "hire-details"}
+                required
+                aria-invalid={!!errors.projectDetails}
+                aria-describedby={errors.projectDetails && !isCaptureMode ? "hire-details-error" : undefined}
                 rows={4}
                 placeholder="Tell me about your product, timeline, vision, or role..."
                 value={projectDetails}
                 onChange={(e) => {
                   setProjectDetails?.(e.target.value);
-                  if (errors.projectDetails) errors.projectDetails = undefined;
                 }}
                 disabled={formState === "loading" || formState === "success"}
                 className={`w-full rounded-2xl border ${isCaptureMode ? "bg-[var(--bg-elev)]" : "bg-[var(--bg-elev)]/60 backdrop-blur-md"} px-4 py-3 text-sm text-[var(--fg-primary)] placeholder:[var(--fg-mute)]/50 transition-all duration-200 focus:border-[#ff8a3d] focus:outline-none focus:ring-1 focus:ring-[#ff8a3d]/50 resize-none ${
                   errors.projectDetails ? "border-red-500/80" : "border-[var(--border-subtle)]"
                 }`}
               />
+              {!isCaptureMode && errors.projectDetails && <p id="hire-details-error" className="mt-1 text-sm text-red-600">{errors.projectDetails}</p>}
             </div>
 
             {/* Submit Button */}
             <div className="pt-2">
               <Magnetic strength={0.2} className="w-full">
-                <div
-                  // We use a simple button instead of GlowButton in capture mode if GlowButton causes WebGL issues,
-                  // but GlowButton should be fine. We just map it.
+                <button
+                  type="submit"
+                  disabled={isCaptureMode || formState === "loading" || formState === "success"}
                   className="font-syne group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-full border border-[#ff8a3d]/60 bg-gradient-to-r from-[#ff8a3d] via-[#e8742c] to-[#c2410c] px-6 py-3.5 text-sm font-bold tracking-wider uppercase text-[#1a0d05] shadow-[0_0_25px_rgba(255,138,61,0.35)]"
                 >
-                  <span className="font-syne">SEND INQUIRY →</span>
-                </div>
+                  {formState === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {formState === "success" && <CheckCircle2 className="h-4 w-4" />}
+                  <span className="font-syne">{formState === "loading" ? "SENDING..." : formState === "success" ? "INQUIRY SENT" : "SEND INQUIRY"}</span>
+                </button>
               </Magnetic>
             </div>
+
+            {!isCaptureMode && submitError && <p role="alert" className="text-sm text-red-600">{submitError}</p>}
+            {!isCaptureMode && formState === "success" && <p role="status" className="text-sm text-[var(--fg-primary)]">Thanks! Your inquiry has been sent.</p>}
 
             {/* Subtle direct email hint */}
             <div className="pt-1 text-center">
               <span className="text-[11px] text-[var(--fg-mute)]/75 font-syne">
                 Prefer direct contact?{" "}
-                <span className="text-[#ff8a3d]">prajitk299@gmail.com</span>
+                <a href="mailto:prajitk299@gmail.com" className="text-[#ff8a3d] underline">prajitk299@gmail.com</a>
               </span>
             </div>
           </form>
@@ -198,6 +221,7 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
                </div>
             ) : (
               <iframe
+                tabIndex={-1}
                 src="/Prajit_Balaji_Resume.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0"
                 className="absolute -top-[20px] -left-[20px] w-[calc(100%+40px)] h-[calc(100%+40px)] pointer-events-none border-none bg-white"
                 title="Prajit Balaji Resume"
@@ -209,10 +233,10 @@ const ModalContent = React.forwardRef<HTMLDivElement, {
           {/* Download Resume Button */}
           <div className="mt-5 flex justify-center shrink-0">
             <Magnetic strength={0.3}>
-              <div className="font-syne group flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--fg-mute)] px-4 py-2">
+              <a href="/Prajit_Balaji_Resume.pdf" download="Prajit_Balaji_Resume.pdf" className="font-syne group flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--fg-mute)] px-4 py-2">
                 <Download className="h-4 w-4" />
                 DOWNLOAD MY RESUME
-              </div>
+              </a>
             </Magnetic>
           </div>
         </div>
@@ -233,6 +257,12 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
   const [projectDetails, setProjectDetails] = useState("");
   const [formState, setFormState] = useState<"idle" | "loading" | "success">("idle");
   const [errors, setErrors] = useState<{ name?: string; email?: string; projectDetails?: string }>({});
+
+  const [submitError, setSubmitError] = useState("");
+  const submittingRef = useRef(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
 
   const hiddenCaptureRef = useRef<HTMLDivElement>(null);
   const cachedCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -274,60 +304,57 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
     return toCanvas(el, { pixelRatio: 1.5, backgroundColor: "transparent" });
   }, []);
 
-  // Close on ESC key press & lock body scroll, with layout shift prevention
+  // Keep keyboard navigation inside the dialog and restore the opener on close.
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
+    if (!isOpen) return;
+    const dialog = dialogRef.current;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const body = document.body;
+    const previousOverflow = body.style.overflow;
+    const previousPadding = body.style.paddingRight;
+    const width = window.innerWidth - document.documentElement.clientWidth;
+    const fixedButton = document.querySelector('[aria-label="Hire Me"]')?.closest<HTMLElement>('.fixed');
+    const previousMargin = fixedButton?.style.marginRight ?? "";
+    body.style.paddingRight = (parseFloat(getComputedStyle(body).paddingRight) + width) + "px";
+    body.style.overflow = "hidden";
+    if (fixedButton) fixedButton.style.marginRight = width + "px";
+    const root = document.documentElement;
+    const hadCustomCursor = root.classList.contains("has-custom-cursor");
+    root.classList.remove("has-custom-cursor");
+
+    const focusFrame = requestAnimationFrame(() => dialog?.focus());
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeRef.current();
+      }
+      if (event.key !== "Tab" || !dialog) return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
+        'a[href], button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex="0"]'
+      )).filter((element) => element.getClientRects().length > 0);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) {
+        event.preventDefault();
+        dialog.focus();
+      } else if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog || !dialog.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
       }
     };
-
-    if (isOpen) {
-      // Prevent the layout shift jitter when scrollbar disappears
-      const currentScrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.paddingRight = `${currentScrollbarWidth}px`;
-      
-      const hireBtn = document.querySelector('[aria-label="Hire Me"]');
-      if (hireBtn instanceof HTMLElement) {
-        // Find the fixed container of the button to apply the offset
-        const fixedContainer = hireBtn.closest('.fixed');
-        if (fixedContainer instanceof HTMLElement) {
-          fixedContainer.style.marginRight = `${currentScrollbarWidth}px`;
-        }
-      }
-
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.paddingRight = "0px";
-      
-      const hireBtn = document.querySelector('[aria-label="Hire Me"]');
-      if (hireBtn instanceof HTMLElement) {
-        const fixedContainer = hireBtn.closest('.fixed');
-        if (fixedContainer instanceof HTMLElement) {
-          fixedContainer.style.marginRight = "0px";
-        }
-      }
-
-      document.body.style.overflow = "unset";
-    }
-
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.body.style.overflow = "unset";
-      document.body.style.paddingRight = "0px";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  // Disable custom cursor and restore native 1:1 cursor on modal open
-  useEffect(() => {
-    if (isOpen) {
-      document.documentElement.classList.remove("has-custom-cursor");
-    } else {
-      document.documentElement.classList.add("has-custom-cursor");
-    }
-    return () => {
-      document.documentElement.classList.add("has-custom-cursor");
+      cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", handleKeyDown);
+      body.style.overflow = previousOverflow;
+      body.style.paddingRight = previousPadding;
+      if (fixedButton) fixedButton.style.marginRight = previousMargin;
+      if (hadCustomCursor) root.classList.add("has-custom-cursor");
+      const returnTarget = opener?.getClientRects().length ? opener : document.querySelector<HTMLElement>('[aria-controls="site-menu"]');
+      returnTarget?.focus({ preventScroll: true });
     };
   }, [isOpen]);
 
@@ -335,28 +362,36 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
     const newErrors: { name?: string; email?: string; projectDetails?: string } = {};
     if (!name.trim()) newErrors.name = "Please provide your name";
     if (!email.trim()) newErrors.email = "Please provide your email";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Please enter a valid email address";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) newErrors.email = "Please enter a valid email address";
     if (!projectDetails.trim()) newErrors.projectDetails = "Please describe what you are looking to build";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (submittingRef.current || formState === "success") return;
+    setSubmitError("");
+    if (!validateForm()) {
+      requestAnimationFrame(() => dialogRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      return;
+    }
+    submittingRef.current = true;
     setFormState("loading");
-    setTimeout(() => {
+    try {
+      await sendContactInquiry({ name, email, message: projectDetails });
       setFormState("success");
       setName("");
       setEmail("");
       setProjectDetails("");
       setErrors({});
-      setTimeout(() => {
-        setFormState("idle");
-        onClose();
-      }, 2200);
-    }, 1500);
+    } catch (error) {
+      setFormState("idle");
+      setSubmitError(error instanceof Error ? error.message : "Unable to send. Please try again or email directly.");
+    } finally {
+      submittingRef.current = false;
+    }
   };
 
   return (
@@ -366,7 +401,9 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
         Rendered identically to the real modal, ensuring EXACT padding and dimensions
         so the WebGL snapshot matches the final DOM pixel-for-pixel.
       */}
-      <div 
+      <div
+        aria-hidden="true"
+        inert
         className="fixed top-0 bottom-0 left-0 z-[-9999] pointer-events-none flex items-center justify-center p-4 sm:p-6 md:p-8"
         style={{ right: "0px" }}
       >
@@ -386,7 +423,9 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
         No global dimming / backdrop overlays are rendered as per request.
       */}
       <div 
-        className="fixed top-0 bottom-0 left-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 pointer-events-none"
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+        className={"fixed top-0 bottom-0 left-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 " + (isOpen ? "pointer-events-auto" : "pointer-events-none")}
         style={{ right: isOpen ? `${scrollbarWidth}px` : "0px" }}
       >
         <Genie
@@ -405,10 +444,12 @@ export function HireMeModal({ isOpen, onClose }: HireMeModalProps) {
            projectDetails={projectDetails}
            formState={formState}
            errors={errors}
+           ref={dialogRef}
+           submitError={submitError}
            isCaptureMode={false}
-           setName={setName}
-           setEmail={setEmail}
-           setProjectDetails={setProjectDetails}
+           setName={(value) => { setName(value); setErrors((previous) => ({ ...previous, name: undefined })); setSubmitError(""); }}
+           setEmail={(value) => { setEmail(value); setErrors((previous) => ({ ...previous, email: undefined })); setSubmitError(""); }}
+           setProjectDetails={(value) => { setProjectDetails(value); setErrors((previous) => ({ ...previous, projectDetails: undefined })); setSubmitError(""); }}
            handleSubmit={handleSubmit}
            onClose={onClose}
          />

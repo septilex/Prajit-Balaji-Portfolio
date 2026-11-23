@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Magnetic } from "@/components/ui/Magnetic";
+import { observeAnimationActivity } from "@/lib/animationActivity";
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -34,10 +35,10 @@ export interface ProjectWheel3DProps {
  *   glass front → project image → glass back + visible 3D edge thickness.
  */
 
-const FACETS = 7;
+const FACETS = 3;
 const GLASS_DEPTH = 10; // half-thickness in px; total slab depth = 20px
 // Progressive Y-rotation per facet: center flat, edges bend away
-const FACET_ROTATIONS = [-16, -7, -2.5, 0, 2.5, 7, 16];
+const FACET_ROTATIONS = [-12, 0, 12];
 
 /** Compute facet center (x, z) so adjacent facets connect edge-to-edge. */
 function computeFacetCenters(segW: number) {
@@ -163,12 +164,12 @@ function CurvedProjectCard({
                 style={{
                   width: `${cardWidth}px`,
                   left: `${-i * segW}px`,
-                  backgroundImage: `url(${item.src})`,
-                  backgroundSize: `${cardWidth}px ${cardHeight}px`,
-                  backgroundPosition: "0 0",
-                  backgroundRepeat: "no-repeat",
                 }}
-              />
+              >
+                <Image src={item.src} alt={i === 0 ? item.title : ""} fill
+                  sizes="(max-width: 767px) 280px, (max-width: 1904px) 42vw, 800px"
+                  className="object-fill" />
+              </div>
             </div>
 
             {/* Glass Front Surface */}
@@ -613,20 +614,7 @@ export function ProjectWheel3D({
     // Velocity threshold below which we stop applying momentum
     const VEL_EPSILON = 0.01;
 
-    let isVisible = true;
-    const observer = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
-    });
-    if (cylinderRef.current?.parentElement) {
-      observer.observe(cylinderRef.current.parentElement);
-    }
-
     const tick = (time: number) => {
-      if (!isVisible) {
-        lastTime.current = 0; // Prevent delta jump on return
-        rafRef.current = requestAnimationFrame(tick);
-        return;
-      }
       
       if (!lastTime.current) lastTime.current = time;
       const rawDt = (time - lastTime.current) / 1000;
@@ -691,10 +679,16 @@ export function ProjectWheel3D({
 
       rafRef.current = requestAnimationFrame(tick);
     };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => {
+    const scene = cylinderRef.current?.parentElement;
+    if (!scene) return;
+    const stopObserving = observeAnimationActivity(scene, (active) => {
       cancelAnimationFrame(rafRef.current);
-      observer.disconnect();
+      lastTime.current = 0;
+      if (active) rafRef.current = requestAnimationFrame(tick);
+    });
+    return () => {
+      stopObserving();
+      cancelAnimationFrame(rafRef.current);
     };
   }, [autoRotate, autoSpeed, focusedIndex, radius]);
 
@@ -785,10 +779,12 @@ export function ProjectWheel3D({
           perspective: `${perspective}px`,
           perspectiveOrigin: "50% 50%",
           cursor: isDragging.current ? "grabbing" : "grab",
+          touchAction: "pan-y",
         }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
         onPointerLeave={handlePointerUp}
         onWheel={handleWheel}
       >

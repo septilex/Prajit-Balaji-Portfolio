@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { onIntroPhase } from "@/lib/intro";
+import { observeAnimationActivity } from "@/lib/animationActivity";
 import { loadDinoSprites, type SpriteImage } from "./dinoSprites";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -392,7 +392,7 @@ export function DinoRunner() {
     };
 
     const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const r = el.getBoundingClientRect();
       W = r.width; H = r.height;
       el.width = W * dpr; el.height = H * dpr;
@@ -1073,8 +1073,10 @@ export function DinoRunner() {
 
     // The canvas sits under the intro overlay — start drawing only when the
     // curtain begins to lift instead of rendering invisible frames.
-    const cancelStart = onIntroPhase("revealing", () => {
-      rid.current = requestAnimationFrame(frame);
+    const cancelStart = observeAnimationActivity(el, (active) => {
+      cancelAnimationFrame(rid.current);
+      prev = 0;
+      if (active) rid.current = requestAnimationFrame(frame);
     });
 
     return () => {
@@ -1089,7 +1091,11 @@ export function DinoRunner() {
   return (
     <canvas
       ref={cvs}
-      className="absolute inset-0 w-full h-full pointer-events-none"
+      // Phones: a dedicated 170px strip at the bottom of the hero. Sky, ground
+      // and bird lanes are fractions of the canvas height, so every bird and
+      // particle stays inside the strip and never crosses the hero text.
+      // md+: the original full-hero canvas.
+      className="absolute inset-x-0 bottom-0 h-[170px] w-full pointer-events-none md:top-0 md:h-full"
       style={{ zIndex: 1 }}
       aria-hidden="true"
     />

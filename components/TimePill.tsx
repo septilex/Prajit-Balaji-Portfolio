@@ -33,7 +33,7 @@ export function TimePill() {
 
   return (
     <div
-      className="group relative hidden md:flex items-center gap-2 rounded-full px-3.5 py-1.5 select-none"
+      className="group relative hidden xl:flex items-center gap-2 rounded-full px-3.5 py-1.5 select-none"
       style={{
         background: "#1a1612",
         boxShadow:

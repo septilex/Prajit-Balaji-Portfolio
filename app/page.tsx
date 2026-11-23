@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
-import { ProjectWheel3D } from "@/components/ui/ProjectWheel3D";
+import { DeferredSection } from "@/components/DeferredSection";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { BackgroundTypography } from "@/components/BackgroundTypography";
 import { StatsMarquee } from "@/components/StatsMarquee";
@@ -37,13 +37,22 @@ import { GlowButton } from "@/components/ui/glow";
 import { TimePill } from "@/components/TimePill";
 import { StatsCard } from "@/components/StatsCard";
 import { BottomTicker } from "@/components/BottomTicker";
-import { DinoRunner } from "@/components/DinoRunner";
 import GithubContributions from "@/components/GithubContributions";
+import { sendContactInquiry } from "@/lib/contact";
 
 // The Hire Me modal pulls in a WebGL "genie" effect and html-to-image; it's
 // closed on load, so ship it as a separate chunk instead of the initial bundle.
 const HireMeModal = dynamic(
   () => import("@/components/HireMeModal").then((m) => m.HireMeModal),
+  { ssr: false }
+);
+
+const ProjectWheel3D = dynamic(
+  () => import("@/components/ui/ProjectWheel3D").then((m) => m.ProjectWheel3D),
+  { ssr: false }
+);
+const DinoRunner = dynamic(
+  () => import("@/components/DinoRunner").then((m) => m.DinoRunner),
   { ssr: false }
 );
 
@@ -369,8 +378,31 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [menuOpen, setMenuOpen] = useState(false);
   const [hireMeOpen, setHireMeOpen] = useState(false);
+  const [hireMeLoaded, setHireMeLoaded] = useState(false);
   // Mouse-driven effects (WebGL hero mesh) only make sense with a fine pointer
   const [isFinePointer, setIsFinePointer] = useState(false);
+
+  // Compact-nav menu: Escape and taps outside the nav close it
+  const navRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [menuOpen]);
 
   // Form Fields
   const [name, setName] = useState("");
@@ -412,12 +444,12 @@ export default function Home() {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !message) return;
+    if (!name.trim() || !email.trim() || !message.trim()) return;
     if (formState === "loading") return;
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(email.trim())) {
       alert("Please enter a valid email address.");
       return;
     }
@@ -425,50 +457,22 @@ export default function Home() {
     setFormState("loading");
     
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
-          name: name,
-          email: email,
-          message: message,
-        }),
-      });
+      await sendContactInquiry({ name, email, message });
+      setFormState("success");
+      setName("");
+      setEmail("");
+      setMessage("");
 
-      const result = await response.json();
-      if (response.status === 200 && result.success) {
-        setFormState("success");
-        setName("");
-        setEmail("");
-        setMessage("");
-        
-        // Reset button state after 3 seconds
-        setTimeout(() => {
-          setFormState("idle");
-        }, 3000);
-      } else {
-        console.error("Web3Forms error:", result);
+      // Reset button state after 3 seconds
+      setTimeout(() => {
         setFormState("idle");
-        alert(result.message || "Something went wrong. Please try again later.");
-      }
+      }, 3000);
     } catch (error) {
       console.error("Submission failed:", error);
       setFormState("idle");
-      alert("Network error. Please check your connection and try again.");
+      alert(error instanceof Error ? error.message : "Unable to send. Please try again or email directly.");
     }
   };
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen w-full bg-[#0a0807] flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-[#ff8a3d]" />
-      </div>
-    );
-  }
 
   const buildPillars = [
     {
@@ -630,18 +634,16 @@ export default function Home() {
       {/* Floating quick-access dock — GitHub / LinkedIn / Gmail / Instagram, always on screen */}
       <style dangerouslySetInnerHTML={{ __html: `
         .glass-icon-btn, .glass-pill-btn, .glass-corner-btn {
-          color: #ff6a00;
-          background: linear-gradient(180deg, rgba(32, 28, 24, 0.85) 0%, rgba(15, 13, 11, 0.95) 100%);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-top: 1px solid rgba(255, 255, 255, 0.25);
-          box-shadow: 
-            inset 0 1px 1px rgba(255, 255, 255, 0.22),
-            inset 0 -1px 3px rgba(0, 0, 0, 0.4),
+          /* Pure black body, orange matched to the hero accent (#ff8a3d) */
+          color: #ff8a3d;
+          background: #000000;
+          border: 1px solid rgba(255, 138, 61, 0.28);
+          /* Soft, light-intensity orange halo (static — no repaint cost) */
+          box-shadow:
             0 8px 24px -4px rgba(0, 0, 0, 0.35),
-            0 0 12px rgba(255, 106, 0, 0.12);
-          text-shadow: 0 0 8px rgba(255, 106, 0, 0.35);
+            0 0 10px rgba(255, 138, 61, 0.28),
+            0 0 22px rgba(255, 138, 61, 0.16);
+          text-shadow: 0 0 8px rgba(255, 138, 61, 0.55);
           transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s, text-shadow 0.2s, background 0.25s, border-color 0.25s;
           cursor: pointer;
         }
@@ -650,54 +652,30 @@ export default function Home() {
         .glass-corner-btn { border-left: 1px solid rgba(255, 255, 255, 0.1); }
         
         .glass-icon-btn svg, .glass-pill-btn svg, .glass-corner-btn svg {
-          filter: drop-shadow(0 0 6px rgba(255, 106, 0, 0.35));
+          filter: drop-shadow(0 0 5px rgba(255, 138, 61, 0.55));
           transition: filter 0.25s, color 0.25s;
         }
         .glass-icon-btn:hover, .glass-pill-btn:hover, .glass-corner-btn:hover {
           color: #ffffff;
-          background: linear-gradient(180deg, rgba(48, 42, 36, 0.9) 0%, rgba(20, 18, 16, 0.98) 100%);
-          border-color: rgba(255, 138, 61, 0.35);
-          border-top: 1px solid rgba(255, 255, 255, 0.45);
-          box-shadow: 
-            inset 0 1px 2px rgba(255, 255, 255, 0.4),
-            inset 0 -1px 3px rgba(0, 0, 0, 0.4),
-            0 12px 28px -4px rgba(255, 106, 0, 0.25),
-            0 0 25px rgba(255, 106, 0, 0.35);
-          text-shadow: 0 0 12px rgba(255, 255, 255, 1), 0 0 24px rgba(255, 106, 0, 0.6);
+          background: #000000;
+          border-color: rgba(255, 138, 61, 0.45);
+          box-shadow:
+            0 12px 28px -4px rgba(255, 138, 61, 0.25),
+            0 0 25px rgba(255, 138, 61, 0.35);
+          text-shadow: 0 0 12px rgba(255, 255, 255, 1), 0 0 24px rgba(255, 138, 61, 0.6);
         }
         .glass-icon-btn:hover svg, .glass-pill-btn:hover svg, .glass-corner-btn:hover svg {
           filter: drop-shadow(0 0 10px rgba(255, 138, 61, 0.8));
         }
         .glass-icon-btn:active, .glass-pill-btn:active, .glass-corner-btn:active {
           transform: scale(0.95);
-          box-shadow: 
-            inset 0 1px 1px rgba(255, 255, 255, 0.15),
-            inset 0 -1px 3px rgba(0, 0, 0, 0.6),
-            0 4px 12px rgba(0, 0, 0, 0.35);
-        }
-        .glass-icon-btn::before, .glass-pill-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 12%;
-          right: 12%;
-          height: 35%;
-          background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
-          border-radius: 50px 50px 0 0;
-          pointer-events: none;
-        }
-        .glass-corner-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 35%;
-          background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
-          pointer-events: none;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
         }
       `}} />
-      <div className="fixed z-[90] flex gap-3 max-md:bottom-5 max-md:left-1/2 max-md:-translate-x-1/2 max-md:flex-row md:right-5 md:top-1/2 md:-translate-y-1/2 md:flex-col">
+      {/* Desktop only (≥ 1024px). Below that, the same links live in the
+          compact-nav menu and the Contact section; a floating row of 56px
+          buttons covered the bottom of every phone and tablet screen. */}
+      <div className="fixed right-5 top-1/2 z-[90] hidden -translate-y-1/2 flex-col gap-3 lg:flex">
         {[
           {
             label: "Github",
@@ -754,111 +732,136 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Static Glow Orb */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed top-0 left-0 z-[1] h-[500px] w-[500px] rounded-full opacity-70 mix-blend-screen transition-transform duration-500"
-        style={{ transform: "translateX(-200px) translateY(-200px)" }}
-      >
-        <div className="glow-orb h-full w-full rounded-full"></div>
-      </div>
+      {/* Static Glow Orb — fine pointers (desktop) only. On touch screens this
+          fixed 500px mix-blend layer is invisible against the light theme but
+          still forces the whole page to be composited against it. */}
+      {isFinePointer && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed top-0 left-0 z-[1] h-[500px] w-[500px] rounded-full opacity-70 mix-blend-screen transition-transform duration-500"
+          style={{ transform: "translateX(-200px) translateY(-200px)" }}
+        >
+          <div className="glow-orb h-full w-full rounded-full"></div>
+        </div>
+      )}
 
       <div className="grid-overlay"></div>
       <div className="grain"></div>
       <div className="vignette"></div>
 
-      {/* Floating Header Navbar */}
+      {/* Floating Header Navbar
+          Centred by layout, not transforms: a full-width fixed rail with 16px
+          gutters centres the pill with flexbox. (Previously the pill combined
+          left: calc(50% + 16px) with two separate -50% shifts — Tailwind v4's
+          `translate` utility plus an inline transform — so it sat a full pill
+          width left of centre and ran off-screen below ~1536px.)
+          < 1024px: compact bar (logo, wordmark, menu) for phones and tablets.
+          ≥ 1024px: full pill. Its max width leaves the same clearance on both
+          sides for the fixed Hire Me button: 358px = 2 × (20px offset + 159px
+          button + 16px gap) − the rail's 32px padding. */}
       <nav
-        className="fixed top-4 left-[calc(50%+16px)] z-50 -translate-x-1/2 transition-all duration-700 w-[min(95%,760px)]"
+        ref={navRef}
+        aria-label="Primary"
+        className="pointer-events-none fixed inset-x-0 top-[max(1rem,env(safe-area-inset-top))] z-50 flex justify-center px-4 transition-[opacity,transform] duration-700"
         style={{
           opacity: mounted ? 1 : 0,
-          transform: mounted ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-40px)",
+          transform: mounted ? "translateY(0)" : "translateY(-40px)",
         }}
       >
-        <div className="flex items-center justify-between gap-3 rounded-full border border-[var(--nav-border)] bg-[var(--nav-bg)] backdrop-blur-xl px-6 py-2.5 shadow-[var(--nav-shadow)]">
-          <a href="#hero" className="flex items-center gap-2 text-sm font-medium tracking-tight">
-            <span className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[var(--nav-border)] shadow-[0_0_15px_rgba(255,138,61,0.2)]">
-              <Image
-                src="/pb_logo.jpg"
-                alt="PB Logo"
-                fill
-                sizes="40px"
-                className="object-cover"
-              />
-            </span>
-            <span className="hidden sm:inline text-[var(--fg-body)] font-researcher font-bold tracking-[0.2em] text-[11px] whitespace-nowrap">
-              PRAJIT BALAJI
-            </span>
-          </a>
-
-          <MagneticNavGroup items={navItems} activeSection={activeSection} />
-
-          <div className="flex items-center gap-2">
-            {/* IST Time Pill — only visible md+ */}
-            <TimePill />
-
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--fg-body)] transition-colors hover:text-[var(--amber)] md:hidden"
-            >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile dropdown — glass panel */}
-        <div
-          className={`mt-2 overflow-hidden rounded-3xl border bg-[var(--dropdown-bg)] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden ${
-            menuOpen
-              ? "max-h-96 border-[var(--border-subtle)] opacity-100"
-              : "max-h-0 border-transparent opacity-0"
-          }`}
-        >
-          <div className="flex flex-col p-3">
-            {navItems.map((item) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                onClick={() => setMenuOpen(false)}
-                className={`font-syne rounded-2xl px-4 py-3 text-[15px] font-semibold transition-colors ${
-                  activeSection === item.id
-                    ? "bg-[var(--dropdown-active-bg)] text-[var(--amber)]"
-                    : "text-[var(--fg-body)]/70 active:bg-[var(--fg-body)]/5"
-                }`}
-              >
-                {item.label}
-              </a>
-            ))}
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                setHireMeOpen(true);
-              }}
-              className="font-syne mt-1 flex items-center justify-between rounded-2xl bg-[var(--amber)]/15 border border-[var(--amber)]/40 px-4 py-3 text-[15px] font-bold text-[var(--amber)] transition-colors"
-            >
-              <span>HIRE ME</span>
-              <Sparkles className="h-4 w-4 text-[var(--amber)]" />
-            </button>
-            <a
-              href="/Prajit_Balaji_Resume.pdf"
-              download="Prajit_Balaji_Resume.pdf"
-              onClick={() => setMenuOpen(false)}
-              className="font-syne mt-1 flex items-center gap-2 rounded-2xl border-t border-[var(--border-subtle)] px-4 py-3 text-[15px] font-semibold text-[var(--fg-body)]"
-            >
-              <Download className="h-4 w-4 text-[var(--amber)]" />
-              My Resume
+        <div className="pointer-events-auto w-full max-w-[560px] lg:max-w-[min(760px,calc(100%-358px))]">
+          <div className="flex items-center justify-between gap-3 rounded-full border border-[var(--nav-border)] bg-[var(--nav-bg)] backdrop-blur-xl px-4 py-1.5 shadow-[var(--nav-shadow)] sm:px-5 lg:px-6 lg:py-2.5">
+            <a href="#hero" className="flex min-h-11 items-center gap-2 text-sm font-medium tracking-tight lg:min-h-0">
+              <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-[var(--nav-border)] shadow-[0_0_15px_rgba(255,138,61,0.2)] lg:h-10 lg:w-10">
+                <Image
+                  src="/pb_logo.jpg"
+                  alt="PB Logo"
+                  fill
+                  sizes="40px"
+                  className="object-cover"
+                />
+              </span>
+              <span className="text-[var(--fg-body)] font-researcher font-bold tracking-[0.2em] text-[11px] whitespace-nowrap">
+                PRAJIT BALAJI
+              </span>
             </a>
+
+            {/* Section links — desktop pill only (≥ 1024px) */}
+            <MagneticNavGroup items={navItems} activeSection={activeSection} />
+
+            <div className="flex items-center gap-2">
+              {/* IST Time Pill — only where the pill has room for it (≥ 1280px) */}
+              <TimePill />
+
+              {/* Compact-nav menu toggle (phones + tablets) — 44px touch target */}
+              <button
+                ref={menuButtonRef}
+                type="button"
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
+                className="-mr-1.5 flex h-11 w-11 items-center justify-center rounded-full text-[var(--fg-body)] transition-colors hover:text-[var(--amber)] lg:hidden"
+              >
+                {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Compact-nav dropdown — same width as the pill, never taller than
+              the visible viewport (scrolls inside on short landscape screens),
+              and removed from focus/screen readers while closed. */}
+          <div
+            id="site-menu"
+            className={`mt-2 overflow-y-auto overscroll-contain rounded-3xl border bg-[var(--dropdown-bg)] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden ${
+              menuOpen
+                ? "visible max-h-[min(24rem,calc(100svh-6.5rem))] border-[var(--border-subtle)] opacity-100"
+                : "invisible max-h-0 border-transparent opacity-0"
+            }`}
+          >
+            <div className="flex flex-col p-3">
+              {navItems.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={() => setMenuOpen(false)}
+                  className={`font-syne rounded-2xl px-4 py-3 text-[15px] font-semibold transition-colors ${
+                    activeSection === item.id
+                      ? "bg-[var(--dropdown-active-bg)] text-[var(--amber)]"
+                      : "text-[var(--fg-body)]/70 active:bg-[var(--fg-body)]/5"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setHireMeLoaded(true);
+                  setHireMeOpen(true);
+                }}
+                className="font-syne mt-1 flex items-center justify-between rounded-2xl bg-[var(--amber)]/15 border border-[var(--amber)]/40 px-4 py-3 text-[15px] font-bold text-[var(--amber)] transition-colors"
+              >
+                <span>HIRE ME</span>
+                <Sparkles className="h-4 w-4 text-[var(--amber)]" />
+              </button>
+              <a
+                href="/Prajit_Balaji_Resume.pdf"
+                download="Prajit_Balaji_Resume.pdf"
+                onClick={() => setMenuOpen(false)}
+                className="font-syne mt-1 flex items-center gap-2 rounded-2xl border-t border-[var(--border-subtle)] px-4 py-3 text-[15px] font-semibold text-[var(--fg-body)]"
+              >
+                <Download className="h-4 w-4 text-[var(--amber)]" />
+                My Resume
+              </a>
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Top-Right Fixed HIRE ME Button (Aligned horizontally with navbar, vertically above side social dock) */}
       <div
-        className="fixed top-4 right-5 z-50 hidden md:block transition-all duration-700"
+        className="fixed top-4 right-5 z-50 hidden lg:block transition-all duration-700"
         style={{
           opacity: mounted ? 1 : 0,
           transform: mounted ? "translateY(0)" : "translateY(-40px)",
@@ -868,14 +871,14 @@ export default function Home() {
           <div className="group relative">
             <button
               type="button"
-              onClick={() => setHireMeOpen(true)}
+              onClick={() => { setHireMeLoaded(true); setHireMeOpen(true); }}
               className="glass-pill-btn relative z-10 flex h-[48px] items-center gap-2.5 rounded-full px-6 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
               aria-label="Hire Me"
             >
               {/* Pulsing indicator dot */}
               <span className="relative z-10 flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ffffff] opacity-75 transition-colors duration-300" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ffffff] transition-colors duration-300" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff8a3d] opacity-75 transition-colors duration-300" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff8a3d] transition-colors duration-300" />
               </span>
 
               {/* Text */}
@@ -888,7 +891,7 @@ export default function Home() {
       </div>
 
       {/* Hire Me Premium Modal */}
-      <HireMeModal isOpen={hireMeOpen} onClose={() => setHireMeOpen(false)} />
+      {hireMeLoaded && <HireMeModal isOpen={hireMeOpen} onClose={() => setHireMeOpen(false)} />}
 
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen w-full overflow-hidden">
@@ -913,15 +916,20 @@ export default function Home() {
         </div>
 
         {/* Ambient pixel-art infinite runner Easter egg */}
-        <DinoRunner />
+        <DeferredSection className="absolute inset-0 pointer-events-none">
+          <DinoRunner />
+        </DeferredSection>
 
         {/* Hero layout: flex column filling full viewport height */}
-        <div className="relative z-10 flex min-h-[100svh] flex-col justify-between pt-32 pb-10">
+        {/* Phones (< 768px): a composed poster — single-line eyebrow, two-line
+            name, role, stats — with the bottom 180px reserved for the dino
+            strip. md+ keeps the original desktop composition. */}
+        <div className="relative z-10 flex min-h-[100svh] flex-col justify-between pt-24 pb-[180px] md:pt-32 md:pb-10">
 
           {/* Top metadata row — constrained to 1600px */}
           <ScrollReveal
             initialTransform="translateY(20px)"
-            className="mx-auto mt-12 w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[9.5px] uppercase tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
+            className="mx-auto w-full max-w-[1600px] px-6 md:mt-12 md:px-12 flex items-center justify-center md:justify-between whitespace-nowrap text-[9.5px] tracking-[0.12em] min-[400px]:tracking-[0.18em] uppercase md:tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
           >
             <div className="flex items-center gap-3">
               <span className="relative flex h-2 w-2">
@@ -940,9 +948,9 @@ export default function Home() {
               <motion.div style={{ scale: heroScale, opacity: heroOpacity, y: heroY }}>
                 <Magnetic strength={0.08}>
                   <ElasticHeroTitle
-                    className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow"
+                    className="font-montserrat whitespace-nowrap font-black text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] text-glow [--hero-name:clamp(3.5rem,20vw,7.5rem)] md:[--hero-name:clamp(2rem,12.5vw,18rem)]"
                     style={{
-                      fontSize: "clamp(2rem, 12.5vw, 18rem)",
+                      fontSize: "var(--hero-name)",
                       lineHeight: "0.85",
                       letterSpacing: "-0.06em",
                       position: "relative",
@@ -953,7 +961,7 @@ export default function Home() {
             </ScrollReveal>
 
             {/* Sub-info row — centered directly underneath */}
-            <div className="mt-12 flex flex-col items-center justify-center gap-6 px-6 md:px-12 w-full max-w-[1600px]">
+            <div className="mt-7 flex flex-col items-center justify-center gap-5 px-6 md:mt-12 md:gap-6 md:px-12 w-full max-w-[1600px]">
               <ScrollReveal
                 initialTransform="translateY(30px)"
                 className="relative w-full flex justify-center"
@@ -963,20 +971,20 @@ export default function Home() {
                   <br />
                   <TypewriterTitle />
                   <br />
-                  <span className="font-syne text-[#a89c8d] text-xl md:text-2xl mt-3 inline-block">Creating futuristic digital experiences.</span>
+                  <span className="font-syne text-[#625649] text-base md:text-[#a89c8d] md:text-2xl mt-2 md:mt-3 inline-block">Creating futuristic digital experiences.</span>
                 </p>
               </ScrollReveal>
 
               <ScrollReveal
                 initialTransform="translateY(30px)"
-                className="text-[9.5px] uppercase tracking-[0.25em] text-[#1A1612] font-researcher font-bold text-center mt-4"
+                className="hidden md:block text-[9.5px] uppercase tracking-[0.25em] text-[#1A1612] font-researcher font-bold text-center mt-4"
               >
                 <div>Based in the <span className="text-[#ff8a3d] font-bold">cloud</span></div>
                 <div className="mt-1">Building the <span className="text-[#ff8a3d] font-bold">next decade</span></div>
               </ScrollReveal>
 
               {/* Stats card + resume */}
-              <ScrollReveal initialTransform="translateY(30px)" className="mt-8 flex justify-center w-full">
+              <ScrollReveal initialTransform="translateY(30px)" className="mt-1 md:mt-8 flex justify-center w-full">
                 <StatsCard />
               </ScrollReveal>
             </div>
@@ -985,7 +993,7 @@ export default function Home() {
           {/* Bottom row — constrained to 1600px */}
           <ScrollReveal
             initialTransform="translateY(20px)"
-            className="mx-auto w-full max-w-[1600px] px-6 md:px-12 flex items-center justify-between text-[9px] uppercase tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
+            className="mx-auto w-full max-w-[1600px] px-6 md:px-12 hidden md:flex items-center justify-between text-[9px] uppercase tracking-[0.3em] text-[#1A1612] font-researcher font-bold"
           >
             <span className="flex items-center gap-2">Scroll to explore</span>
             <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#3a2a1c]/80 dark:border-[#3a2a1c]/80 light:border-black/10">
@@ -996,8 +1004,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Bottom Ticker — fixed to viewport bottom, visible immediately ── */}
-      <div className="fixed bottom-0 left-0 w-full z-[60]">
+      {/* ── Bottom Ticker ──
+          Desktop (≥ 1024px): fixed to the viewport bottom, as before, padded
+          for the safe-area inset. Phones/tablets: an ordinary band after the
+          hero, so it no longer covers the bottom 36px of every screen. */}
+      <div className="relative z-[60] w-full lg:fixed lg:bottom-0 lg:left-0 lg:bg-[#1a1612] lg:pb-[env(safe-area-inset-bottom)]">
         <BottomTicker />
       </div>
 
@@ -1165,7 +1176,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full mt-16 overflow-hidden">
+        <DeferredSection className="w-full mt-16 overflow-hidden min-h-[514px] md:min-h-[min(calc(26.04vw+280px),776px)]">
           <ProjectWheel3D
             items={projects.map(p => ({
               src: p.image,
@@ -1179,7 +1190,7 @@ export default function Home() {
               year: p.year
             }))}
           />
-        </div>
+        </DeferredSection>
       </section>
 
       {/* Section 6: GitHub Graph */}

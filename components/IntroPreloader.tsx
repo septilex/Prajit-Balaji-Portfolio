@@ -10,6 +10,13 @@ export function IntroPreloader() {
   const [startOutro, setStartOutro] = useState(false);
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const skip = setTimeout(() => {
+        setIsVisible(false);
+        setIntroPhase("done");
+      }, 0);
+      return () => clearTimeout(skip);
+    }
     // Lock scroll during the intro
     document.body.style.overflow = "hidden";
     
@@ -42,7 +49,7 @@ export function IntroPreloader() {
         <motion.div
           initial={{ y: 0 }}
           exit={{ y: "-100%" }}
-          transition={{ duration: 0.85, ease: [0.85, 0, 0.15, 1] }}
+          transition={{ duration: 0.65, ease: [0.85, 0, 0.15, 1] }}
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#f2ece1] will-change-transform select-none pointer-events-auto"
           style={{
             backgroundImage: `

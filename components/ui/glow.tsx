@@ -5,6 +5,7 @@ import { motion, type Transition } from "framer-motion";
 import { type VariantProps } from "class-variance-authority";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { observeAnimationActivity } from "@/lib/animationActivity";
 
 type ButtonProps = React.ComponentPropsWithoutRef<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -63,24 +64,44 @@ function GlowEffectLayer({
   transition,
   className,
 }: GlowEffectInnerProps) {
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const [active, setActive] = React.useState(false);
+  React.useEffect(() => {
+    if (!rootRef.current) return;
+    return observeAnimationActivity(rootRef.current, setActive);
+  }, []);
   // "rotate" is GPU-composited: static conic gradient spun via CSS transform.
   // (Animating the background string via JS repaints + reblurs every frame.)
+  //
+  // The spinning layer is a square, so its silhouette never changes as it
+  // turns, and it sits inside a static pill 12px larger than the button with
+  // a soft radial mask. Previously the layer was the button's own rectangle
+  // scaled 1.45× and rotated: on a wide button that swept a blurred bar
+  // ±155px above and below it, across neighbouring content.
   if (mode === "rotate") {
+    const mask = "radial-gradient(closest-side, #000 62%, transparent)";
     return (
       <div
-        style={
-          {
-            background: `conic-gradient(from 0deg at 50% 50%, ${colors.join(", ")})`,
-            animationDuration: `${duration}s`,
-            "--glow-scale": scale * 1.45,
-          } as React.CSSProperties
-        }
-        className={cn(
-          "pointer-events-none absolute inset-0 h-full w-full glow-spin",
-          blurClass(blur),
-          className
-        )}
-      />
+        ref={rootRef}
+        aria-hidden="true"
+        className={cn("pointer-events-none absolute -inset-3 rounded-full", className)}
+        style={{ maskImage: mask, WebkitMaskImage: mask }}
+      >
+        <div
+          style={
+            {
+              background: `conic-gradient(from 0deg at 50% 50%, ${colors.join(", ")})`,
+              animationDuration: `${duration}s`,
+              animationPlayState: active ? "running" : "paused",
+              "--glow-scale": scale,
+            } as React.CSSProperties
+          }
+          className={cn(
+            "absolute left-1/2 top-1/2 aspect-square w-[115%] -translate-x-1/2 -translate-y-1/2 glow-spin",
+            blurClass(blur)
+          )}
+        />
+      </div>
     );
   }
 
@@ -130,7 +151,8 @@ function GlowEffectLayer({
 
   return (
     <motion.div
-      animate={animations[mode] as any}
+      ref={rootRef}
+      animate={animations[active ? mode : "static"] as any}
       style={
         {
           "--scale": scale,

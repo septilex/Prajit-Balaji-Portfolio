@@ -108,6 +108,9 @@ function getTechSubtitle(skill: string) {
 // ─── Abstract Tech Icons ──────────────────────────────────────────────────────
 
 function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolean }) {
+  // "Framer Motion" appears in more than one category, so its gradient needs a
+  // per-instance id (a repeated id="framerGrad" is invalid HTML).
+  const framerGradId = `framerGrad-${React.useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   switch (skill) {
     // --- AI & Intelligent Systems ---
     case "OpenAI":
@@ -695,7 +698,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
       return (
         <svg viewBox="0 0 100 100" className="w-full h-full opacity-90" stroke="#3a2a1c" fill="none">
            <defs>
-             <linearGradient id="framerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+             <linearGradient id={framerGradId} x1="0%" y1="0%" x2="100%" y2="100%">
                <stop offset="0%" stopColor="#3a2a1c" />
                <stop offset="100%" stopColor="#1a1612" />
              </linearGradient>
@@ -709,7 +712,7 @@ function AbstractTechIcon({ skill, isActive }: { skill: string, isActive: boolea
              <motion.g animate={{ scale: isActive ? 1.05 : 1 }} transition={{ duration: 0.3, type: "spring", stiffness: 300 }}>
                {/* Framer Logo */}
                {/* Top Triangle */}
-               <path d="M 30 20 L 70 20 L 50 40 L 30 40 Z" fill="url(#framerGrad)" stroke="#fcfaf7" strokeWidth="1.5" strokeLinejoin="round" />
+               <path d="M 30 20 L 70 20 L 50 40 L 30 40 Z" fill={`url(#${framerGradId})`} stroke="#fcfaf7" strokeWidth="1.5" strokeLinejoin="round" />
                {/* Middle Triangle */}
                <path d="M 30 40 L 70 40 L 50 60 L 30 60 Z" fill="#ff8a3d" fillOpacity="0.9" stroke="#fcfaf7" strokeWidth="1.5" strokeLinejoin="round" />
                {/* Bottom Triangle */}

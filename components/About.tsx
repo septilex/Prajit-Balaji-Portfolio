@@ -7,10 +7,14 @@ import { ScrollReveal } from "./ScrollReveal";
 export const About = () => {
   return (
     <section
-      id="about"
+      id="education"
       className="relative mx-auto max-w-[1600px] px-6 md:px-12"
     >
-      {/* ── Section layout: flex column, generous spacing for scrolling ── */}
+      {/* ── Section layout: flex column, generous spacing for scrolling ──
+          Entry titles keep their 1.25× horizontal stretch, but a CSS transform
+          doesn't change the layout box, so each title is capped at 80% of the
+          column (1 / 1.25): it wraps inside that box and the stretched result
+          ends exactly at the column edge instead of 50–230px past it. */}
       <div className="flex flex-col gap-24 py-24 md:gap-40 md:py-36">
 
         {/* ── SECTION HEADER ── */}
@@ -47,7 +51,7 @@ export const About = () => {
           <ScrollReveal
             className="relative flex w-full justify-end z-10"
           >
-            <div className="flex flex-col items-end text-right">
+            <div className="flex w-full flex-col items-end text-right">
               {/* Arrow */}
               <div className="mb-4 flex items-center gap-2">
                 <span className="font-researcher text-sm text-[#ff8a3d]">&larr;</span>
@@ -55,12 +59,12 @@ export const About = () => {
               </div>
 
               {/* Institution */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] scale-x-[1.25] origin-right inline-block">
+              <h3 className="font-geist max-w-[80%] text-[1.75rem] md:text-[3.25rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] scale-x-[1.25] origin-right inline-block">
                 SRM University AP
               </h3>
 
               {/* Degree */}
-              <h4 className="font-syne mt-2 text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
+              <h4 className="font-syne mt-2 text-[1.375rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
                 B.Tech Computer Science
               </h4>
 
@@ -115,7 +119,7 @@ export const About = () => {
           <ScrollReveal
             className="relative flex w-full justify-start z-10"
           >
-            <div className="flex flex-col items-start text-left">
+            <div className="flex w-full flex-col items-start text-left">
               {/* Arrow */}
               <div className="mb-4 flex items-center gap-2">
                 <div className="h-px w-14 md:w-24 bg-[#ff8a3d]" />
@@ -123,12 +127,12 @@ export const About = () => {
               </div>
 
               {/* Institution */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-left">
+              <h3 className="font-geist max-w-[80%] text-[1.75rem] md:text-[3.25rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-left">
                 Geethanjali Olympiad School
               </h3>
 
               {/* Board */}
-              <h4 className="font-syne mt-2 text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
+              <h4 className="font-syne mt-2 text-[1.375rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
                 CBSE
               </h4>
 
@@ -183,7 +187,7 @@ export const About = () => {
           <ScrollReveal
             className="relative flex w-full justify-end z-10"
           >
-            <div className="flex flex-col items-end text-right">
+            <div className="flex w-full flex-col items-end text-right">
               {/* Arrow */}
               <div className="mb-4 flex items-center gap-2">
                 <span className="font-researcher text-sm text-[#ff8a3d]">&larr;</span>
@@ -191,12 +195,12 @@ export const About = () => {
               </div>
 
               {/* Institution/Role */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-right">
+              <h3 className="font-geist max-w-[80%] text-[1.75rem] md:text-[3.25rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-right">
                 Google Student Ambassador
               </h3>
 
               {/* Organization */}
-              <h4 className="font-syne mt-2 text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
+              <h4 className="font-syne mt-2 text-[1.375rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
                 Google Student Ambassadors (India)
               </h4>
 
@@ -251,7 +255,7 @@ export const About = () => {
           <ScrollReveal
             className="relative flex w-full justify-start z-10"
           >
-            <div className="flex flex-col items-start text-left">
+            <div className="flex w-full flex-col items-start text-left">
               {/* Arrow */}
               <div className="mb-4 flex items-center gap-2">
                 <div className="h-px w-14 md:w-24 bg-[#ff8a3d]" />
@@ -259,12 +263,12 @@ export const About = () => {
               </div>
 
               {/* Institution/Role */}
-              <h3 className="font-geist text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-left">
+              <h3 className="font-geist max-w-[80%] text-[1.75rem] md:text-[3.25rem] lg:text-[5rem] font-black leading-[0.9] tracking-tighter text-[#f2ece1] dark:text-[#f2ece1] light:text-[#1a1612] inline-block scale-x-[1.25] origin-left">
                 Data Analyst Intern
               </h3>
 
               {/* Organization */}
-              <h4 className="font-syne mt-2 text-[1.75rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
+              <h4 className="font-syne mt-2 text-[1.375rem] md:text-[2.75rem] lg:text-[3.25rem] font-black leading-[0.9] tracking-tighter text-[#ff8a3d]">
                 Unified Mentor
               </h4>
 

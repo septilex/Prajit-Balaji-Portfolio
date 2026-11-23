@@ -7,7 +7,6 @@ import "./globals.css";
 import { CursorGlow } from "@/components/CursorGlow";
 import { CustomCursor } from "@/components/CustomCursor";
 
-import { SmoothScroll } from "@/components/SmoothScroll";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -69,30 +68,36 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {/* Font stylesheets are requested in CORS mode (crossOrigin="anonymous";
+            both hosts send Access-Control-Allow-Origin: *). Without it their
+            cssRules are unreadable, and html-to-image (Hire Me modal snapshot)
+            logs two console errors per sheet. The preconnects use the same
+            mode so the stylesheet requests can reuse those connections. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
         {/* Intro preloader font — listed first so it wins the race */}
         <link
           rel="stylesheet"
+          crossOrigin="anonymous"
           href="https://fonts.googleapis.com/css2?family=Montenegrin+Gothic+One&display=swap"
         />
         <link
           rel="stylesheet"
+          crossOrigin="anonymous"
           href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@800;900&family=Space+Mono:wght@400;700&display=swap"
         />
         <link
           rel="stylesheet"
+          crossOrigin="anonymous"
           href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400,900&f[]=switzer@400,500,600,700&display=swap"
         />
       </head>
       <body className="antialiased min-h-screen">
           <CustomCursor />
           <CursorGlow />
-          <SmoothScroll>
-            {children}
-          </SmoothScroll>
+          {children}
       </body>
     </html>
   );

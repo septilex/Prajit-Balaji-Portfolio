@@ -136,7 +136,7 @@ export function MagneticNavGroup({ items, activeSection }: MagneticNavGroupProps
 
   return (
     <div
-      className="hidden md:flex items-center gap-0.5"
+      className="hidden lg:flex items-center gap-0.5"
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
     >

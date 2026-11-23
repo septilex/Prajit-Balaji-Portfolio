@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback } from "react";
 import { gsap } from "gsap";
-import { onIntroPhase } from "@/lib/intro";
+import { observeAnimationActivity } from "@/lib/animationActivity";
 
 // ─── ElasticHeroTitle ─────────────────────────────────────────────────────────
 // Renders "PRAJIT BALAJI" with each letter in its own clipped slot.
@@ -27,8 +27,12 @@ interface ElasticHeroTitleProps {
 const TITLE_CHARS = "PRAJIT BALAJI".split("");
 type Direction = "up" | "down" | "left" | "right";
 const DIRECTIONS: Direction[] = ["up", "down", "left", "right"];
+const isCompactViewport = () =>
+  typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
 
 export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const activeRef = useRef(false);
   const mainRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const animatingRef = useRef<Set<number>>(new Set());
   const activeDirsRef = useRef<Set<Direction>>(new Set());
@@ -45,7 +49,7 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
 
   // ── Animate a single letter with exit + re-entry ──────────────────────────
   const animateLetter = useCallback((idx: number, dir: Direction) => {
-    if (!mountedRef.current) return;
+    if (!mountedRef.current || !activeRef.current) return;
     if (animatingRef.current.has(idx)) return; // already in-flight
 
     const mainEl = mainRefs.current[idx];
@@ -95,8 +99,9 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
         gsap.set(mainEl, { x: 0, y: 0 });
         animatingRef.current.delete(idx);
         activeDirsRef.current.delete(dir);
-        // Immediately replenish if we dropped below minimum
-        if (scheduleNextRef.current) scheduleNextRef.current();
+        // Immediately replenish if we dropped below minimum (desktop only;
+        // phones run on their own slower timer — see scheduleNext)
+        if (scheduleNextRef.current && !isCompactViewport()) scheduleNextRef.current();
       },
     });
 
@@ -129,7 +134,26 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
 
   // ── Scheduling loop ───────────────────────────────────────────────────────
   const scheduleNext = useCallback(() => {
-    if (!mountedRef.current) return;
+    if (!mountedRef.current || !activeRef.current) return;
+
+    // Phones: the name is set on two lines at poster scale, so 2–4 letters in
+    // flight at once left it unreadable. Move one letter at a time, with a
+    // pause between moves.
+    if (isCompactViewport()) {
+      if (animatingRef.current.size === 0) {
+        const letters = TITLE_CHARS.map((ch, i) => (ch !== " " ? i : -1)).filter(
+          (i) => i !== -1 && !recentLettersRef.current.includes(i)
+        );
+        const idx = letters[Math.floor(Math.random() * letters.length)];
+        recentLettersRef.current = [...recentLettersRef.current, idx].slice(-6);
+        animateLetter(idx, DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)]);
+      }
+      if (loopRef.current) clearTimeout(loopRef.current);
+      loopRef.current = setTimeout(() => {
+        if (mountedRef.current) scheduleNext();
+      }, 1800 + Math.random() * 1400);
+      return;
+    }
 
     const activeCount = animatingRef.current.size;
     const numAvailableDirs = 4 - activeCount;
@@ -219,7 +243,12 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
 
     // Start the letter loop only once the intro curtain is fully gone, so the
     // GSAP tweens never compete with the preloader / curtain-lift animation.
-    const cancelIntro = onIntroPhase("done", () => {
+    const heading = headingRef.current;
+    if (!heading) return;
+    const cancelIntro = observeAnimationActivity(heading, (active) => {
+      activeRef.current = active;
+      if (loopRef.current) clearTimeout(loopRef.current);
+      if (!active) return;
       const initialDelay = 300 + Math.random() * 400;
       loopRef.current = setTimeout(() => {
         if (mountedRef.current) scheduleNext();
@@ -242,16 +271,18 @@ export function ElasticHeroTitle({ className, style }: ElasticHeroTitleProps) {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <h1 className={className} style={style}>
+    <h1 ref={headingRef} className={className} style={style}>
       {TITLE_CHARS.map((ch, i) => {
         if (ch === " ") {
+          // Phones: break the name onto two lines (PRAJIT / BALAJI).
+          // md+: the original single line with a 0.3em gap.
           return (
-            <span
-              key={`space-${i}`}
-              style={{ display: "inline-block", width: "0.3em" }}
-            >
-              &nbsp;
-            </span>
+            <React.Fragment key={`space-${i}`}>
+              <br className="md:hidden" />
+              <span className="hidden md:inline-block" style={{ width: "0.3em" }}>
+                &nbsp;
+              </span>
+            </React.Fragment>
           );
         }
         return (

@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { getGithubContributions, GithubData } from '@/lib/githubContributions';
 import { motion } from 'framer-motion';
+import { observeAnimationActivity } from '@/lib/animationActivity';
 
 // three.js + react-three-fiber are by far the largest dependencies on the page.
 // Loading them in a separate chunk keeps them out of the initial bundle, so the
@@ -31,7 +32,13 @@ export default function GithubContributions({ username = 'septilex' }: { usernam
   const [isFetching, setIsFetching] = useState(false);
   const [year, setYear] = useState<"2026" | "2025">("2026");
   const [nearView, setNearView] = useState(false);
+  const [active, setActive] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    return observeAnimationActivity(rootRef.current, setActive);
+  }, []);
 
   // Only mount the WebGL scene once the section is about to scroll into view.
   useEffect(() => {
@@ -88,7 +95,7 @@ export default function GithubContributions({ username = 'septilex' }: { usernam
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-7xl mx-auto py-12 relative"
       >
-        <GithubGraph3D data={data.days} totalContributions={data.total} year={year} onYearChange={(y) => setYear(y as "2026" | "2025")} isFetching={isFetching} />
+        <GithubGraph3D data={data.days} totalContributions={data.total} year={year} onYearChange={(y) => setYear(y as "2026" | "2025")} isFetching={isFetching} isInView={active} />
       </motion.div>
     );
   }

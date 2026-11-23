@@ -548,7 +548,7 @@ export default function GithubGraph3D({
         className="absolute top-0 left-0 z-50 pointer-events-none px-4 py-2 bg-neutral-900/90 text-white text-[13px] font-syne font-medium tracking-wide rounded-xl shadow-xl opacity-0 transition-opacity duration-150 whitespace-nowrap backdrop-blur-md border border-white/10"
         style={{ transform: 'translate3d(0,0,0)', willChange: 'transform, opacity' }}
       ></div>
-      <Canvas camera={{ position: [0, 0, 30], fov: 40 }}>
+      <Canvas frameloop={isInView ? 'always' : 'never'} dpr={[1, 1.5]} camera={{ position: [0, 0, 30], fov: 40 }}>
         <ambientLight intensity={0.6} />
         <directionalLight 
           position={[20, 20, 20]} 
@@ -586,6 +586,8 @@ export default function GithubGraph3D({
           ))}
 
           <ContactShadows 
+            frames={1}
+            resolution={256}
             position={[0, -5, -1]} 
             opacity={0.6} 
             scale={70} 
@@ -599,9 +601,11 @@ export default function GithubGraph3D({
         <Environment preset="city" />
       </Canvas>
 
-      <div className="absolute top-8 left-10 pointer-events-none">
+      {/* Phones: title top-left with the year toggle stacked beneath it (side by
+          side they overlapped below ~500px). md+: original corner placement. */}
+      <div className="absolute top-6 left-6 md:top-8 md:left-10 pointer-events-none">
         <div className="flex flex-col gap-1">
-          <h3 className="font-researcher uppercase text-xl md:text-2xl font-black text-[#1a1612] flex items-center gap-4 tracking-[0.15em]">
+          <h3 className="font-researcher uppercase text-lg whitespace-nowrap md:text-2xl font-black text-[#1a1612] flex items-center gap-4 tracking-[0.15em]">
             <span>GITHUB <span className="text-[#40c463]">ACTIVITY</span></span>
             {isFetching && <Loader2 className="w-5 h-5 animate-spin text-[#40c463]" />}
           </h3>
@@ -616,11 +620,11 @@ export default function GithubGraph3D({
         </div>
       )}
 
-      <div className="absolute top-6 right-8 z-10 flex gap-2 p-1.5 bg-white/40 backdrop-blur-md rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/60">
+      <div className="absolute left-6 top-[4.5rem] z-10 flex gap-2 p-1.5 md:left-auto md:right-8 md:top-6 bg-white/40 backdrop-blur-md rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/60">
         <Magnetic strength={0.2}>
           <button
             onClick={() => onYearChange?.("2025")}
-            className={`px-5 py-2 rounded-full text-[13px] font-black font-syne tracking-wide uppercase transition-all duration-300 ${year === "2025" ? "bg-[#ff8a3d] text-white shadow-md scale-100" : "text-neutral-600 hover:text-neutral-900 hover:bg-white/50 scale-95"}`}
+            className={`min-h-11 md:min-h-0 px-5 py-2 rounded-full text-[13px] font-black font-syne tracking-wide uppercase transition-all duration-300 ${year === "2025" ? "bg-[#ff8a3d] text-white shadow-md scale-100" : "text-neutral-600 hover:text-neutral-900 hover:bg-white/50 scale-95"}`}
           >
             2025
           </button>
@@ -628,7 +632,7 @@ export default function GithubGraph3D({
         <Magnetic strength={0.2}>
           <button
             onClick={() => onYearChange?.("2026")}
-            className={`px-5 py-2 rounded-full text-[13px] font-black font-syne tracking-wide uppercase transition-all duration-300 ${year === "2026" ? "bg-[#ff8a3d] text-white shadow-md scale-100" : "text-neutral-600 hover:text-neutral-900 hover:bg-white/50 scale-95"}`}
+            className={`min-h-11 md:min-h-0 px-5 py-2 rounded-full text-[13px] font-black font-syne tracking-wide uppercase transition-all duration-300 ${year === "2026" ? "bg-[#ff8a3d] text-white shadow-md scale-100" : "text-neutral-600 hover:text-neutral-900 hover:bg-white/50 scale-95"}`}
           >
             2026
           </button>

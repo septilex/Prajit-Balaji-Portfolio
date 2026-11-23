@@ -5,6 +5,11 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @variant light (&:where(.light, .light *));

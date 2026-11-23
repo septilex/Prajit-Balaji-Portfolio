@@ -40,7 +40,7 @@ function ParallaxText({
           animationPlayState: playing ? "running" : "paused",
         }}
       >
-        {[...Array(4)].map((_, i) => (
+        {[...Array(2)].map((_, i) => (
           <span
             key={i}
             className="block px-8"

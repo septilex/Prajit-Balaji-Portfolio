@@ -22,7 +22,9 @@ const STATS: Stat[] = [
 export function StatsCard() {
   return (
     <motion.div
-      className="relative flex flex-col sm:flex-row items-stretch gap-0 overflow-hidden rounded-2xl"
+      // Phones (< 768px): full content width, stats in three equal columns,
+      // résumé below. From 768px: the original single inline row.
+      className="relative flex w-full max-w-[26rem] flex-col items-stretch gap-0 overflow-hidden rounded-2xl md:w-auto md:max-w-none md:flex-row"
       style={{
         // Liquid glass: translucent so the grid shows through, saturated
         // backdrop for that refractive richness.
@@ -52,39 +54,38 @@ export function StatsCard() {
         }}
       />
 
-      {/* Stats block */}
-      <div className="relative z-10 flex divide-x divide-white/40">
+      {/* Stats block. On phones the labels may wrap onto two lines (11px,
+          AA-contrast ink) instead of forcing a ~500px no-wrap row that pushed
+          "Curiosity" out of the card. md+ keeps the original 8.5px row. */}
+      <div className="relative z-10 grid grid-cols-3 divide-x divide-white/40 md:flex">
         {STATS.map((stat) => (
           <div
             key={stat.label}
-            className="flex flex-col items-center justify-center gap-1 px-5 py-4 sm:py-5"
+            className="flex min-w-0 flex-col items-center justify-start gap-1.5 px-2 py-3 text-center md:justify-center md:gap-1 md:px-5 md:py-5"
           >
             <span
-              className="font-montserrat text-2xl font-black leading-none tracking-tight"
+              className="font-montserrat text-xl font-black leading-none tracking-tight md:text-2xl"
               style={{ color: stat.accent ? "#ff8a3d" : "#1a1612" }}
             >
               {stat.value}
             </span>
-            <span
-              className="font-researcher text-[8.5px] font-bold uppercase tracking-[0.22em] whitespace-nowrap"
-              style={{ color: "rgba(58,50,43,0.45)" }}
-            >
+            <span className="font-researcher text-[11px] font-bold uppercase leading-[1.3] tracking-[0.12em] text-[rgba(58,50,43,0.72)] md:whitespace-nowrap md:text-[8.5px] md:leading-normal md:tracking-[0.22em] md:text-[rgba(58,50,43,0.45)]">
               {stat.label}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Divider (vertical on sm+, horizontal on mobile) */}
-      <div className="relative z-10 hidden sm:block w-px bg-white/40" />
-      <div className="relative z-10 block sm:hidden h-px bg-white/40" />
+      {/* Divider (vertical on md+, horizontal on phones) */}
+      <div className="relative z-10 hidden md:block w-px bg-white/40" />
+      <div className="relative z-10 block md:hidden h-px bg-white/40" />
 
       {/* Resume CTA */}
       <a
         href="/Prajit_Balaji_Resume.pdf"
         download="Prajit_Balaji_Resume.pdf"
         aria-label="Download my resume"
-        className="glass-corner-btn group relative z-10 flex items-center justify-center gap-2.5 px-6 py-4 sm:py-5"
+        className="glass-corner-btn group relative z-10 flex items-center justify-center gap-2.5 px-6 py-3 md:py-5"
         style={{
           textDecoration: "none",
           minWidth: "9rem",

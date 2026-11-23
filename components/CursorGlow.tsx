@@ -1,20 +1,29 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useSyncExternalStore } from "react";
+
+// The glow only exists to follow a mouse. On touch screens it used to render
+// anyway — a fixed 400px layer parked in the top-left corner — so it is now
+// rendered only while the primary pointer is fine (mouse / trackpad).
+const FINE_POINTER = "(pointer: fine)";
+function subscribeFinePointer(onChange: () => void) {
+  const mq = window.matchMedia(FINE_POINTER);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+const getFinePointer = () => window.matchMedia(FINE_POINTER).matches;
+const getServerFinePointer = () => false;
 
 export function CursorGlow() {
   const glowRef = useRef<HTMLDivElement>(null);
   const mouse = useRef({ x: 0, y: 0 });
-  const current = useRef({ x: 0, y: 0 });
+  const finePointer = useSyncExternalStore(subscribeFinePointer, getFinePointer, getServerFinePointer);
 
   useEffect(() => {
-    // Skip entirely on touch devices
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (!finePointer) return;
 
     mouse.current.x = window.innerWidth / 2;
     mouse.current.y = window.innerHeight / 2;
-    current.current.x = mouse.current.x;
-    current.current.y = mouse.current.y;
 
     let rafId: number | null = null;
 
@@ -38,7 +47,9 @@ export function CursorGlow() {
       window.removeEventListener("mousemove", handleMouseMove);
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [finePointer]);
+
+  if (!finePointer) return null;
 
   return (
     <div
